@@ -10,9 +10,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ProjectPlanner
 TEMPLATE = app
-
+CONFIG += c++11
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+    gui/mainwindow.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += \
+    gui/mainwindow.h

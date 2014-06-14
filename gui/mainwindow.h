@@ -18,25 +18,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "gui/mainwindow.h"
-#include <QApplication>
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
 
 /*************************************************************************************************/
-// ProjectPlanner by Richard Crook
-// Aims to be a project planner similar to M$Project with table entry of tasks & gantt chart
-// Also aims to have automatic resource levelling and scheduling based on task priority
-// Also aims to have resource levels variable within single task
-// Also aims to have gantt chart task bar thickness showing this variable resource usage
-// Based on work I started as early as 2005
-// IDEA - Resourcing tasks can use special pseudo-resource 'All' & Organisations/Groups/Types
-// Progress 2014-06-10 started again using Qt 5.3 + QtCreator 3
+/********************* Main application window showing tabbed main screens ***********************/
 /*************************************************************************************************/
 
-int main( int argc, char* argv[] )
+class MainWindow : public QMainWindow
 {
-    QApplication app( argc, argv );
-    MainWindow win;
-    win.show();
+  Q_OBJECT
+public:
+  MainWindow( QWidget* parent = nullptr );         // constructor
 
-    return app.exec();
-}
+};
+
+#endif // MAINWINDOW_H
