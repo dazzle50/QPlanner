@@ -23,16 +23,27 @@
 
 #include <QMainWindow>
 
+class QUndoView;
+
 /*************************************************************************************************/
 /********************* Main application window showing tabbed main screens ***********************/
 /*************************************************************************************************/
+
+namespace Ui { class MainWindow; }
 
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
 public:
-  MainWindow( QWidget* parent = nullptr );         // constructor
+  explicit MainWindow( QWidget* parent = nullptr );         // constructor
 
+  void setModels();                            // set models for views & undostack
+
+private:
+  Ui::MainWindow*         ui;                  // user interface created using qt designer
+  QUndoView*              m_undoview;          // window to display contents of undostack
+  //MainTabWidget*          m_tabs;              // tabs for mainwindow central widget
+  //QList<QPointer<MainTabWidget>>  m_windows;   // list of other tabWidgets
 };
 
 #endif // MAINWINDOW_H

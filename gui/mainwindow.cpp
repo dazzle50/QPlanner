@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 
 /*************************************************************************************************/
 /********************* Main application window showing tabbed main screens ***********************/
@@ -26,8 +27,34 @@
 
 /****************************************** constructor ******************************************/
 
-MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent )
+MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent ), ui( new Ui::MainWindow )
 {
+  // initialise private variables
+  m_undoview = nullptr;
+  //m_tabs     = new MainTabWidget();
 
+  // setup ui for main window including central widget of tabs
+  ui->setupUi( this );
+  //setCentralWidget( m_tabs );
+  resize( 900, 450 );
+
+  // ensure plan tab and is kept up-to-date when plan signals changes
+  //connect( plan, SIGNAL(signalPlanUpdated()), m_tabs, SLOT(slotUpdatePlanTab()),
+  //         Qt::UniqueConnection );
+
+  // ensure menus and plan tab are kept up-to-date when current tab changes
+  //slotTabChange( m_tabs->currentIndex() );
+  //connect( m_tabs, SIGNAL(currentChanged(int)), this, SLOT(slotTabChange(int)),
+  //         Qt::UniqueConnection );
+
+  // update edit menu with undostack undo & redo actions
+  setModels();
 }
 
+/******************************************* setModels *******************************************/
+
+void MainWindow::setModels()
+{
+  // set undostack for edit menu undo/redo
+
+}

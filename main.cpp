@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "gui/mainwindow.h"
+
 #include <QApplication>
 
 /*************************************************************************************************/
@@ -34,9 +35,11 @@
 
 int main( int argc, char* argv[] )
 {
-    QApplication app( argc, argv );
-    MainWindow win;
-    win.show();
+  // control and provides info to all Qt applications
+  QApplication app( argc, argv );
 
-    return app.exec();
+  // create application main window & enter main event loop
+  MainWindow window;
+  window.show();
+  return app.exec();
 }
