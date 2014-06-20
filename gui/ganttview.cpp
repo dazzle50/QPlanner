@@ -18,34 +18,15 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
-#include <QMainWindow>
-#include <QPointer>
-
-class QUndoView;
-class MainTabWidget;
+#include "ganttview.h"
 
 /*************************************************************************************************/
-/********************* Main application window showing tabbed main screens ***********************/
+/**************************** GanttView shows tasks in a gantt format ****************************/
 /*************************************************************************************************/
 
-namespace Ui { class MainWindow; }
+/****************************************** constructor ******************************************/
 
-class MainWindow : public QMainWindow
+GanttView::GanttView( QWidget* parent ) : QScrollArea( parent )
 {
-  Q_OBJECT
-public:
-  explicit MainWindow( QWidget* parent = nullptr );         // constructor
-
-  void setModels();                            // set models for views & undostack
-
-private:
-  Ui::MainWindow*         ui;                  // user interface created using qt designer
-  QUndoView*              m_undoview;          // window to display contents of undostack
-  MainTabWidget*          m_tabs;              // tabs for mainwindow central widget
-  QList<QPointer<MainTabWidget>>  m_windows;   // list of other tabWidgets
-};
-
-#endif // MAINWINDOW_H
+  // set defaults
+}

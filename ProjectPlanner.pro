@@ -13,10 +13,18 @@ TEMPLATE = app
 CONFIG += c++11
 
 SOURCES += main.cpp\
-    gui/mainwindow.cpp
+    gui/mainwindow.cpp \
+    gui/maintabwidget.cpp \
+    gui/ganttview.cpp \
+    gui/xtableview.cpp
 
 HEADERS  += \
-    gui/mainwindow.h
+    gui/mainwindow.h \
+    gui/maintabwidget.h \
+    gui/ganttview.h \
+    gui/xtableview.h \
+    gui/propertieswidget.h
 
 FORMS += \
-    gui/mainwindow.ui
+    gui/mainwindow.ui \
+    gui/maintabwidget.ui

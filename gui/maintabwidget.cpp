@@ -18,34 +18,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
-#include <QMainWindow>
-#include <QPointer>
-
-class QUndoView;
-class MainTabWidget;
+#include "maintabwidget.h"
+#include "ui_maintabwidget.h"
 
 /*************************************************************************************************/
-/********************* Main application window showing tabbed main screens ***********************/
+/***************************** Tabbed widget containing main screens *****************************/
 /*************************************************************************************************/
 
-namespace Ui { class MainWindow; }
+/****************************************** constructor ******************************************/
 
-class MainWindow : public QMainWindow
+MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new Ui::MainTabWidget )
 {
-  Q_OBJECT
-public:
-  explicit MainWindow( QWidget* parent = nullptr );         // constructor
+  // setup palette & ui for main tab widget
+  QPalette  pal = palette();
+  pal.setBrush( QPalette::Inactive, QPalette::Highlight, QColor("#E0E0E0") );
+  setPalette( pal );
+  ui->setupUi( this );
 
-  void setModels();                            // set models for views & undostack
+}
 
-private:
-  Ui::MainWindow*         ui;                  // user interface created using qt designer
-  QUndoView*              m_undoview;          // window to display contents of undostack
-  MainTabWidget*          m_tabs;              // tabs for mainwindow central widget
-  QList<QPointer<MainTabWidget>>  m_windows;   // list of other tabWidgets
-};
+/****************************************** destructor *******************************************/
 
-#endif // MAINWINDOW_H
+MainTabWidget::~MainTabWidget()
+{
+  // free up memory used by the ui
+  delete ui;
+}

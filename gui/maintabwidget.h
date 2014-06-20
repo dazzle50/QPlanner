@@ -18,34 +18,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINTABWIDGET_H
+#define MAINTABWIDGET_H
 
-#include <QMainWindow>
-#include <QPointer>
-
-class QUndoView;
-class MainTabWidget;
+#include <QTabWidget>
 
 /*************************************************************************************************/
-/********************* Main application window showing tabbed main screens ***********************/
+/***************************** Tabbed widget containing main screens *****************************/
 /*************************************************************************************************/
 
-namespace Ui { class MainWindow; }
+namespace Ui { class MainTabWidget; }
 
-class MainWindow : public QMainWindow
+class MainTabWidget : public QTabWidget
 {
   Q_OBJECT
 public:
-  explicit MainWindow( QWidget* parent = nullptr );         // constructor
-
-  void setModels();                            // set models for views & undostack
+  explicit MainTabWidget( QWidget* parent = nullptr );          // constructor
+  ~MainTabWidget();                                             // destructor
 
 private:
-  Ui::MainWindow*         ui;                  // user interface created using qt designer
-  QUndoView*              m_undoview;          // window to display contents of undostack
-  MainTabWidget*          m_tabs;              // tabs for mainwindow central widget
-  QList<QPointer<MainTabWidget>>  m_windows;   // list of other tabWidgets
+  Ui::MainTabWidget*   ui;           // user interface created using qt designer
 };
 
-#endif // MAINWINDOW_H
+#endif // MAINTABWIDGET_H

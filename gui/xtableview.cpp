@@ -18,34 +18,58 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "xtableview.h"
 
-#include <QMainWindow>
-#include <QPointer>
-
-class QUndoView;
-class MainTabWidget;
+#include <QHeaderView>
 
 /*************************************************************************************************/
-/********************* Main application window showing tabbed main screens ***********************/
+/*************************** XTableView provides an enhanced QTableView **************************/
 /*************************************************************************************************/
 
-namespace Ui { class MainWindow; }
-
-class MainWindow : public QMainWindow
+class XTableHeader : public QHeaderView
 {
-  Q_OBJECT
-public:
-  explicit MainWindow( QWidget* parent = nullptr );         // constructor
+  public:
+    XTableHeader( QWidget* parent ) : QHeaderView( Qt::Horizontal, parent )
+    { customHeight = 0; }
 
-  void setModels();                            // set models for views & undostack
+    QSize sizeHint() const
+    {
+      QSize rs = QHeaderView::sizeHint();
+      if ( customHeight > 0 ) rs.setHeight( customHeight );
+      return rs;
+    }
 
-private:
-  Ui::MainWindow*         ui;                  // user interface created using qt designer
-  QUndoView*              m_undoview;          // window to display contents of undostack
-  MainTabWidget*          m_tabs;              // tabs for mainwindow central widget
-  QList<QPointer<MainTabWidget>>  m_windows;   // list of other tabWidgets
+    int customHeight;
 };
 
-#endif // MAINWINDOW_H
+/****************************************** constuctor *******************************************/
+
+XTableView::XTableView( QWidget* parent ) : QTableView( parent )
+{
+  // set horizontal header to enable having controllable height
+  setHorizontalHeader( new XTableHeader( this ) );
+  horizontalHeader()->setSectionsClickable( true );
+  horizontalHeader()->setHighlightSections( true );
+
+  // set smaller row height for table views
+  int height = fontMetrics().lineSpacing() + 4;
+  verticalHeader()->setDefaultSectionSize( height );
+  verticalHeader()->setMinimumSectionSize( height );
+}
+
+/**************************************** setHeaderHeight ****************************************/
+
+void   XTableView::setHeaderHeight( int height )
+{
+  // set horizontal header height
+  (dynamic_cast<XTableHeader*>(horizontalHeader()))->customHeight = height;
+}
+
+/******************************************** endEdit ********************************************/
+
+void  XTableView::endEdit()
+{
+  // if any editting in progress, commits the update to the model
+  QModelIndex index = currentIndex();
+  currentChanged( index, index );
+}

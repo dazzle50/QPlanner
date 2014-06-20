@@ -20,6 +20,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "maintabwidget.h"
 
 /*************************************************************************************************/
 /********************* Main application window showing tabbed main screens ***********************/
@@ -31,11 +32,11 @@ MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent ), ui( new Ui::M
 {
   // initialise private variables
   m_undoview = nullptr;
-  //m_tabs     = new MainTabWidget();
+  m_tabs     = new MainTabWidget();
 
   // setup ui for main window including central widget of tabs
   ui->setupUi( this );
-  //setCentralWidget( m_tabs );
+  setCentralWidget( m_tabs );
   resize( 900, 450 );
 
   // ensure plan tab and is kept up-to-date when plan signals changes

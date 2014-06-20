@@ -18,34 +18,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef PROPERTIESWIDGET_H
+#define PROPERTIESWIDGET_H
 
-#include <QMainWindow>
-#include <QPointer>
-
-class QUndoView;
-class MainTabWidget;
+#include <QWidget>
 
 /*************************************************************************************************/
-/********************* Main application window showing tabbed main screens ***********************/
+/************************ Special widget that gives extra wide sizeHint() ************************/
 /*************************************************************************************************/
 
-namespace Ui { class MainWindow; }
-
-class MainWindow : public QMainWindow
+class PropertiesWidget : public QWidget
 {
-  Q_OBJECT
 public:
-  explicit MainWindow( QWidget* parent = nullptr );         // constructor
-
-  void setModels();                            // set models for views & undostack
-
-private:
-  Ui::MainWindow*         ui;                  // user interface created using qt designer
-  QUndoView*              m_undoview;          // window to display contents of undostack
-  MainTabWidget*          m_tabs;              // tabs for mainwindow central widget
-  QList<QPointer<MainTabWidget>>  m_windows;   // list of other tabWidgets
+  QSize	   sizeHint() const     // implement sizeHint to give extra width
+             { QSize size = QWidget::sizeHint();
+               size.setWidth( size.width() * 1.6 );
+               return size; }
 };
 
-#endif // MAINWINDOW_H
+#endif // PROPERTIESWIDGET_H

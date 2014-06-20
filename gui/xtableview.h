@@ -18,34 +18,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef XTABLEVIEW_H
+#define XTABLEVIEW_H
 
-#include <QMainWindow>
-#include <QPointer>
-
-class QUndoView;
-class MainTabWidget;
+#include <QTableView>
 
 /*************************************************************************************************/
-/********************* Main application window showing tabbed main screens ***********************/
+/*************************** XTableView provides an enhanced QTableView **************************/
 /*************************************************************************************************/
 
-namespace Ui { class MainWindow; }
-
-class MainWindow : public QMainWindow
+class XTableView : public QTableView
 {
-  Q_OBJECT
 public:
-  explicit MainWindow( QWidget* parent = nullptr );         // constructor
+  XTableView( QWidget* );                            // constructor
 
-  void setModels();                            // set models for views & undostack
-
-private:
-  Ui::MainWindow*         ui;                  // user interface created using qt designer
-  QUndoView*              m_undoview;          // window to display contents of undostack
-  MainTabWidget*          m_tabs;              // tabs for mainwindow central widget
-  QList<QPointer<MainTabWidget>>  m_windows;   // list of other tabWidgets
+  void             endEdit();                        // cancel any ongoing edit in table
+  void             setHeaderHeight( int );           // set horizontal header height
 };
 
-#endif // MAINWINDOW_H
+#endif // XTABLEVIEW_H
