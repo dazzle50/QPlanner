@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QFileDialog>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "maintabwidget.h"
@@ -57,5 +59,172 @@ MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent ), ui( new Ui::M
 void MainWindow::setModels()
 {
   // set undostack for edit menu undo/redo
+
+}
+
+/******************************************* message *********************************************/
+
+void MainWindow::message( QString msg )
+{
+  // raise other windows
+  foreach( MainTabWidget* tabs, m_windows )
+    if (tabs) tabs->raise();
+
+  // show message on status bar and enure is top & active
+  raise();
+  activateWindow();
+  ui->statusBar->showMessage( msg );
+}
+
+/******************************************* slotIndent ******************************************/
+
+void MainWindow::slotIndent()
+{
+  // indent task(s) - determine unique rows selected
+
+}
+
+/****************************************** slotOutdent ******************************************/
+
+void MainWindow::slotOutdent()
+{
+  // outdent task(s) - determine unique rows selected
+
+}
+
+/****************************************** slotFileNew ******************************************/
+
+void MainWindow::slotFileNew()
+{
+  // slot for file new plan action
+
+  qDebug("MainWindow::slotFileNew() - TODO !!!!");
+}
+
+/****************************************** slotFileOpen *****************************************/
+
+bool MainWindow::slotFileOpen()
+{
+  // slot for file open plan action - get user to select filename and location
+  m_tabs->endEdits();
+  QString filename = QFileDialog::getOpenFileName();
+  if ( filename.isEmpty() )
+  {
+    message();
+    return false;
+  }
+
+  return false; // loadPlan( filename );
+}
+
+/****************************************** slotFileSave *****************************************/
+
+bool MainWindow::slotFileSave()
+{
+  // slot for file save plan action - if plan has filename, save to same file and location
+  m_tabs->endEdits();
+
+}
+
+/***************************************** slotFileSaveAs ****************************************/
+
+bool MainWindow::slotFileSaveAs()
+{
+  // slot for file saveAs plan action - get user to select filename and location
+  m_tabs->endEdits();
+
+}
+
+/***************************************** slotFilePrint *****************************************/
+
+void MainWindow::slotFilePrint()
+{
+  // slot for file saveAs plan action
+  m_tabs->endEdits();
+  qDebug("MainWindow::slotFilePrint() - TODO !!!!");
+}
+
+/************************************** slotFilePrintPreview *************************************/
+
+void MainWindow::slotFilePrintPreview()
+{
+  // slot for file saveAs plan action
+  m_tabs->endEdits();
+  qDebug("MainWindow::slotFilePrintPreview() - TODO !!!!");
+}
+
+/****************************************** slotFileExit *****************************************/
+
+void MainWindow::slotFileExit()
+{
+  // slot for file saveAs plan action
+  m_tabs->endEdits();
+  qDebug("MainWindow::slotFileExit() - TODO !!!!");
+}
+
+/*************************************** slotAboutQPlanner ***************************************/
+
+void MainWindow::slotAboutQPlanner()
+{
+  // slot for file saveAs plan action
+  m_tabs->endEdits();
+  qDebug("MainWindow::slotAboutQPlanner() - TODO !!!!");
+}
+
+/**************************************** slotSchedulePlan ***************************************/
+
+void MainWindow::slotSchedulePlan()
+{
+  // get plan to reschedule all the tasks
+  m_tabs->endEdits();
+  //plan->schedule();
+}
+
+/*************************************** slotStretchTasks ****************************************/
+
+void MainWindow::slotStretchTasks( bool checked )
+{
+  // if stretch tasks flag is changed, trigger redraw of gantt
+  m_tabs->endEdits();
+
+}
+
+/***************************************** slotNewWindow *****************************************/
+
+void MainWindow::slotNewWindow()
+{
+  // open new window
+  MainTabWidget*  tabWidget = new MainTabWidget();
+  tabWidget->setAttribute( Qt::WA_QuitOnClose, false );
+  tabWidget->setAttribute( Qt::WA_DeleteOnClose, true );
+  //tabWidget->removePlanTab();
+  tabWidget->setWindowTitle( windowTitle() );
+  tabWidget->show();
+  m_windows.append( tabWidget );
+}
+
+/*************************************** slotViewUndoStack ***************************************/
+
+void MainWindow::slotUndoStackView( bool checked )
+{
+  // show undo stack view window if checked, otherwise hide
+  m_tabs->endEdits();
+
+}
+
+/*********************************** slotUndoStackViewDestroyed **********************************/
+
+void MainWindow::slotUndoStackViewDestroyed()
+{
+  // undo stack view window closed and destroyed so reset pointer and uncheck action
+  m_undoview = nullptr;
+  ui->actionUndoStackView->setChecked( false );
+}
+
+/***************************************** slotTabChange *****************************************/
+
+void MainWindow::slotTabChange( int index )
+{
+  // check if switched to tasks/gantt tab, enable its menu & actions, otherwise hide them
 
 }

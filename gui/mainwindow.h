@@ -40,6 +40,26 @@ public:
   explicit MainWindow( QWidget* parent = nullptr );         // constructor
 
   void setModels();                            // set models for views & undostack
+  void message( QString = "" );                // show message on status bar and enure is top & active
+
+public slots:
+  void slotUndoStackView( bool );              // slot for actionUndoStackView triggered signal
+  void slotUndoStackViewDestroyed();           // slot for undo stack view destroyed signal
+  void slotTabChange( int );                   // slot for mainTabWidget current changed signal
+  void slotSchedulePlan();                     // slot for schedule plan action
+  void slotIndent();                           // slot for indent task(s) action
+  void slotOutdent();                          // slot for outdent task(s) action
+  void slotStretchTasks( bool );               // slot for stretch tasks action
+  void slotNewWindow();                        // slot for new window action
+
+  void slotFileNew();                          // slot for file new plan action
+  bool slotFileOpen();                         // slot for file open plan action
+  bool slotFileSave();                         // slot for file save plan action
+  bool slotFileSaveAs();                       // slot for file saveAs plan action
+  void slotFilePrint();                        // slot for file print action
+  void slotFilePrintPreview();                 // slot for file print preview action
+  void slotFileExit();                         // slot for file exit application action
+  void slotAboutQPlanner();                    // slot for about qplanner action
 
 private:
   Ui::MainWindow*         ui;                  // user interface created using qt designer

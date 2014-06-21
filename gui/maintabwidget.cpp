@@ -44,3 +44,14 @@ MainTabWidget::~MainTabWidget()
   // free up memory used by the ui
   delete ui;
 }
+
+/****************************************** endEdits *********************************************/
+
+void MainTabWidget::endEdits()
+{
+  // end any task/resource/calendar/day edits in progress
+  //ui->tasksView->endEdit();
+  //ui->resourcesView->endEdit();
+  //ui->calendarsView->endEdit();
+  //ui->daysView->endEdit();
+}

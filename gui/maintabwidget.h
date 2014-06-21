@@ -36,6 +36,8 @@ public:
   explicit MainTabWidget( QWidget* parent = nullptr );          // constructor
   ~MainTabWidget();                                             // destructor
 
+  void  endEdits();                  // end any task/resource/calendar/day edits in progress
+
 private:
   Ui::MainTabWidget*   ui;           // user interface created using qt designer
 };
