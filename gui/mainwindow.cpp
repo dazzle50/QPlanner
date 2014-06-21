@@ -19,10 +19,13 @@
  ***************************************************************************/
 
 #include <QFileDialog>
+#include <QUndoView>
+#include <QUndoStack>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "maintabwidget.h"
+#include "model/plan.h"
 
 /*************************************************************************************************/
 /********************* Main application window showing tabbed main screens ***********************/
@@ -59,6 +62,21 @@ MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent ), ui( new Ui::M
 void MainWindow::setModels()
 {
   // set undostack for edit menu undo/redo
+  QAction* undoAction = plan->undostack()->createUndoAction( this );
+  undoAction->setShortcut( QKeySequence::Undo );
+  undoAction->setStatusTip( "Undo the last operation" );
+  ui->menuEdit->insertAction( ui->actionUndo, undoAction );
+  QAction* redoAction = plan->undostack()->createRedoAction( this );
+  redoAction->setShortcut( QKeySequence::Redo );
+  redoAction->setStatusTip( "Redo the last operation" );
+  ui->menuEdit->insertAction( ui->actionUndo, redoAction );
+  ui->menuEdit->removeAction( ui->actionUndo );
+  ui->menuEdit->removeAction( ui->actionRedo );
+  ui->actionUndo = undoAction;
+  ui->actionRedo = redoAction;
+
+  // set undostack for undoview
+  if ( m_undoview != nullptr ) m_undoview->setStack( plan->undostack() );
 
 }
 

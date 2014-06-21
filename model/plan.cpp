@@ -18,35 +18,56 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "gui/mainwindow.h"
-#include "model/plan.h"
+#include "plan.h"
 
-#include <QApplication>
+#include <QUndoStack>
+#include <QXmlStreamWriter>
+#include <QFileInfo>
 
 /*************************************************************************************************/
-// ProjectPlanner by Richard Crook
-// Aims to be a project planner similar to M$Project with table entry of tasks & gantt chart
-// Also aims to have automatic resource levelling and scheduling based on task priority
-// Also aims to have resource levels variable within single task
-// Also aims to have gantt chart task bar thickness showing this variable resource usage
-// Based on work I started as early as 2005
-// IDEA - Resourcing tasks can use special pseudo-resource 'All' & Organisations/Groups/Types
-// Progress 2014-06-10 started again using Qt 5.3 + QtCreator 3
+/************************** Holds the complete data model for the plan ***************************/
 /*************************************************************************************************/
 
-Plan*        plan;    // global variable
+/****************************************** constructor ******************************************/
 
-int main( int argc, char* argv[] )
+Plan::Plan()
 {
-  // control and provides info to all Qt applications
-  QApplication app( argc, argv );
+  // create blank models and set private variables
+  //m_days       = new DaysModel();
+  //m_calendars  = new CalendarsModel();
+  //m_resources  = new ResourcesModel();
+  //m_tasks      = new TasksModel();
+  m_undostack  = new QUndoStack();
 
-  // create complete data model for the plan
-  plan = new Plan();
-  plan->initialise();
-
-  // create application main window & enter main event loop
-  MainWindow window;
-  window.show();
-  return app.exec();
+  //m_datetime_format = "ddd dd/MM/yyyy hh:mm:ss";
+  //m_calendar        = nullptr;
+  //stretchTasks      = true;
 }
+
+/****************************************** destructor *******************************************/
+
+Plan::~Plan()
+{
+  // delete models and undostack
+  //delete m_tasks;
+  //delete m_resources;
+  //delete m_calendars;
+  //delete m_days;
+  delete m_undostack;
+}
+
+/****************************************** initialise *******************************************/
+
+void  Plan::initialise()
+{
+  // initialise the models
+  //m_days->initialise();
+  //m_calendars->initialise();
+
+  //m_calendar = calendar( Calendar::DEFAULT_CALENDAR );
+  //m_start    = m_calendar->workUp( QDateTime( QDate::currentDate(), QTime(0,0,0) ) );
+
+  //m_resources->initialise();
+  //m_tasks->initialise();
+}
+

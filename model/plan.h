@@ -18,35 +18,43 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "gui/mainwindow.h"
-#include "model/plan.h"
+#ifndef PLAN_H
+#define PLAN_H
 
-#include <QApplication>
+#include <QString>
+#include <QDateTime>
+#include <QColor>
+
+class TasksModel;
+class ResourcesModel;
+class CalendarsModel;
+class DaysModel;
+class QUndoStack;
+
+class Task;
+class Resource;
+class Calendar;
+class Day;
 
 /*************************************************************************************************/
-// ProjectPlanner by Richard Crook
-// Aims to be a project planner similar to M$Project with table entry of tasks & gantt chart
-// Also aims to have automatic resource levelling and scheduling based on task priority
-// Also aims to have resource levels variable within single task
-// Also aims to have gantt chart task bar thickness showing this variable resource usage
-// Based on work I started as early as 2005
-// IDEA - Resourcing tasks can use special pseudo-resource 'All' & Organisations/Groups/Types
-// Progress 2014-06-10 started again using Qt 5.3 + QtCreator 3
+/************************** Holds the complete data model for the plan ***************************/
 /*************************************************************************************************/
 
-Plan*        plan;    // global variable
-
-int main( int argc, char* argv[] )
+class Plan : public QObject
 {
-  // control and provides info to all Qt applications
-  QApplication app( argc, argv );
+  Q_OBJECT
+public:
+  Plan();                       // constructor
+  ~Plan();                      // destructor
 
-  // create complete data model for the plan
-  plan = new Plan();
-  plan->initialise();
+  void             initialise();                                    // create initial plan default contents
+  QUndoStack*      undostack() { return m_undostack; }              // return undo stack pointer
 
-  // create application main window & enter main event loop
-  MainWindow window;
-  window.show();
-  return app.exec();
-}
+private:
+  QUndoStack*      m_undostack;         // undo stack of plan editing
+
+};
+
+extern Plan*        plan;
+
+#endif // PLAN_H

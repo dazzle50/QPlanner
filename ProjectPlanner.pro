@@ -16,14 +16,16 @@ SOURCES += main.cpp\
     gui/mainwindow.cpp \
     gui/maintabwidget.cpp \
     gui/ganttview.cpp \
-    gui/xtableview.cpp
+    gui/xtableview.cpp \
+    model/plan.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
     gui/maintabwidget.h \
     gui/ganttview.h \
     gui/xtableview.h \
-    gui/propertieswidget.h
+    gui/propertieswidget.h \
+    model/plan.h
 
 FORMS += \
     gui/mainwindow.ui \
