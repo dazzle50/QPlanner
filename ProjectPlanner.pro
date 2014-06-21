@@ -17,7 +17,10 @@ SOURCES += main.cpp\
     gui/maintabwidget.cpp \
     gui/ganttview.cpp \
     gui/xtableview.cpp \
-    model/plan.cpp
+    model/plan.cpp \
+    model/day.cpp \
+    model/daysmodel.cpp \
+    model/datetime.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -25,7 +28,10 @@ HEADERS  += \
     gui/ganttview.h \
     gui/xtableview.h \
     gui/propertieswidget.h \
-    model/plan.h
+    model/plan.h \
+    model/day.h \
+    model/daysmodel.h \
+    model/datetime.h
 
 FORMS += \
     gui/mainwindow.ui \

@@ -142,6 +142,7 @@ bool MainWindow::slotFileSave()
   // slot for file save plan action - if plan has filename, save to same file and location
   m_tabs->endEdits();
 
+  return false;
 }
 
 /***************************************** slotFileSaveAs ****************************************/
@@ -151,6 +152,7 @@ bool MainWindow::slotFileSaveAs()
   // slot for file saveAs plan action - get user to select filename and location
   m_tabs->endEdits();
 
+  return false;
 }
 
 /***************************************** slotFilePrint *****************************************/
