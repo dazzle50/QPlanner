@@ -20,3 +20,34 @@
 
 #include "datetime.h"
 
+#include <QString>
+
+/*************************************************************************************************/
+/********************** XTime provides static methods to support Time type ***********************/
+/*************************************************************************************************/
+
+/********************************************* time **********************************************/
+
+Time XTime::time( int hours, int mins )
+{
+  // return qint16 Time hours & minutes
+  Q_ASSERT( hours >= 0 );
+  Q_ASSERT( hours <= 24 );
+  Q_ASSERT( mins >= 0 );
+  Q_ASSERT( mins <= 59 );
+  Q_ASSERT( hours < 24 || mins == 0 );
+  return hours*60 + mins;
+}
+
+/******************************************* toString ********************************************/
+
+QString XTime::toString( Time t )
+{
+  // return HH:MM string from Time
+  if ( t == XTime::NULL_TIME ) return QString( "Null" );
+
+  Q_ASSERT( t >= 0 );
+  Q_ASSERT( t <= 24*60 );
+  return QString( "%1:%2" ).arg( t/60, 2, 10, QLatin1Char('0') )
+                           .arg( t%60, 2, 10, QLatin1Char('0') );
+}

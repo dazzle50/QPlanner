@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "day.h"
+#include "plan.h"
 
 /*************************************************************************************************/
 /**************************** Single day type used in plan calendars *****************************/
@@ -106,4 +107,65 @@ void Day::calcMinutes()
   m_minutes = 0;
   for( int p=0 ; p<m_periods ; p++ )
     m_minutes += m_end[p] - m_start[p];
+}
+
+/********************************************* data **********************************************/
+
+QVariant  Day::data( int column, int role )
+{
+  // if role is EditRole, return appropriate edit value
+  if ( role == Qt::EditRole )
+  {
+    if ( column == SECTION_WORK )   return m_work;
+
+    // for all other columns return the DisplayRole for EditRole
+    role = Qt::DisplayRole;
+  }
+
+  // if role is DisplayRole, return appropriate display value
+  if ( role == Qt::DisplayRole )
+  {
+    if ( column == SECTION_NAME )   return m_name;
+    if ( column == SECTION_WORK )   return QString("%1").arg( m_work, 0, 'f', 2 );
+    if ( column == SECTION_PARTS )  return m_periods;
+
+    if ( column >= m_periods*2+SECTION_START ) return QVariant();
+
+    if ( (column-SECTION_START) % 2 == 0 )
+      return XTime::toString( m_start.at(( column-SECTION_START) / 2 ) );
+    else
+      return XTime::toString( m_end.at( (column-SECTION_END) / 2 ) );
+  }
+
+  // if role is TextAlignmentRole, return appropriate display alignment
+  if ( role == Qt::TextAlignmentRole )
+  {
+    if ( column == SECTION_NAME )   return int( Qt::AlignVCenter | Qt::AlignLeft );
+    return Qt::AlignCenter;
+  }
+
+  // if role is BackgroundRole, return appropriate background colour
+  if ( role == Qt::BackgroundRole )
+  {
+    if ( column >= m_periods*2+SECTION_START ) return plan->nullCellColour();
+    return QVariant();
+  }
+
+  // otherwise return an invalid QVariant
+  return QVariant();
+}
+
+/****************************************** headerData *******************************************/
+
+QVariant  Day::headerData( int section )
+{
+  // return section horizontal header title text
+  if ( section == SECTION_NAME )  return "Name";
+  if ( section == SECTION_WORK )  return "Work";
+  if ( section == SECTION_PARTS ) return "Periods";
+
+  if ( (section-SECTION_START) % 2 == 0 )
+    return QString("Start %1").arg( (section-SECTION_START) / 2 + 1 );
+  else
+    return QString("End %1").arg( (section-SECTION_END) / 2 + 1 );
 }

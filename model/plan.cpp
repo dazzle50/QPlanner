@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "plan.h"
+#include "daysmodel.h"
 
 #include <QUndoStack>
 #include <QXmlStreamWriter>
@@ -33,7 +34,7 @@
 Plan::Plan()
 {
   // create blank models and set private variables
-  //m_days       = new DaysModel();
+  m_days       = new DaysModel();
   //m_calendars  = new CalendarsModel();
   //m_resources  = new ResourcesModel();
   //m_tasks      = new TasksModel();
@@ -52,7 +53,7 @@ Plan::~Plan()
   //delete m_tasks;
   //delete m_resources;
   //delete m_calendars;
-  //delete m_days;
+  delete m_days;
   delete m_undostack;
 }
 
@@ -61,7 +62,7 @@ Plan::~Plan()
 void  Plan::initialise()
 {
   // initialise the models
-  //m_days->initialise();
+  m_days->initialise();
   //m_calendars->initialise();
 
   //m_calendar = calendar( Calendar::DEFAULT_CALENDAR );

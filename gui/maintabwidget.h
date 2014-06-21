@@ -37,6 +37,7 @@ public:
   ~MainTabWidget();                                             // destructor
 
   void  endEdits();                  // end any task/resource/calendar/day edits in progress
+  void  setModels();                 // ensure views are connected to correct models
 
 private:
   Ui::MainTabWidget*   ui;           // user interface created using qt designer

@@ -21,14 +21,39 @@
 #ifndef DAYSMODEL_H
 #define DAYSMODEL_H
 
+#include <QAbstractTableModel>
+
+class Day;
+class QTableView;
+
 /*************************************************************************************************/
 /************************ Table model containing all calendar day types **************************/
 /*************************************************************************************************/
 
-class DaysModel
+class DaysModel : public QAbstractTableModel
 {
+  Q_OBJECT
 public:
-  DaysModel();
+  DaysModel();                                                     // constructor
+  ~DaysModel();                                                    // destructor
+
+  void         initialise();                                       // create initial default contents
+  void         setColumnWidths( QTableView* );                     // set initial column widths
+
+  Day*         day( int n );                                       // return pointer to n'th day type
+  int          index( Day* d ) { return m_days.indexOf(d); }       // return index of day type, or -1
+
+  /********************* methods to support QAbstractTableModel ************************/
+
+  int            rowCount( const QModelIndex& parent = QModelIndex() ) const;     // implement virtual row count
+  int            columnCount( const QModelIndex& parent = QModelIndex() ) const;  // implement virtual column count
+  QVariant       data( const QModelIndex&, int ) const;                           // implement virtual return data
+  bool           setData( const QModelIndex&, const QVariant&, int );             // implement virtual set data
+  QVariant       headerData( int, Qt::Orientation, int ) const;                   // implement virtual header data
+  Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
+
+private:
+  QList<Day*>     m_days;      // list of day types available to calendars
 };
 
 #endif // DAYSMODEL_H

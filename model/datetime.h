@@ -28,14 +28,16 @@ typedef  qint32  Date;       // simple date between 1AD and ~8000AD with one day
 typedef  qint16  Time;       // simple time between 00:00H and 24:00H with one minute resolution
 
 /*************************************************************************************************/
-/******************************** XTime provides an enhanced QTime *******************************/
+/********************** XTime provides static methods to support Time type ***********************/
 /*************************************************************************************************/
 
 class XTime
 {
 public:
-  static Time      time( int h, int m )    // return qint16 Time hours & minutes
-                    { return h*60 + m; }
+  const static Time   NULL_TIME = -1;        // Time value that represents null
+
+  static Time      time( int, int );         // return Time from hours & minutes
+  static QString   toString( Time );         // return HH:MM string from Time
 };
 
 

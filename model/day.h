@@ -23,6 +23,7 @@
 
 #include <QString>
 #include <QVector>
+#include <QVariant>
 
 #include "datetime.h"
 
@@ -35,6 +36,11 @@ class Day
 public:
   Day();                                               // constructor
   Day( int );                                          // constructor
+
+  quint8     periods() { return m_periods; }           // return number of work periods
+  QVariant   data( int, int );                         // return data for column & role
+
+  static QVariant   headerData( int );                 // return column header data
 
   enum DefaultDayTypes
   {

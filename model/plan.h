@@ -49,8 +49,34 @@ public:
 
   void             initialise();                                    // create initial plan default contents
   QUndoStack*      undostack() { return m_undostack; }              // return undo stack pointer
+  QColor           nullCellColour() { return QColor( "#F0F0F0" ); } // return colour for null table cell
+
+  TasksModel*      tasks() { return m_tasks; }                      // return tasks model pointer
+  ResourcesModel*  resources() { return m_resources; }              // return resources model pointer
+  CalendarsModel*  calendars() { return m_calendars; }              // return calendars model pointer
+  DaysModel*       days() { return m_days; }                        // return days model pointer
+
+  Task*            task( int );                                     // return the n'th task pointer
+  Resource*        resource( int );                                 // return the n'th resource pointer
+  Calendar*        calendar( int );                                 // return the n'th calendar pointer
+  Day*             day( int );                                      // return the n'th day type pointer
+
+  int              index( Task* );                                  // return internal index of task
+  int              index( Resource* );                              // return internal index of resource
+  int              index( Calendar* );                              // return internal index of calendar
+  int              index( Day* );                                   // return internal index of day
+
+  int              numTasks();                                      // return number of tasks in plan
+  int              numResources();                                  // return number of resources in plan
+  int              numCalendars();                                  // return number of calendars in plan
+  int              numDays();                                       // return number of day types in plan
 
 private:
+  TasksModel*      m_tasks;             // model of plan tasks
+  ResourcesModel*  m_resources;         // model of plan resources
+  CalendarsModel*  m_calendars;         // model of plan calendars
+  DaysModel*       m_days;              // model of plan day types
+
   QUndoStack*      m_undostack;         // undo stack of plan editing
 
 };
