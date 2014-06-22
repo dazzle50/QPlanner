@@ -37,7 +37,12 @@ public:
   Day();                                               // constructor
   Day( int );                                          // constructor
 
+  QString    name() { return m_name; }                 // return day name
+  float      work() { return m_work; }                 // return work days equivalent
   quint8     periods() { return m_periods; }           // return number of work periods
+  Time       start( int n ) { return m_start.at(n); }  // return work period start
+  Time       end( int n ) { return m_end.at(n); }      // return work period end
+
   QVariant   data( int, int );                         // return data for column & role
 
   static QVariant   headerData( int );                 // return column header data

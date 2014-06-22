@@ -18,99 +18,63 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "daysmodel.h"
-#include "day.h"
-#include "plan.h"
-
-#include <QTableView>
-#include <QHeaderView>
+#include "calendarsmodel.h"
+#include "calendar.h"
 
 /*************************************************************************************************/
-/************************ Table model containing all calendar day types **************************/
+/************************** Table model containing all base calendars ****************************/
 /*************************************************************************************************/
 
 /****************************************** constructor ******************************************/
 
-DaysModel::DaysModel() : QAbstractTableModel()
+CalendarsModel::CalendarsModel() : QAbstractTableModel()
 {
 }
 
 /****************************************** destructor *******************************************/
 
-DaysModel::~DaysModel()
+CalendarsModel::~CalendarsModel()
 {
-  // delete all day types in model
-  foreach( Day* d, m_days ) delete d;
+  // delete all calendars in model
+  foreach( Calendar* c, m_calendars ) delete c;
 }
 
 /****************************************** initialise *******************************************/
 
-void DaysModel::initialise()
+void CalendarsModel::initialise()
 {
-  // create initial default day types
-  for ( int day=0 ; day<=Day::DEFAULT_MAX ; day++ )
-    m_days.append( new Day(day) );
+  // create initial default calendars
+  for ( int cal=0 ; cal<=Calendar::DEFAULT_MAX ; cal++ )
+    m_calendars.append( new Calendar(cal) );
 }
 
-/********************************************* day ***********************************************/
+/******************************************* calendar ********************************************/
 
-Day* DaysModel::day( int n )
+Calendar* CalendarsModel::calendar( int n )
 {
-  // return pointer to n'th day type
+  // return pointer to n'th calendar
   Q_ASSERT( n >= 0 );
-  Q_ASSERT( n < m_days.size() );
-  return m_days.at(n);
-}
-/**************************************** setColumnWidths ****************************************/
-
-void DaysModel::setColumnWidths( QTableView* table )
-{
-  // set initial column widths
-  table->horizontalHeader()->setDefaultSectionSize( 70 );
-  table->setColumnWidth( Day::SECTION_NAME, 150 );
-  table->setColumnWidth( Day::SECTION_WORK,  50 );
-  table->setColumnWidth( Day::SECTION_PARTS, 50 );
-}
-
-/******************************************** rowCount *******************************************/
-
-int DaysModel::rowCount( const QModelIndex& parent ) const
-{
-  Q_UNUSED(parent);
-  return m_days.size();
-}
-
-/****************************************** columnCount ******************************************/
-
-int DaysModel::columnCount( const QModelIndex& parent ) const
-{
-  Q_UNUSED(parent);
-
-  // table column count is max number of periods * 2 + SECTION_START
-  int max = 0;
-  foreach( Day* day, m_days )
-    if ( max < day->periods() ) max = day->periods();
-
-  return max*2 + Day::SECTION_START;
+  Q_ASSERT( n < m_calendars.size() );
+  return m_calendars.at(n);
 }
 
 /********************************************** data *********************************************/
 
-QVariant DaysModel::data( const QModelIndex& index, int role  = Qt::DisplayRole ) const
+QVariant CalendarsModel::data( const QModelIndex& index, int role  = Qt::DisplayRole ) const
 {
   // if index is not valid, return an invalid QVariant
   if ( !index.isValid() ) return QVariant();
 
-  // if index row is out of bounds, return an invalid QVariant
-  int row = index.row();
-  if ( row<0 || row>=m_days.size() ) return QVariant();
+  // if index column is out of bounds, return an invalid QVariant
+  int column = index.column();
+  if ( column<0 || column>=m_calendars.size() ) return QVariant();
 
-  return m_days.at(row)->data( index.column(), role );
+  return m_calendars.at(column)->data( index.row(), role );
 }
 
 /******************************************** setData ********************************************/
 
-bool DaysModel::setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole )
+bool CalendarsModel::setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole )
 {
   // if index is not valid, return false - can't set data
   if ( !index.isValid() ) return false;
@@ -126,24 +90,56 @@ bool DaysModel::setData( const QModelIndex& index, const QVariant& value, int ro
 
 /****************************************** headerData *******************************************/
 
-QVariant DaysModel::headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const
+QVariant CalendarsModel::headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const
 {
   // if role is not DisplayRole, return an invalid QVariant
   if ( role != Qt::DisplayRole ) return QVariant();
 
-  // if horizontal header, return resource header, otherwise row section number
-  if ( orientation == Qt::Horizontal ) return Day::headerData( section );
-  return QString("%1").arg( section+1 );
+  if ( orientation == Qt::Vertical )
+  {
+    if ( section == Calendar::ROW_NAME )        return "Name";
+    if ( section == Calendar::ROW_ANCHOR )      return "Anchor";
+    if ( section == Calendar::ROW_EXCEPTIONS )  return "Exceptions";
+    if ( section == Calendar::ROW_CYCLELENGTH ) return "Cycle";
+
+    return QString("Normal %1").arg( section - Calendar::ROW_NORMAL1 + 1 );
+  }
+  else
+    return m_calendars.at(section)->name();
+}
+
+/******************************************** rowCount *******************************************/
+
+int CalendarsModel::rowCount( const QModelIndex& parent ) const
+{
+  Q_UNUSED(parent);
+
+  // table row count is largest cycle length + ROW_NORMAL1
+  int max = 0;
+  foreach( Calendar* cal, m_calendars )
+    if ( max < cal->cycleLength() ) max = cal->cycleLength();
+
+  return max + Calendar::ROW_NORMAL1;
+}
+
+/****************************************** columnCount ******************************************/
+
+int CalendarsModel::columnCount( const QModelIndex& parent ) const
+{
+  Q_UNUSED(parent);
+
+  // table column count is number of calendars in m_cals QList
+  return m_calendars.size();
 }
 
 /********************************************* flags *********************************************/
 
-Qt::ItemFlags DaysModel::flags( const QModelIndex& index ) const
+Qt::ItemFlags CalendarsModel::flags( const QModelIndex& index ) const
 {
   // if cell refers to non-existing working period, then cell is not selectable, etc
   int row = index.row();
   int col = index.column();
-  if ( col >= m_days.at(row)->periods()*2+Day::SECTION_START ) return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  if ( row >= m_calendars.at(col)->cycleLength()+Calendar::ROW_NORMAL1 ) return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
   // otherwise all cells are selectable, editable, etc
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
@@ -151,12 +147,12 @@ Qt::ItemFlags DaysModel::flags( const QModelIndex& index ) const
 
 /******************************************* namesList *******************************************/
 
-QStringList  DaysModel::namesList() const
+QStringList  CalendarsModel::namesList() const
 {
-  // return list of day names
+  // return list of calendar names
   QStringList  list;
-  foreach( Day* d, m_days )
-    list << d->name();
+  foreach( Calendar* cal, m_calendars )
+    list << cal->name();
 
   return list;
 }

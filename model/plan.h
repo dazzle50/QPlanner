@@ -25,6 +25,8 @@
 #include <QDateTime>
 #include <QColor>
 
+#include "datetime.h"
+
 class TasksModel;
 class ResourcesModel;
 class CalendarsModel;
@@ -71,6 +73,8 @@ public:
   int              numCalendars();                                  // return number of calendars in plan
   int              numDays();                                       // return number of day types in plan
 
+  bool             stretchTasks;                                    // flag if gantt task bars stretched to use full 24h day
+
 private:
   TasksModel*      m_tasks;             // model of plan tasks
   ResourcesModel*  m_resources;         // model of plan resources
@@ -79,6 +83,15 @@ private:
 
   QUndoStack*      m_undostack;         // undo stack of plan editing
 
+  QString          m_title;             // plan title as set in properties
+  DateTime         m_start;             // plan start as set in properties
+  Calendar*        m_calendar;          // plan default calendar pointer
+  QString          m_datetime_format;   // plan datetime format as set in properties
+  QString          m_filename;          // filename when last opened/saved
+  QString          m_file_location;     // file location when last opened/saved
+  QString          m_saved_by;          // username of who last saved
+  QDateTime        m_saved_when;        // datetime when last saved
+  QString          m_notes;             // plan notes as in properties
 };
 
 extern Plan*        plan;

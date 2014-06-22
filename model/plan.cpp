@@ -20,6 +20,8 @@
 
 #include "plan.h"
 #include "daysmodel.h"
+#include "calendarsmodel.h"
+#include "calendar.h"
 
 #include <QUndoStack>
 #include <QXmlStreamWriter>
@@ -29,20 +31,40 @@
 /************************** Holds the complete data model for the plan ***************************/
 /*************************************************************************************************/
 
+//Task*      Plan::task( int n ) { return m_tasks->task(n); }               // return the n'th task pointer
+//Resource*  Plan::resource( int n ) { return m_resources->resource(n); }   // return the n'th resource pointer
+Calendar*  Plan::calendar( int n ) { return m_calendars->calendar(n); }   // return the n'th calendar pointer
+Day*       Plan::day( int n ) { return m_days->day(n); }                  // return the n'th day-type pointer
+
+//int        Plan::index( Task* t ) { return m_tasks->index(t); }           // return internal index of task
+//int        Plan::index( Resource* r ) { return m_resources->index(r); }   // return internal index of resource
+int        Plan::index( Calendar* c ) { return m_calendars->index(c); }   // return internal index of calendar
+int        Plan::index( Day* d ) { return m_days->index(d); }             // return internal index of day
+
+//int        Plan::numTasks() { return m_tasks->number(); }                 // return number of tasks in plan
+//int        Plan::numResources() { return m_resources->number(); }         // return number of resources in plan
+int        Plan::numCalendars() { return m_calendars->number(); }         // return number of calendars in plan
+int        Plan::numDays() { return m_days->number(); }                   // return number of day types in plan
+
+//QDateTime  Plan::beginning() { return m_tasks->planBeginning(); }         // return start of earliest starting task
+//QDateTime  Plan::end() { return m_tasks->planEnd(); }                     // return finish of latest finishing task
+
+//void       Plan::schedule() { m_tasks->schedule(); }                      // schedule the plan tasks
+
 /****************************************** constructor ******************************************/
 
 Plan::Plan()
 {
   // create blank models and set private variables
   m_days       = new DaysModel();
-  //m_calendars  = new CalendarsModel();
+  m_calendars  = new CalendarsModel();
   //m_resources  = new ResourcesModel();
   //m_tasks      = new TasksModel();
   m_undostack  = new QUndoStack();
 
-  //m_datetime_format = "ddd dd/MM/yyyy hh:mm:ss";
-  //m_calendar        = nullptr;
-  //stretchTasks      = true;
+  m_datetime_format = "ddd dd/MM/yyyy hh:mm:ss";
+  m_calendar        = nullptr;
+  stretchTasks      = true;
 }
 
 /****************************************** destructor *******************************************/
@@ -52,7 +74,7 @@ Plan::~Plan()
   // delete models and undostack
   //delete m_tasks;
   //delete m_resources;
-  //delete m_calendars;
+  delete m_calendars;
   delete m_days;
   delete m_undostack;
 }
@@ -63,9 +85,9 @@ void  Plan::initialise()
 {
   // initialise the models
   m_days->initialise();
-  //m_calendars->initialise();
+  m_calendars->initialise();
 
-  //m_calendar = calendar( Calendar::DEFAULT_CALENDAR );
+  m_calendar = calendar( Calendar::DEFAULT_CALENDAR );
   //m_start    = m_calendar->workUp( QDateTime( QDate::currentDate(), QTime(0,0,0) ) );
 
   //m_resources->initialise();

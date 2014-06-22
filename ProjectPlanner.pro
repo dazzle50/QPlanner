@@ -20,7 +20,9 @@ SOURCES += main.cpp\
     model/plan.cpp \
     model/day.cpp \
     model/daysmodel.cpp \
-    model/datetime.cpp
+    model/datetime.cpp \
+    model/calendar.cpp \
+    model/calendarsmodel.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -31,7 +33,9 @@ HEADERS  += \
     model/plan.h \
     model/day.h \
     model/daysmodel.h \
-    model/datetime.h
+    model/datetime.h \
+    model/calendar.h \
+    model/calendarsmodel.h
 
 FORMS += \
     gui/mainwindow.ui \

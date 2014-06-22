@@ -18,32 +18,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef DAYSMODEL_H
-#define DAYSMODEL_H
+#ifndef CALENDARSMODEL_H
+#define CALENDARSMODEL_H
 
 #include <QAbstractTableModel>
 
-class Day;
-class QTableView;
+class Calendar;
 
 /*************************************************************************************************/
-/************************ Table model containing all calendar day types **************************/
+/************************** Table model containing all base calendars ****************************/
 /*************************************************************************************************/
 
-class DaysModel : public QAbstractTableModel
+class CalendarsModel : public QAbstractTableModel
 {
   Q_OBJECT
 public:
-  DaysModel();                                                     // constructor
-  ~DaysModel();                                                    // destructor
+  CalendarsModel();                                                       // constructor
+  ~CalendarsModel();                                                      // destructor
 
-  void         initialise();                                       // create initial default contents
-  void         setColumnWidths( QTableView* );                     // set initial column widths
-
-  Day*         day( int n );                                       // return pointer to n'th day type
-  int          index( Day* d ) { return m_days.indexOf(d); }       // return index of day type, or -1
-  int          number() { return m_days.size(); }                  // return number of day types in plan
-  QStringList  namesList() const;                                  // return list of day type names
+  void           initialise();                                            // create initial default contents
+  Calendar*      calendar( int n );                                       // return pointer to n'th calendar
+  int            index( Calendar* c ) { return m_calendars.indexOf(c); }  // return index of calendar, or -1
+  int            number() { return m_calendars.size(); }                  // return number of calendars in plan
+  QStringList    namesList() const;                                       // return list of calendar names
 
   /********************* methods to support QAbstractTableModel ************************/
 
@@ -55,7 +52,8 @@ public:
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
 
 private:
-  QList<Day*>     m_days;      // list of day types available to calendars
+  QList<Calendar*>   m_calendars;     // list of calendars available to plan
+
 };
 
-#endif // DAYSMODEL_H
+#endif // CALENDARSMODEL_H
