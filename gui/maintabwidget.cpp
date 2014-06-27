@@ -24,6 +24,7 @@
 #include "model/plan.h"
 #include "model/daysmodel.h"
 #include "model/calendarsmodel.h"
+#include "model/resourcesmodel.h"
 
 /*************************************************************************************************/
 /***************************** Tabbed widget containing main screens *****************************/
@@ -44,7 +45,7 @@ MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new 
 
   // set initial column widths for tables views
   //plan->tasks()->setColumnWidths( ui->tasksView );
-  //plan->resources()->setColumnWidths( ui->resourcesView );
+  plan->resources()->setColumnWidths( ui->resourcesView );
   ui->calendarsView->horizontalHeader()->setDefaultSectionSize( 150 );
   plan->days()->setColumnWidths( ui->daysView );
 
@@ -64,7 +65,7 @@ void MainTabWidget::endEdits()
 {
   // end any task/resource/calendar/day edits in progress
   //ui->tasksView->endEdit();
-  //ui->resourcesView->endEdit();
+  ui->resourcesView->endEdit();
   ui->calendarsView->endEdit();
   ui->daysView->endEdit();
 }
@@ -75,7 +76,7 @@ void MainTabWidget::setModels()
 {
   // ensure table views are connected to correct models
   //ui->tasksView->setModel( plan->tasks() );
-  //ui->resourcesView->setModel( plan->resources() );
+  ui->resourcesView->setModel( plan->resources() );
   ui->calendarsView->setModel( plan->calendars() );
   ui->daysView->setModel( plan->days() );
   //ui->ganttView->setTable( ui->tasksView );

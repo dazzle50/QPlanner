@@ -22,6 +22,7 @@
 #define CALENDAR_H
 
 #include <QString>
+#include <QVector>
 #include <QHash>
 
 #include "datetime.h"
