@@ -40,7 +40,7 @@ public:
   static Time      time( int, int );           // return Time from hours & minutes
   static QString   toString( Time );           // return HH:MM string from Time
 
-  // CANNOT handle Time as QTime because Time can represent *24:00* unlike QTime
+  // CANNOT convert Time to QTime because Time can represent *24:00* unlike QTime
 };
 
 /*************************************************************************************************/
@@ -60,6 +60,23 @@ public:
   static Date      currentDate();              // return Date for current date
   static QString   toString( Date );           // return dd/MM/yyyy string from Date
   static QString   toString( Date, QString );  // return string in format from Date
+};
+
+/*************************************************************************************************/
+/****************** XDateTime provides static methods to support DateTime type *******************/
+/*************************************************************************************************/
+
+class XDateTime
+{
+public:
+  const static DateTime    NULL_DATETIME = -1;      // DateTime value that represents null
+  const static DateTime    MAX_DATETIME = -2;       // max permissible DateTime value
+  const static DateTime    MIN_DATETIME = 0;        // min permissible DateTime value
+  const static QDateTime   ANCHOR_QDATETIME;        // anchor QDateTime for DateTime zero
+
+  static QDateTime   qdatetime( DateTime );         // return QDateTime from DateTime
+  static QString     toString( DateTime );          // return dd/MM/yyyy hh:mm string from DateTime
+  static QString     toString( DateTime, QString ); // return string in format from DateTime
 };
 
 #endif // DATETIME_H

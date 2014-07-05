@@ -73,6 +73,18 @@ public:
   int              numCalendars();                                  // return number of calendars in plan
   int              numDays();                                       // return number of day types in plan
 
+  QString          title() { return m_title; }                      // return title of plan
+  DateTime         start() { return m_start; }                      // return nominal start of plan (T0)
+  //DateTime         beginning();                                     // return start of earliest starting task
+  //DateTime         end();                                           // return finish of latest finishing task
+  Calendar*        calendar() { return m_calendar; }                // return default calendar pointer
+  QString          datetimeFormat() { return m_datetime_format; }   // return datetime format
+  QString          filename() {return m_filename; }                 // return filename
+  QString          fileLocation() { return m_file_location; }       // return file location
+  QString          savedBy() { return m_saved_by; }                 // return saved by username
+  QDateTime        savedWhen() { return m_saved_when; }             // return saved datetime
+  QString          notes() { return m_notes; }                      // return notes text
+
   bool             stretchTasks;                                    // flag if gantt task bars stretched to use full 24h day
 
 private:

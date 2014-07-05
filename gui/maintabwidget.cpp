@@ -25,6 +25,7 @@
 #include "model/daysmodel.h"
 #include "model/calendarsmodel.h"
 #include "model/resourcesmodel.h"
+#include "model/tasksmodel.h"
 
 /*************************************************************************************************/
 /***************************** Tabbed widget containing main screens *****************************/
@@ -64,7 +65,7 @@ MainTabWidget::~MainTabWidget()
 void MainTabWidget::endEdits()
 {
   // end any task/resource/calendar/day edits in progress
-  //ui->tasksView->endEdit();
+  ui->tasksView->endEdit();
   ui->resourcesView->endEdit();
   ui->calendarsView->endEdit();
   ui->daysView->endEdit();
@@ -75,7 +76,7 @@ void MainTabWidget::endEdits()
 void MainTabWidget::setModels()
 {
   // ensure table views are connected to correct models
-  //ui->tasksView->setModel( plan->tasks() );
+  ui->tasksView->setModel( plan->tasks() );
   ui->resourcesView->setModel( plan->resources() );
   ui->calendarsView->setModel( plan->calendars() );
   ui->daysView->setModel( plan->days() );

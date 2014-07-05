@@ -24,7 +24,9 @@ SOURCES += main.cpp\
     model/calendar.cpp \
     model/calendarsmodel.cpp \
     model/resource.cpp \
-    model/resourcesmodel.cpp
+    model/resourcesmodel.cpp \
+    model/task.cpp \
+    model/tasksmodel.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -39,7 +41,10 @@ HEADERS  += \
     model/calendar.h \
     model/calendarsmodel.h \
     model/resource.h \
-    model/resourcesmodel.h
+    model/resourcesmodel.h \
+    model/task.h \
+    model/tasksmodel.h \
+    model/timespan.h
 
 FORMS += \
     gui/mainwindow.ui \

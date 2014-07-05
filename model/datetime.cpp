@@ -112,3 +112,35 @@ QString XDate::toString( Date d, QString format )
   QDate qdate = ANCHOR_QDATE.addDays( d );
   return qdate.toString( format );
 }
+
+/*************************************************************************************************/
+/****************** XDateTime provides static methods to support DateTime type *******************/
+/*************************************************************************************************/
+
+const QDateTime  XDateTime::ANCHOR_QDATETIME = QDateTime( XDate::ANCHOR_QDATE );
+
+/****************************************** qdatetime ********************************************/
+
+QDateTime XDateTime::qdatetime( DateTime dt )
+{
+  // return QDateTime from quint32 DateTime
+  if ( dt == NULL_DATETIME ) return QDateTime();
+  return ANCHOR_QDATETIME.addSecs( dt*60 );
+}
+
+/******************************************* toString ********************************************/
+
+QString XDateTime::toString( DateTime dt )
+{
+  // return dd/MM/yyyy hh:mm string from DateTime
+  return toString( dt, "dd/MM/yyyy hh:mm" );
+}
+
+QString XDateTime::toString( DateTime dt, QString format )
+{
+  // return string in specified format from Date
+  if ( dt == XDateTime::NULL_DATETIME ) return QString( "Null" );
+
+  QDateTime qdatetime = ANCHOR_QDATETIME.addSecs( dt*60 );
+  return qdatetime.toString( format );
+}
