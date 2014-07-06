@@ -22,8 +22,6 @@
 #include "resource.h"
 #include "plan.h"
 
-#include <QTableView>
-
 /*************************************************************************************************/
 /**************************** Table model containing all resources *******************************/
 /*************************************************************************************************/
@@ -76,21 +74,6 @@ int ResourcesModel::number()
     if ( !res->isNull() ) count++;
 
   return count;
-}
-
-/**************************************** setColumnWidths ****************************************/
-
-void ResourcesModel::setColumnWidths( QTableView* table )
-{
-  // set initial column widths
-  table->setColumnWidth( Resource::SECTION_INITIALS,  60 );
-  table->setColumnWidth( Resource::SECTION_NAME,     150 );
-  table->setColumnWidth( Resource::SECTION_ORG,      150 );
-  table->setColumnWidth( Resource::SECTION_GROUP,    150 );
-  table->setColumnWidth( Resource::SECTION_AVAIL,     65 );
-  table->setColumnWidth( Resource::SECTION_ABILITY,   65 );
-  table->setColumnWidth( Resource::SECTION_COST,      65 );
-  table->setColumnWidth( Resource::SECTION_COMMENT,  250 );
 }
 
 /******************************************** rowCount *******************************************/

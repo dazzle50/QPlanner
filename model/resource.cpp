@@ -38,7 +38,6 @@ Resource::Resource()
   m_calendar     = nullptr;
   m_start        = XDate::NULL_DATE;
   m_end          = XDate::NULL_DATE;
-  m_ability      = 1.0;
 }
 
 /****************************************** constructor ******************************************/
@@ -53,7 +52,6 @@ Resource::Resource( bool unassigned )
   m_calendar     = nullptr;
   m_start        = XDate::NULL_DATE;
   m_end          = XDate::NULL_DATE;
-  m_ability      = 1.0;
   m_comment      = "Unassigned";
 }
 
@@ -71,7 +69,6 @@ QVariant  Resource::headerData( int column )
   if ( column == SECTION_START )      return "Start";
   if ( column == SECTION_END )        return "End";
   if ( column == SECTION_AVAIL )      return "Available";
-  if ( column == SECTION_ABILITY )    return "Ability";
   if ( column == SECTION_COST )       return "Cost";
   if ( column == SECTION_CALENDAR )   return "Calendar";
   if ( column == SECTION_COMMENT )    return "Comment";
@@ -98,7 +95,6 @@ QVariant  Resource::data( int column, int role )
     if ( column == SECTION_START )    return XDate::qdate( m_start );
     if ( column == SECTION_END )      return XDate::qdate( m_end );
     if ( column == SECTION_AVAIL )    return m_availability;
-    if ( column == SECTION_ABILITY )  return m_ability;
     if ( column == SECTION_COST )     return m_cost;
     if ( column == SECTION_CALENDAR ) return plan->index( m_calendar );
 
@@ -118,7 +114,6 @@ QVariant  Resource::data( int column, int role )
     if ( column == SECTION_START )    return XDate::toString( m_start );
     if ( column == SECTION_END )      return XDate::toString( m_end );
     if ( column == SECTION_AVAIL )    return QString("%1").arg( m_availability, 0, 'f', 1 );
-    if ( column == SECTION_ABILITY )  return QString("%1").arg( m_ability, 0, 'f', 1 );
     if ( column == SECTION_COST )     return QString("%1").arg( m_cost, 0, 'f', 1 );;
     if ( column == SECTION_CALENDAR ) return m_calendar->name();
     if ( column == SECTION_COMMENT )  return m_comment;

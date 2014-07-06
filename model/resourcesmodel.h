@@ -24,7 +24,6 @@
 #include <QAbstractTableModel>
 
 class Resource;
-class QTableView;
 
 /*************************************************************************************************/
 /**************************** Table model containing all resources *******************************/
@@ -39,7 +38,6 @@ public:
 
   void              initialise();                                     // create initial default contents
   int               number();                                         // return number of resources in plan
-  void              setColumnWidths( QTableView* );                   // set initial column widths
 
   Resource*         resource( int n );                                // return pointer to n'th resource
   int               index( Resource* r )

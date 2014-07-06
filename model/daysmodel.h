@@ -24,7 +24,6 @@
 #include <QAbstractTableModel>
 
 class Day;
-class QTableView;
 
 /*************************************************************************************************/
 /************************ Table model containing all calendar day types **************************/
@@ -38,7 +37,6 @@ public:
   ~DaysModel();                                                    // destructor
 
   void         initialise();                                       // create initial default contents
-  void         setColumnWidths( QTableView* );                     // set initial column widths
 
   Day*         day( int n );                                       // return pointer to n'th day type
   int          index( Day* d ) { return m_days.indexOf(d); }       // return index of day type, or -1

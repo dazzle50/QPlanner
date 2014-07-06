@@ -23,9 +23,13 @@
 
 #include "model/plan.h"
 #include "model/daysmodel.h"
+#include "model/day.h"
 #include "model/calendarsmodel.h"
+#include "model/calendar.h"
 #include "model/resourcesmodel.h"
+#include "model/resource.h"
 #include "model/tasksmodel.h"
+#include "model/task.h"
 
 /*************************************************************************************************/
 /***************************** Tabbed widget containing main screens *****************************/
@@ -44,12 +48,35 @@ MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new 
   // set models & delegates for table views
   setModels();
 
-  // set initial column widths for tables views
-  //plan->tasks()->setColumnWidths( ui->tasksView );
-  plan->resources()->setColumnWidths( ui->resourcesView );
-  ui->calendarsView->horizontalHeader()->setDefaultSectionSize( 150 );
-  plan->days()->setColumnWidths( ui->daysView );
+  // set initial column widths for tasks table view
+  ui->tasksView->horizontalHeader()->setDefaultSectionSize( 140 );
+  ui->tasksView->setColumnWidth( Task::SECTION_TITLE,    150 );
+  ui->tasksView->setColumnWidth( Task::SECTION_DURATION,  60 );
+  ui->tasksView->setColumnWidth( Task::SECTION_WORK,      50 );
+  ui->tasksView->setColumnWidth( Task::SECTION_PREDS,     80 );
+  ui->tasksView->setColumnWidth( Task::SECTION_RES,       80 );
+  ui->tasksView->setColumnWidth( Task::SECTION_TYPE,     150 );
+  ui->tasksView->setColumnWidth( Task::SECTION_PRIORITY,  50 );
+  ui->tasksView->setColumnWidth( Task::SECTION_COST,      50 );
+  ui->tasksView->setColumnWidth( Task::SECTION_COMMENT,  200 );
 
+  // set initial column widths for reources table view
+  ui->resourcesView->setColumnWidth( Resource::SECTION_INITIALS,  60 );
+  ui->resourcesView->setColumnWidth( Resource::SECTION_NAME,     150 );
+  ui->resourcesView->setColumnWidth( Resource::SECTION_ORG,      150 );
+  ui->resourcesView->setColumnWidth( Resource::SECTION_GROUP,    150 );
+  ui->resourcesView->setColumnWidth( Resource::SECTION_AVAIL,     65 );
+  ui->resourcesView->setColumnWidth( Resource::SECTION_COST,      65 );
+  ui->resourcesView->setColumnWidth( Resource::SECTION_COMMENT,  250 );
+
+  // set initial column widths for calendars table view
+  ui->calendarsView->horizontalHeader()->setDefaultSectionSize( 150 );
+
+  // set initial column widths for day types table view
+  ui->daysView->horizontalHeader()->setDefaultSectionSize( 70 );
+  ui->daysView->setColumnWidth( Day::SECTION_NAME, 150 );
+  ui->daysView->setColumnWidth( Day::SECTION_WORK,  50 );
+  ui->daysView->setColumnWidth( Day::SECTION_PARTS, 50 );
 }
 
 /****************************************** destructor *******************************************/

@@ -54,11 +54,10 @@ public:
     SECTION_START    = 6,
     SECTION_END      = 7,
     SECTION_AVAIL    = 8,
-    SECTION_ABILITY  = 9,
-    SECTION_COST     = 10,
-    SECTION_CALENDAR = 11,
-    SECTION_COMMENT  = 12,
-    SECTION_MAXIMUM  = 12
+    SECTION_COST     = 9,
+    SECTION_CALENDAR = 10,
+    SECTION_COMMENT  = 11,
+    SECTION_MAXIMUM  = 11
   };
 
 private:
@@ -71,7 +70,6 @@ private:
   Date               m_start;              // date availability starts inclusive
   Date               m_end;                // date availability end inclusive
   float              m_availability;       // number available
-  float              m_ability;            // ability factor - typical 1.0
   float              m_cost;               // cost TODO
   Calendar*          m_calendar;           // calendar for resource
   QString            m_comment;            // free text
