@@ -75,8 +75,8 @@ public:
 
   QString          title() { return m_title; }                      // return title of plan
   DateTime         start() { return m_start; }                      // return nominal start of plan (T0)
-  //DateTime         beginning();                                     // return start of earliest starting task
-  //DateTime         end();                                           // return finish of latest finishing task
+  DateTime         beginning();                                     // return start of earliest starting task
+  DateTime         end();                                           // return finish of latest finishing task
   Calendar*        calendar() { return m_calendar; }                // return default calendar pointer
   QString          datetimeFormat() { return m_datetime_format; }   // return datetime format
   QString          filename() {return m_filename; }                 // return filename

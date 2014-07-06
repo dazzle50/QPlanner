@@ -48,8 +48,8 @@ int        Plan::numResources() { return m_resources->number(); }         // ret
 int        Plan::numCalendars() { return m_calendars->number(); }         // return number of calendars in plan
 int        Plan::numDays() { return m_days->number(); }                   // return number of day types in plan
 
-//DateTime   Plan::beginning() { return m_tasks->planBeginning(); }         // return start of earliest starting task
-//DateTime   Plan::end() { return m_tasks->planEnd(); }                     // return finish of latest finishing task
+DateTime   Plan::beginning() { return m_tasks->planBeginning(); }         // return start of earliest starting task
+DateTime   Plan::end() { return m_tasks->planEnd(); }                     // return finish of latest finishing task
 
 //void       Plan::schedule() { m_tasks->schedule(); }                      // schedule the plan tasks
 
@@ -64,8 +64,8 @@ Plan::Plan()
   m_tasks      = new TasksModel();
   m_undostack  = new QUndoStack();
 
-  m_start           = XDateTime::NULL_DATETIME;
-  m_datetime_format = "ddd dd/MM/yyyy hh:mm:ss";
+  m_start           = 0;  // TODO
+  m_datetime_format = "ddd dd/MM/yyyy hh:mm";
   m_calendar        = nullptr;
   stretchTasks      = true;
 }

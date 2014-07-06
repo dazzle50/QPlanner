@@ -23,6 +23,8 @@
 
 #include <QAbstractTableModel>
 
+#include "datetime.h"
+
 class Task;
 
 /*************************************************************************************************/
@@ -37,6 +39,8 @@ public:
   ~TasksModel();                                                  // destructor
 
   void           initialise();                                    // create initial default contents
+  DateTime       planBeginning();                                 // return start of earliest starting task
+  DateTime       planEnd();                                       // return finish of latest finishing task
   int            number();                                        // return number of non-null tasks in plan
 
   Task*          task( int n );                                   // return pointer to n'th task

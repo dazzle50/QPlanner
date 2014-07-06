@@ -80,6 +80,36 @@ int TasksModel::number()
   return count;
 }
 
+/***************************************** planBeginning *****************************************/
+
+DateTime TasksModel::planBeginning()
+{
+  // return start of earliest starting task
+  DateTime  first = XDateTime::NULL_DATETIME;
+  foreach( Task* t, m_tasks )
+  {
+    if ( !t->isNull() && first == XDateTime::NULL_DATETIME ) first = t->start();
+    if ( !t->isNull() && t->start() < first ) first = t->start();
+  }
+
+  return first;
+}
+
+/******************************************** planEnd ********************************************/
+
+DateTime TasksModel::planEnd()
+{
+  // return finish of latest finishing task
+  DateTime  end = XDateTime::NULL_DATETIME;
+  foreach( Task* t, m_tasks )
+  {
+    if ( !t->isNull() && end == XDateTime::NULL_DATETIME ) end = t->end();
+    if ( !t->isNull() && t->end() > end ) end = t->end();
+  }
+
+  return end;
+}
+
 /******************************************** rowCount *******************************************/
 
 int TasksModel::rowCount( const QModelIndex& parent ) const

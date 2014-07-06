@@ -23,6 +23,12 @@
 
 #include <QScrollArea>
 
+#include "model/datetime.h"
+
+class GanttChart;
+class GanttScale;
+class QTableView;
+
 /*************************************************************************************************/
 /**************************** GanttView shows tasks in a gantt format ****************************/
 /*************************************************************************************************/
@@ -33,6 +39,32 @@ class GanttView : public QScrollArea
 public:
   GanttView( QWidget* );                // constructor
 
+  void    createGantt( QWidget* );      // sets the table associated with the gantt
+  void    setTable( QTableView* );      // sets the table associated with the gantt
+  int     scaleHeight();                // return scale (upper+lower) height
+
+  void    setStart( DateTime );         // set gantt start date-time
+  void    setEnd( DateTime );           // set gantt end date-time
+  void    setMinsPP( double );          // set gantt minutes per pixel
+  void    setWidth();                   // ensure view width is never less than chart width
+
+public slots:
+  void    contextMenu( QPoint );        // slot to receive context menu signals
+  void    slotZoomIn();                 // slot to receive zoom in action signal
+  void    slotZoomOut();                // slot to receive zoom out action signal
+  void    slotZoomFit();                // slot to receive zoom fit action signal
+
+protected:
+  void resizeEvent( QResizeEvent* );    // resize the GanttView contents
+
+private:
+  QWidget*        m_view;               // widget to display the gantt scales + chart
+  GanttScale*     m_upperScale;         // gantt upper scale view
+  GanttScale*     m_lowerScale;         // gantt lower scale view
+  GanttChart*     m_chart;              // gantt chart view
+  double          m_minsPP;             // minutes per pixel
+  DateTime        m_start;              // start date-time
+  DateTime        m_end;                // end date-time
 };
 
 #endif // GANTTVIEW_H

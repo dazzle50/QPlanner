@@ -38,6 +38,12 @@ public:
 
   void  endEdits();                  // end any task/resource/calendar/day edits in progress
   void  setModels();                 // ensure views are connected to correct models
+  void  updatePlan();                // update plan from 'Plan' tab widgets
+  void  updateGantt();               // trigger gantt widget redraw
+  int   indexOfTasksTab();           // return index of tasks tab
+
+public slots:
+  void  slotUpdatePlanTab();         // ensure 'Plan' tab widgets are up-to-date
 
 private:
   Ui::MainTabWidget*   ui;           // user interface created using qt designer

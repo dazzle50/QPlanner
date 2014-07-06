@@ -107,7 +107,7 @@ QString XDate::toString( Date d )
 QString XDate::toString( Date d, QString format )
 {
   // return string in specified format from Date
-  if ( d == XDate::NULL_DATE ) return QString( "Null" );
+  if ( d == XDate::NULL_DATE ) return QString( "NA" );
 
   QDate qdate = ANCHOR_QDATE.addDays( d );
   return qdate.toString( format );
@@ -121,11 +121,28 @@ const QDateTime  XDateTime::ANCHOR_QDATETIME = QDateTime( XDate::ANCHOR_QDATE );
 
 /****************************************** qdatetime ********************************************/
 
+DateTime XDateTime::datetime( QDateTime qdt )
+{
+  // return quint32 DateTime from QDateTime
+  if ( !qdt.isValid() ) return XDateTime::NULL_DATETIME;
+  return ANCHOR_QDATETIME.secsTo( qdt ) / 60;
+}
+
+/****************************************** qdatetime ********************************************/
+
 QDateTime XDateTime::qdatetime( DateTime dt )
 {
   // return QDateTime from quint32 DateTime
   if ( dt == NULL_DATETIME ) return QDateTime();
   return ANCHOR_QDATETIME.addSecs( dt*60 );
+}
+
+/****************************************** currentDate ******************************************/
+
+DateTime XDateTime::currentDateTime()
+{
+  // return quint32 DateTime for current date-time
+  return datetime( QDateTime::currentDateTime() );
 }
 
 /******************************************* toString ********************************************/
@@ -139,7 +156,7 @@ QString XDateTime::toString( DateTime dt )
 QString XDateTime::toString( DateTime dt, QString format )
 {
   // return string in specified format from Date
-  if ( dt == XDateTime::NULL_DATETIME ) return QString( "Null" );
+  if ( dt == XDateTime::NULL_DATETIME ) return QString( "NA" );
 
   QDateTime qdatetime = ANCHOR_QDATETIME.addSecs( dt*60 );
   return qdatetime.toString( format );

@@ -229,7 +229,23 @@ void MainWindow::slotUndoStackView( bool checked )
 {
   // show undo stack view window if checked, otherwise hide
   m_tabs->endEdits();
-
+  if ( checked )
+  {
+    if ( m_undoview == nullptr )
+    {
+      m_undoview = new QUndoView( plan->undostack() );
+      m_undoview->setWindowTitle( "Undo stack" );
+      m_undoview->setAttribute( Qt::WA_QuitOnClose, false );
+      m_undoview->setAttribute( Qt::WA_DeleteOnClose, true );
+      connect( m_undoview, SIGNAL(destroyed()), this, SLOT(slotUndoStackViewDestroyed()),
+               Qt::UniqueConnection );
+    }
+    m_undoview->show();
+  }
+  else
+  {
+    if ( m_undoview ) m_undoview->hide();
+  }
 }
 
 /*********************************** slotUndoStackViewDestroyed **********************************/
@@ -246,5 +262,20 @@ void MainWindow::slotUndoStackViewDestroyed()
 void MainWindow::slotTabChange( int index )
 {
   // check if switched to tasks/gantt tab, enable its menu & actions, otherwise hide them
+  if ( index == m_tabs->indexOfTasksTab() )
+  {
+    ui->menuTask->menuAction()->setVisible( true );
+    ui->actionIndent->setVisible( true );
+    ui->actionOutdent->setVisible( true );
+  }
+  else
+  {
+    ui->menuTask->menuAction()->setVisible( false );
+    ui->actionIndent->setVisible( false );
+    ui->actionOutdent->setVisible( false );
+  }
 
+  // ensure plan reflects 'Plan' tab widgets and vice versa
+  m_tabs->updatePlan();
+  m_tabs->slotUpdatePlanTab();
 }

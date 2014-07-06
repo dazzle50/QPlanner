@@ -74,7 +74,9 @@ public:
   const static DateTime    MIN_DATETIME = 0;        // min permissible DateTime value
   const static QDateTime   ANCHOR_QDATETIME;        // anchor QDateTime for DateTime zero
 
+  static DateTime    datetime( QDateTime );         // return DateTime from QDateTime
   static QDateTime   qdatetime( DateTime );         // return QDateTime from DateTime
+  static DateTime    currentDateTime();             // return DateTime for current date-time
   static QString     toString( DateTime );          // return dd/MM/yyyy hh:mm string from DateTime
   static QString     toString( DateTime, QString ); // return string in format from DateTime
 };
