@@ -23,6 +23,7 @@
 #include "plan.h"
 #include "resource.h"
 #include "calendar.h"
+#include "command/commandresourcesetdata.h"
 
 /*************************************************************************************************/
 /************************************* Single plan resource **************************************/
@@ -139,10 +140,6 @@ QVariant  Resource::data( int column, int role )
 bool  Resource::setData( int row, int col, const QVariant& new_value )
 {
   // TODO some checks that set data will be allowed, return false if not allowed
-
-  // if value hasn't changed, don't proceed
-  QVariant old_value = data( col, Qt::EditRole );
-  if ( new_value == old_value ) return false;
 
   // set data via undo/redo command
   //plan->undostack()->push( new CommandResourceSetData( row, col, new_value, old_value ) );

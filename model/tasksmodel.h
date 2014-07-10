@@ -42,6 +42,7 @@ public:
   DateTime       planBeginning();                                 // return start of earliest starting task
   DateTime       planEnd();                                       // return finish of latest finishing task
   int            number();                                        // return number of non-null tasks in plan
+  void           schedule();                                      // re-schedule tasks
 
   Task*          task( int n );                                   // return pointer to n'th task
   int            index( Task* t ) { return m_tasks.indexOf(t); }  // return index of task, or -1

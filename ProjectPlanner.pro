@@ -44,7 +44,11 @@ HEADERS  += \
     model/resourcesmodel.h \
     model/task.h \
     model/tasksmodel.h \
-    model/timespan.h
+    model/timespan.h \
+    command/commanddaysetdata.h \
+    command/commandcalendarsetdata.h \
+    command/commandresourcesetdata.h \
+    command/commandtasksetdata.h
 
 FORMS += \
     gui/mainwindow.ui \

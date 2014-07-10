@@ -52,6 +52,7 @@ public:
   void             initialise();                                    // create initial plan default contents
   QUndoStack*      undostack() { return m_undostack; }              // return undo stack pointer
   QColor           nullCellColour() { return QColor( "#F0F0F0" ); } // return colour for null table cell
+  void             schedule();                                      // schedule the plan tasks
 
   TasksModel*      tasks() { return m_tasks; }                      // return tasks model pointer
   ResourcesModel*  resources() { return m_resources; }              // return resources model pointer

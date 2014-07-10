@@ -20,6 +20,7 @@
 
 #include "day.h"
 #include "plan.h"
+#include "command/commanddaysetdata.h"
 
 /*************************************************************************************************/
 /**************************** Single day type used in plan calendars *****************************/
@@ -153,6 +154,17 @@ QVariant  Day::data( int column, int role )
 
   // otherwise return an invalid QVariant
   return QVariant();
+}
+
+/******************************************** setData ********************************************/
+
+bool Day::setData( int col, const QVariant& value )
+{
+  // TODO some checks that set data will be allowed, return false if not allowed
+
+  // set data via undo/redo command
+  //plan->undostack()->push( new CommandDaySetData( row, col, new_value, old_value ) );
+  return true;
 }
 
 /****************************************** headerData *******************************************/

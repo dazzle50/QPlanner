@@ -105,10 +105,13 @@ bool DaysModel::setData( const QModelIndex& index, const QVariant& value, int ro
   // if role is not Qt::EditRole, return false - can't set data
   if ( role != Qt::EditRole ) return false;
 
+  // if value hasn't changed, don't proceed
+  if ( value == data( index, role ) ) return false;
 
-  // TODO
-  Q_UNUSED(value)
-  return false;
+  // try to set data
+  int row = index.row();
+  int col = index.column();
+  return m_days.at( row )->setData( col, value );
 }
 
 /****************************************** headerData *******************************************/

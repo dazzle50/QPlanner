@@ -80,6 +80,14 @@ int TasksModel::number()
   return count;
 }
 
+/******************************************* schedule ********************************************/
+
+void TasksModel::schedule()
+{
+  // re-schedule tasks - first construct list of tasks in correct order
+  qDebug("TasksModel::schedule()");
+}
+
 /***************************************** planBeginning *****************************************/
 
 DateTime TasksModel::planBeginning()
@@ -163,6 +171,9 @@ bool TasksModel::setData( const QModelIndex& index, const QVariant& value, int r
 
   // if role is not Qt::EditRole, return false - can't set data
   if ( role != Qt::EditRole ) return false;
+
+  // if value hasn't changed, don't proceed
+  if ( value == data( index, role ) ) return false;
 
   // try to set data
   int row = index.row();

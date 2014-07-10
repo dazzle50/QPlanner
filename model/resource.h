@@ -38,6 +38,8 @@ public:
   static QVariant   headerData( int );                               // return column header data
   QVariant          data( int, int );                                // return data for column & role
   bool              setData( int, int, const QVariant& );            // attempt to set value via undostack
+  void              setDataDirect( int, const QVariant& );           // set value directly
+
   bool              isNull() const { return m_initials.isNull(); }   // is the task null (blank)
   QString           initials() const { return m_initials; }          // return initials
   Calendar*         calendar() const { return m_calendar; }          // return resource calendar

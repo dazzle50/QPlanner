@@ -22,6 +22,7 @@
 #include "daysmodel.h"
 #include "calendar.h"
 #include "day.h"
+#include "command/commandcalendarsetdata.h"
 
 /*************************************************************************************************/
 /********************************* Single calendar for planning **********************************/
@@ -169,4 +170,15 @@ QVariant  Calendar::data( int row, int role  = Qt::DisplayRole ) const
 
   // otherwise return an invalid QVariant
   return QVariant();
+}
+
+/******************************************** setData ********************************************/
+
+bool Calendar::setData( int row, const QVariant& value )
+{
+  // TODO some checks that set data will be allowed, return false if not allowed
+
+  // set data via undo/redo command
+  //plan->undostack()->push( new CommandCalendarSetData( row, col, new_value, old_value ) );
+  return true;
 }

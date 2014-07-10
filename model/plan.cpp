@@ -51,7 +51,7 @@ int        Plan::numDays() { return m_days->number(); }                   // ret
 DateTime   Plan::beginning() { return m_tasks->planBeginning(); }         // return start of earliest starting task
 DateTime   Plan::end() { return m_tasks->planEnd(); }                     // return finish of latest finishing task
 
-//void       Plan::schedule() { m_tasks->schedule(); }                      // schedule the plan tasks
+void       Plan::schedule() { m_tasks->schedule(); }                      // schedule the plan tasks
 
 /****************************************** constructor ******************************************/
 

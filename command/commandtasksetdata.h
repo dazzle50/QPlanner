@@ -18,57 +18,58 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CALENDAR_H
-#define CALENDAR_H
+#ifndef COMMANDTASKSETDATA_H
+#define COMMANDTASKSETDATA_H
 
-#include <QString>
-#include <QVector>
-#include <QHash>
+#include <QUndoCommand>
 
-#include "datetime.h"
-
-class Day;
+#include "model/plan.h"
+#include "model/tasksmodel.h"
+#include "model/task.h"
 
 /*************************************************************************************************/
-/********************************* Single calendar for planning **********************************/
+/************************* Command for setting Task data via QUndoStack **************************/
 /*************************************************************************************************/
 
-class Calendar
+class CommandTaskSetData : public QUndoCommand
 {
 public:
-  Calendar();                                   // constructor
-  Calendar( int );                              // constructor for initial default calendars
-
-  QVariant      data( int, int ) const;                        // return data for row & role
-  bool          setData( int, const QVariant& );               // attempt to set value via undostack
-  void          setDataDirect( int, const QVariant& );         // set value directly
-
-  int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
-  QString       name() const { return m_name; }                // return calendar name
-
-  enum DefaultCalendarTypes
+  CommandTaskSetData( Task* old_task, int col, const QVariant& new_value )
   {
-    DEFAULT_CALENDAR = 0,
-    DEFAULT_FULLTIME = 1,
-    DEFAULT_FANCY    = 2,
-    DEFAULT_MAX      = 2
-  };
+    // set private variables for new and old values
+    m_old_task  = *old_task;
+    m_row       = plan->index( old_task );
+    m_column    = col;
+    m_new_value = new_value;
 
-  enum Rows
+    // construct command description
+    setText( QString("Task %1 %2 = %3")
+             .arg( m_row )
+             .arg( Task::headerData( col ).toString() )
+             .arg( new_value.toString() ) );
+  }
+
+  void  redo()
   {
-    ROW_NAME        = 0,
-    ROW_ANCHOR      = 1,
-    ROW_EXCEPTIONS  = 2,
-    ROW_CYCLELENGTH = 3,
-    ROW_NORMAL1     = 4
-  };
+    // update task with new value
+    plan->task( m_row )->setDataDirect( m_column, m_new_value );
+    plan->schedule();
+  }
+
+  void  undo()
+  {
+    // revert task back to old values
+    Task* task = plan->task( m_row );
+    *task = m_old_task;
+    //if ( task->isNull() ) plan->tasks()->setSummaries();
+    plan->schedule();
+  }
 
 private:
-  QString             m_name;            // name of calendar
-  Date                m_cycleAnchor;     // anchor date of calendar cycle
-  quint8              m_cycleLength;     // length of basic cycle (eg 7)
-  QVector<Day*>       m_normal;          // normal basic cycle days
-  QHash<Date, Day*>   m_exceptions;      // exceptions override normal days
+  Task      m_old_task;
+  int       m_row;
+  int       m_column;
+  QVariant  m_new_value;
 };
 
-#endif // CALENDAR_H
+#endif // COMMANDTASKSETDATA_H

@@ -18,57 +18,60 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CALENDAR_H
-#define CALENDAR_H
+#ifndef COMMANDCALENDARSETDATA_H
+#define COMMANDCALENDARSETDATA_H
 
-#include <QString>
-#include <QVector>
-#include <QHash>
+#include <QUndoCommand>
 
-#include "datetime.h"
-
-class Day;
+#include "model/plan.h"
+#include "model/calendar.h"
+#include "model/calendarsmodel.h"
 
 /*************************************************************************************************/
-/********************************* Single calendar for planning **********************************/
+/*********************** Command for setting Calendar data via QUndoStack ************************/
 /*************************************************************************************************/
 
-class Calendar
+class CommandCalendarSetData : public QUndoCommand
 {
 public:
-  Calendar();                                   // constructor
-  Calendar( int );                              // constructor for initial default calendars
-
-  QVariant      data( int, int ) const;                        // return data for row & role
-  bool          setData( int, const QVariant& );               // attempt to set value via undostack
-  void          setDataDirect( int, const QVariant& );         // set value directly
-
-  int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
-  QString       name() const { return m_name; }                // return calendar name
-
-  enum DefaultCalendarTypes
+  CommandCalendarSetData( int row, int col, const QVariant& new_value, const QVariant& old_value )
   {
-    DEFAULT_CALENDAR = 0,
-    DEFAULT_FULLTIME = 1,
-    DEFAULT_FANCY    = 2,
-    DEFAULT_MAX      = 2
-  };
+    // set private variables for new and old values
+    m_row       = row;
+    m_column    = col;
+    m_new_value = new_value;
+    m_old_value = old_value;
 
-  enum Rows
+    // construct command description
+    setText( QString("Day %1 %2 = %3")
+             .arg( row )
+             //.arg( Calendar::headerData( col ).toString() )
+             .arg( new_value.toString() ) );
+  }
+
+  void  redo()
   {
-    ROW_NAME        = 0,
-    ROW_ANCHOR      = 1,
-    ROW_EXCEPTIONS  = 2,
-    ROW_CYCLELENGTH = 3,
-    ROW_NORMAL1     = 4
-  };
+    // update resource with new value
+    plan->calendar( m_row )->setDataDirect( m_column, m_new_value );
+    //plan->calendars()->emitDataChangedRow( m_row );
+
+    if ( m_row != Calendar::ROW_NAME ) plan->schedule();
+  }
+
+  void  undo()
+  {
+    // revert resource back to old value
+    plan->calendar( m_row )->setDataDirect( m_column, m_old_value );
+    //plan->calendars()->emitDataChangedRow( m_row );
+
+    if ( m_row != Calendar::ROW_NAME ) plan->schedule();
+  }
 
 private:
-  QString             m_name;            // name of calendar
-  Date                m_cycleAnchor;     // anchor date of calendar cycle
-  quint8              m_cycleLength;     // length of basic cycle (eg 7)
-  QVector<Day*>       m_normal;          // normal basic cycle days
-  QHash<Date, Day*>   m_exceptions;      // exceptions override normal days
+  int       m_row;
+  int       m_column;
+  QVariant  m_new_value;
+  QVariant  m_old_value;
 };
 
-#endif // CALENDAR_H
+#endif // COMMANDCALENDARSETDATA_H

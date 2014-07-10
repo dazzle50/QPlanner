@@ -22,6 +22,7 @@
 
 #include "plan.h"
 #include "task.h"
+#include "command/commandtasksetdata.h"
 
 /*************************************************************************************************/
 /*************************************** Single plan task ****************************************/
@@ -268,9 +269,6 @@ QString  Task::typeToString( int type )
 bool  Task::setData( int col, const QVariant& value )
 {
   // TODO some checks that set data will be allowed, return false if not allowed
-
-  // if value hasn't changed, don't proceed
-  if ( value == dataEditRole(col) ) return false;
 
   // set data via undo/redo command
   //plan->undostack()->push( new CommandTaskSetData( this, col, value ) );

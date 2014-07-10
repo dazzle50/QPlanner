@@ -44,6 +44,8 @@ public:
   Time       end( int n ) { return m_end.at(n); }      // return work period end
 
   QVariant   data( int, int );                         // return data for column & role
+  bool       setData( int, const QVariant& );          // attempt to set value via undostack
+  void       setDataDirect( int, const QVariant& );    // set value directly
 
   static QVariant   headerData( int );                 // return column header data
 
