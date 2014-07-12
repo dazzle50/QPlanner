@@ -178,6 +178,8 @@ bool Calendar::setData( int row, const QVariant& value )
 {
   // TODO some checks that set data will be allowed, return false if not allowed
 
+  qDebug("%p Calendar::setData %i '%s'",this,row,qPrintable(value.toString()));
+
   // set data via undo/redo command
   //plan->undostack()->push( new CommandCalendarSetData( row, col, new_value, old_value ) );
   return true;

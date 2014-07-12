@@ -31,6 +31,11 @@
 #include "model/tasksmodel.h"
 #include "model/task.h"
 
+#include "delegate/daysdelegate.h"
+#include "delegate/calendarsdelegate.h"
+#include "delegate/resourcesdelegate.h"
+#include "delegate/tasksdelegate.h"
+
 /*************************************************************************************************/
 /***************************** Tabbed widget containing main screens *****************************/
 /*************************************************************************************************/
@@ -47,10 +52,14 @@ MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new 
 
   // set models & delegates for table views
   setModels();
-  //TasksDelegate*      td = new TasksDelegate();
-  //ResourcesDelegate*  rd = new ResourcesDelegate();
-  //ui->tasksView->setItemDelegate( td );
-  //ui->resourcesView->setItemDelegate( rd );
+  DaysDelegate*       dd = new DaysDelegate();
+  CalendarsDelegate*  cd = new CalendarsDelegate();
+  ResourcesDelegate*  rd = new ResourcesDelegate();
+  TasksDelegate*      td = new TasksDelegate();
+  ui->daysView->setItemDelegate( dd );
+  ui->calendarsView->setItemDelegate( cd );
+  ui->resourcesView->setItemDelegate( rd );
+  ui->tasksView->setItemDelegate( td );
 
   // connect task delegate edit task cell to slot, queued so any earlier edit is finished and closed
   //connect( td, SIGNAL(editTaskCell(QModelIndex,QString)),

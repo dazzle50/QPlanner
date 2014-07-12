@@ -26,7 +26,11 @@ SOURCES += main.cpp\
     model/resource.cpp \
     model/resourcesmodel.cpp \
     model/task.cpp \
-    model/tasksmodel.cpp
+    model/tasksmodel.cpp \
+    delegate/daysdelegate.cpp \
+    delegate/calendarsdelegate.cpp \
+    delegate/resourcesdelegate.cpp \
+    delegate/tasksdelegate.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -48,7 +52,11 @@ HEADERS  += \
     command/commanddaysetdata.h \
     command/commandcalendarsetdata.h \
     command/commandresourcesetdata.h \
-    command/commandtasksetdata.h
+    command/commandtasksetdata.h \
+    delegate/daysdelegate.h \
+    delegate/calendarsdelegate.h \
+    delegate/resourcesdelegate.h \
+    delegate/tasksdelegate.h
 
 FORMS += \
     gui/mainwindow.ui \

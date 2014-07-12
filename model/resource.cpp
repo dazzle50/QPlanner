@@ -141,6 +141,8 @@ bool  Resource::setData( int row, int col, const QVariant& new_value )
 {
   // TODO some checks that set data will be allowed, return false if not allowed
 
+  qDebug("%p Resource::setData %i '%s'",this,col,qPrintable(new_value.toString()));
+
   // set data via undo/redo command
   //plan->undostack()->push( new CommandResourceSetData( row, col, new_value, old_value ) );
   return true;

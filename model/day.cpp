@@ -162,6 +162,8 @@ bool Day::setData( int col, const QVariant& value )
 {
   // TODO some checks that set data will be allowed, return false if not allowed
 
+  qDebug("%p Day::setData %i '%s'",this,col,qPrintable(value.toString()));
+
   // set data via undo/redo command
   //plan->undostack()->push( new CommandDaySetData( row, col, new_value, old_value ) );
   return true;
