@@ -22,7 +22,6 @@
 
 #include "plan.h"
 #include "task.h"
-#include "command/commandtasksetdata.h"
 
 /*************************************************************************************************/
 /*************************************** Single plan task ****************************************/
@@ -251,7 +250,7 @@ QVariant  Task::dataDisplayRole( int col ) const
   return QVariant();
 }
 
-/***************************************** typetoString ******************************************/
+/***************************************** typeToString ******************************************/
 
 QString  Task::typeToString( int type )
 {
@@ -266,15 +265,12 @@ QString  Task::typeToString( int type )
 
 /******************************************** setData ********************************************/
 
-bool  Task::setData( int col, const QVariant& value )
+void  Task::setData( int col, const QVariant& value )
 {
   // TODO some checks that set data will be allowed, return false if not allowed
 
   qDebug("%p Task::setData %i '%s'",this,col,qPrintable(value.toString()));
 
-  // set data via undo/redo command
-  //plan->undostack()->push( new CommandTaskSetData( this, col, value ) );
-  return true;
 }
 
 /********************************************* work **********************************************/

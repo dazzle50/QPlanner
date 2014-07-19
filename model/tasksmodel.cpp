@@ -20,6 +20,7 @@
 
 #include "tasksmodel.h"
 #include "task.h"
+#include "command/commandtasksetdata.h"
 
 /*************************************************************************************************/
 /**************************** Table model containing all plan tasks ******************************/
@@ -175,10 +176,8 @@ bool TasksModel::setData( const QModelIndex& index, const QVariant& value, int r
   // if value hasn't changed, don't proceed
   if ( value == data( index, role ) ) return false;
 
-  // try to set data
-  int row = index.row();
-  int col = index.column();
-  return m_tasks.at( row )->setData( col, value );
+  // set data via undo/redo command
+  //plan->undostack()->push( new CommandTaskSetData( index, value ) );
 }
 
 /****************************************** headerData *******************************************/

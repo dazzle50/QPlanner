@@ -34,44 +34,46 @@
 class CommandDaySetData : public QUndoCommand
 {
 public:
-  CommandDaySetData( int row, int col, const QVariant& new_value, const QVariant& old_value )
+  CommandDaySetData( const QModelIndex& index, const QVariant& value )
   {
     // set private variables for new and old values
-    m_row       = row;
-    m_column    = col;
-    m_new_value = new_value;
-    m_old_value = old_value;
+    m_row     = index.row();
+    m_column  = index.column();
+    m_old_day = *( plan->day( m_row ) );
+    m_value   = value;
 
     // construct command description
     setText( QString("Day %1 %2 = %3")
-             .arg( row )
-             .arg( Day::headerData( col ).toString() )
-             .arg( new_value.toString() ) );
+             .arg( m_row+1 )
+             .arg( Day::headerData( m_column ).toString() )
+             .arg( value.toString() ) );
   }
 
   void  redo()
   {
-    // update resource with new value
-    plan->day( m_row )->setDataDirect( m_column, m_new_value );
-    //plan->days()->emitDataChangedRow( m_row );
+    // update day with new value
+    plan->day( m_row )->setData( m_column, m_value );
 
-    if ( m_row != Day::SECTION_NAME ) plan->schedule();
+    // ensure table row is refreshed, and plan re-scheduled if needed
+    plan->days()->emitDataChangedRow( m_row );
+    if ( m_column != Day::SECTION_NAME ) plan->schedule();
   }
 
   void  undo()
   {
-    // revert resource back to old value
-    plan->day( m_row )->setDataDirect( m_column, m_old_value );
-    //plan->days()->emitDataChangedRow( m_row );
+    // revert day type to old definition
+    *( plan->day( m_row ) ) = m_old_day;
 
-    if ( m_row != Day::SECTION_NAME ) plan->schedule();
+    // ensure table row is refreshed, and plan re-scheduled if needed
+    plan->days()->emitDataChangedRow( m_row );
+    if ( m_column != Day::SECTION_NAME ) plan->schedule();
   }
 
 private:
   int       m_row;
   int       m_column;
-  QVariant  m_new_value;
-  QVariant  m_old_value;
+  Day       m_old_day;  // need whole copy for undo since reducing number of periods will lose data
+  QVariant  m_value;
 };
 
 #endif // COMMANDDAYSETDATA_H

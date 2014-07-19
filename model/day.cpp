@@ -20,7 +20,6 @@
 
 #include "day.h"
 #include "plan.h"
-#include "command/commanddaysetdata.h"
 
 /*************************************************************************************************/
 /**************************** Single day type used in plan calendars *****************************/
@@ -128,7 +127,7 @@ QVariant  Day::data( int column, int role )
   {
     if ( column == SECTION_NAME )   return m_name;
     if ( column == SECTION_WORK )   return QString("%1").arg( m_work, 0, 'f', 2 );
-    if ( column == SECTION_PARTS )  return m_periods;
+    if ( column == SECTION_PERIODS )  return m_periods;
 
     if ( column >= m_periods*2+SECTION_START ) return QVariant();
 
@@ -158,15 +157,10 @@ QVariant  Day::data( int column, int role )
 
 /******************************************** setData ********************************************/
 
-bool Day::setData( int col, const QVariant& value )
+void Day::setData( int col, const QVariant& value )
 {
-  // TODO some checks that set data will be allowed, return false if not allowed
-
+  // TODO
   qDebug("%p Day::setData %i '%s'",this,col,qPrintable(value.toString()));
-
-  // set data via undo/redo command
-  //plan->undostack()->push( new CommandDaySetData( row, col, new_value, old_value ) );
-  return true;
 }
 
 /****************************************** headerData *******************************************/
@@ -176,7 +170,7 @@ QVariant  Day::headerData( int section )
   // return section horizontal header title text
   if ( section == SECTION_NAME )  return "Name";
   if ( section == SECTION_WORK )  return "Work";
-  if ( section == SECTION_PARTS ) return "Periods";
+  if ( section == SECTION_PERIODS ) return "Periods";
 
   if ( (section-SECTION_START) % 2 == 0 )
     return QString("Start %1").arg( (section-SECTION_START) / 2 + 1 );

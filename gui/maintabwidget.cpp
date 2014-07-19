@@ -115,7 +115,7 @@ MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new 
   ui->daysView->horizontalHeader()->setDefaultSectionSize( 70 );
   ui->daysView->setColumnWidth( Day::SECTION_NAME, 150 );
   ui->daysView->setColumnWidth( Day::SECTION_WORK,  50 );
-  ui->daysView->setColumnWidth( Day::SECTION_PARTS, 50 );
+  ui->daysView->setColumnWidth( Day::SECTION_PERIODS, 50 );
 
   // set tasks view splitter behaviour & default position
   ui->tasksGanttSplitter->setStretchFactor( 1, 1 );

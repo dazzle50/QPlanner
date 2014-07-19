@@ -52,7 +52,7 @@ public:
   void  redo()
   {
     // update resource with new value
-    plan->calendar( m_row )->setDataDirect( m_column, m_new_value );
+    plan->calendar( m_row )->setData( m_column, m_new_value );
     //plan->calendars()->emitDataChangedRow( m_row );
 
     if ( m_row != Calendar::ROW_NAME ) plan->schedule();
@@ -61,7 +61,7 @@ public:
   void  undo()
   {
     // revert resource back to old value
-    plan->calendar( m_row )->setDataDirect( m_column, m_old_value );
+    plan->calendar( m_row )->setData( m_column, m_old_value );
     //plan->calendars()->emitDataChangedRow( m_row );
 
     if ( m_row != Calendar::ROW_NAME ) plan->schedule();

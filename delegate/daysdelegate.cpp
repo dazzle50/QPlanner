@@ -21,8 +21,10 @@
 #include <QLineEdit>
 #include <QDoubleSpinBox>
 #include <QSpinBox>
+#include <QTimeEdit>
 
 #include "daysdelegate.h"
+#include "xtimeedit.h"
 #include "model/day.h"
 
 /*************************************************************************************************/
@@ -60,7 +62,7 @@ QWidget*  DaysDelegate::createEditor( QWidget *parent,
       return editor;
     }
 
-    case Day::SECTION_PARTS:
+    case Day::SECTION_PERIODS:
     {
       QSpinBox* editor = dynamic_cast<QSpinBox*>( QStyledItemDelegate::createEditor( parent, option, index ) );
       editor->setRange( 0, 10 );
@@ -68,8 +70,8 @@ QWidget*  DaysDelegate::createEditor( QWidget *parent,
     }
 
     default:
-      // TODO custom editor for period starts/ends
-      return QStyledItemDelegate::createEditor( parent, option, index );
+      // custom editor for period starts/ends
+      return new XTimeEdit( parent, 0, 24*60 );
   }
 }
 
@@ -78,13 +80,18 @@ QWidget*  DaysDelegate::createEditor( QWidget *parent,
 void  DaysDelegate::setEditorData( QWidget* editor, const QModelIndex& index) const
 {
   // set the editor initial value, method depends on editor which depends on column
-  switch ( index.column() )
+  if ( index.column() >= Day::SECTION_START )
   {
-
-    default:
-      QStyledItemDelegate::setEditorData( editor, index );
-      return;
+    // column is a start or end which uses special time editor
+    XTimeEdit* timeEditor = dynamic_cast<XTimeEdit*>( editor );
+    QString newTime = index.model()->data( index, Qt::EditRole ).toString();
+    timeEditor->setTime( newTime );
+    return;
   }
+
+  // use default method for name/work/periods
+  QStyledItemDelegate::setEditorData( editor, index );
+  return;
 }
 
 /***************************************** setModelData ******************************************/
@@ -94,11 +101,15 @@ void  DaysDelegate::setModelData( QWidget* editor,
                                   const QModelIndex& index ) const
 {
   // update the model value, method depends on editor which depends on column
-  switch ( index.column() )
+  if ( index.column() >= Day::SECTION_START )
   {
-
-    default:
-      QStyledItemDelegate::setModelData( editor, model, index );
-      return;
+    // column is a start or end which uses special time editor
+    XTimeEdit* timeEditor = dynamic_cast<XTimeEdit*>( editor );
+    model->setData( index, timeEditor->toString() );
+    return;
   }
+
+  // use default method for name/work/periods
+  QStyledItemDelegate::setModelData( editor, model, index );
+  return;
 }

@@ -40,8 +40,7 @@ public:
   Calendar( int );                              // constructor for initial default calendars
 
   QVariant      data( int, int ) const;                        // return data for row & role
-  bool          setData( int, const QVariant& );               // attempt to set value via undostack
-  void          setDataDirect( int, const QVariant& );         // set value directly
+  void          setData( int, const QVariant& );               // set data value for column
 
   int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
   QString       name() const { return m_name; }                // return calendar name

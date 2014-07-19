@@ -52,7 +52,7 @@ public:
   void  redo()
   {
     // update task with new value
-    plan->task( m_row )->setDataDirect( m_column, m_new_value );
+    plan->task( m_row )->setData( m_column, m_new_value );
     plan->schedule();
   }
 

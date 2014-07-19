@@ -42,6 +42,7 @@ public:
   int          index( Day* d ) { return m_days.indexOf(d); }       // return index of day type, or -1
   int          number() { return m_days.size(); }                  // return number of day types in plan
   QStringList  namesList() const;                                  // return list of day type names
+  void         emitDataChangedRow( int );                          // emit data changed signal for row
 
   /********************* methods to support QAbstractTableModel ************************/
 

@@ -49,8 +49,7 @@ public:
   QVariant          dataTextAlignmentRole( int ) const;           // return text alignment for cell
   QVariant          dataToolTipRole( int ) const;                 // return tool tip text for cell
   QVariant          dataFontRole( int ) const;                    // return font for cell
-  bool              setData( int, const QVariant& );              // attempt to set value via undostack
-  void              setDataDirect( int, const QVariant& );        // set value directly
+  void              setData( int, const QVariant& );              // set data value for column
 
   bool              isExpanded() const { return m_expanded; }     // if summary is it expanded to show subtasks
   bool              isSummary() const { return m_summaryEnd >= 0; }    // is this task a summary

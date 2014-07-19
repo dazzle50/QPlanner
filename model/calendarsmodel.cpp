@@ -20,6 +20,7 @@
 
 #include "calendarsmodel.h"
 #include "calendar.h"
+#include "command/commandcalendarsetdata.h"
 
 /*************************************************************************************************/
 /************************** Table model containing all base calendars ****************************/
@@ -85,10 +86,8 @@ bool CalendarsModel::setData( const QModelIndex& index, const QVariant& value, i
   // if value hasn't changed, don't proceed
   if ( value == data( index, role ) ) return false;
 
-  // try to set data
-  int row = index.row();
-  int col = index.column();
-  return m_calendars.at( col )->setData( row, value );
+  // set data via undo/redo command
+  //plan->undostack()->push( new CommandCalendarSetData( index, value ) );
 }
 
 /****************************************** headerData *******************************************/

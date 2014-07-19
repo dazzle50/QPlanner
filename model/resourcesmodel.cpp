@@ -21,6 +21,7 @@
 #include "resourcesmodel.h"
 #include "resource.h"
 #include "plan.h"
+#include "command/commandresourcesetdata.h"
 
 /*************************************************************************************************/
 /**************************** Table model containing all resources *******************************/
@@ -122,10 +123,8 @@ bool ResourcesModel::setData( const QModelIndex& index,
   // if value hasn't changed, don't proceed
   if ( value == data( index, role ) ) return false;
 
-  // try to set data
-  int row = index.row();
-  int col = index.column();
-  return m_resources.at( row )->setData( row, col, value );
+  // set data via undo/redo command
+  //plan->undostack()->push( new CommandResourceSetData( index, value ) );
 }
 
 /****************************************** headerData *******************************************/

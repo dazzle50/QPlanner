@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     delegate/daysdelegate.cpp \
     delegate/calendarsdelegate.cpp \
     delegate/resourcesdelegate.cpp \
-    delegate/tasksdelegate.cpp
+    delegate/tasksdelegate.cpp \
+    delegate/xtimeedit.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -56,7 +57,8 @@ HEADERS  += \
     delegate/daysdelegate.h \
     delegate/calendarsdelegate.h \
     delegate/resourcesdelegate.h \
-    delegate/tasksdelegate.h
+    delegate/tasksdelegate.h \
+    delegate/xtimeedit.h
 
 FORMS += \
     gui/mainwindow.ui \

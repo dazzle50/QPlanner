@@ -21,6 +21,7 @@
 #include "daysmodel.h"
 #include "day.h"
 #include "plan.h"
+#include "command/commanddaysetdata.h"
 
 /*************************************************************************************************/
 /************************ Table model containing all calendar day types **************************/
@@ -106,12 +107,11 @@ bool DaysModel::setData( const QModelIndex& index, const QVariant& value, int ro
   if ( role != Qt::EditRole ) return false;
 
   // if value hasn't changed, don't proceed
-  if ( value == data( index, role ) ) return false;
+  if ( value.toString() == data( index, role ).toString() ) return false;
 
-  // try to set data
-  int row = index.row();
-  int col = index.column();
-  return m_days.at( row )->setData( col, value );
+  // set data via undo/redo command
+  plan->undostack()->push( new CommandDaySetData( index, value ) );
+  return true;
 }
 
 /****************************************** headerData *******************************************/
@@ -149,4 +149,13 @@ QStringList  DaysModel::namesList() const
     list << d->name();
 
   return list;
+}
+
+/******************************************* namesList *******************************************/
+
+void DaysModel::emitDataChangedRow( int row )
+{
+  // emit data changed signal for row
+  emit dataChanged( QAbstractTableModel::index( row, 0 ),
+                    QAbstractTableModel::index( row, columnCount() ) );
 }

@@ -44,8 +44,7 @@ public:
   Time       end( int n ) { return m_end.at(n); }      // return work period end
 
   QVariant   data( int, int );                         // return data for column & role
-  bool       setData( int, const QVariant& );          // attempt to set value via undostack
-  void       setDataDirect( int, const QVariant& );    // set value directly
+  void       setData( int, const QVariant& );          // set data value for column
 
   static QVariant   headerData( int );                 // return column header data
 
@@ -61,11 +60,11 @@ public:
 
   enum Sections
   {
-    SECTION_NAME  = 0,
-    SECTION_WORK  = 1,
-    SECTION_PARTS = 2,
-    SECTION_START = 3,
-    SECTION_END   = 4
+    SECTION_NAME    = 0,
+    SECTION_WORK    = 1,
+    SECTION_PERIODS = 2,
+    SECTION_START   = 3,
+    SECTION_END     = 4
   };
 
 private:
