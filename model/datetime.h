@@ -38,6 +38,7 @@ public:
   const static Time   NULL_TIME = -1;          // Time value that represents null
 
   static Time      time( int, int );           // return Time from hours & minutes
+  static Time      time( QString );            // return Time from HH:MM string
   static QString   toString( Time );           // return HH:MM string from Time
 
   // CANNOT convert Time to QTime because Time can represent *24:00* unlike QTime

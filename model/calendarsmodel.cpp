@@ -87,7 +87,7 @@ bool CalendarsModel::setData( const QModelIndex& index, const QVariant& value, i
   if ( value == data( index, role ) ) return false;
 
   // set data via undo/redo command
-  //plan->undostack()->push( new CommandCalendarSetData( index, value ) );
+  plan->undostack()->push( new CommandCalendarSetData( index, value ) );
 }
 
 /****************************************** headerData *******************************************/
@@ -97,17 +97,8 @@ QVariant CalendarsModel::headerData( int section, Qt::Orientation orientation, i
   // if role is not DisplayRole, return an invalid QVariant
   if ( role != Qt::DisplayRole ) return QVariant();
 
-  if ( orientation == Qt::Vertical )
-  {
-    if ( section == Calendar::ROW_NAME )        return "Name";
-    if ( section == Calendar::ROW_ANCHOR )      return "Anchor";
-    if ( section == Calendar::ROW_EXCEPTIONS )  return "Exceptions";
-    if ( section == Calendar::ROW_CYCLELENGTH ) return "Cycle";
-
-    return QString("Normal %1").arg( section - Calendar::ROW_NORMAL1 + 1 );
-  }
-  else
-    return m_calendars.at(section)->name();
+  if ( orientation == Qt::Vertical ) return Calendar::headerData( section );
+  return m_calendars.at(section)->name();
 }
 
 /******************************************** rowCount *******************************************/
@@ -121,7 +112,7 @@ int CalendarsModel::rowCount( const QModelIndex& parent ) const
   foreach( Calendar* cal, m_calendars )
     if ( max < cal->cycleLength() ) max = cal->cycleLength();
 
-  return max + Calendar::ROW_NORMAL1;
+  return max + Calendar::SECTION_NORMAL1;
 }
 
 /****************************************** columnCount ******************************************/
@@ -141,7 +132,7 @@ Qt::ItemFlags CalendarsModel::flags( const QModelIndex& index ) const
   // if cell refers to non-existing working period, then cell is not selectable, etc
   int row = index.row();
   int col = index.column();
-  if ( row >= m_calendars.at(col)->cycleLength()+Calendar::ROW_NORMAL1 ) return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  if ( row >= m_calendars.at(col)->cycleLength()+Calendar::SECTION_NORMAL1 ) return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
   // otherwise all cells are selectable, editable, etc
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
@@ -157,4 +148,37 @@ QStringList  CalendarsModel::namesList() const
     list << cal->name();
 
   return list;
+}
+
+/************************************ emitDataChangedColumn **************************************/
+
+void CalendarsModel::emitDataChangedColumn( int col )
+{
+  // emit data changed signal for column
+  emit dataChanged( QAbstractTableModel::index( 0, col ),
+                    QAbstractTableModel::index( rowCount(), col ) );
+}
+
+/**************************************** emitNameChanged ****************************************/
+
+void CalendarsModel::emitNameChanged() const
+{
+  // emit name changed signal
+  emit nameChanged();
+}
+
+/****************************************** beginInsert ******************************************/
+
+void CalendarsModel::beginInsert( int num )
+{
+  // begin process of appending number of rows to table model
+  beginInsertRows( QModelIndex(), rowCount(), rowCount()+num-1 );
+}
+
+/****************************************** beginRemove ******************************************/
+
+void CalendarsModel::beginRemove( int num )
+{
+  // begin process of removing number of rows to table model
+  beginRemoveRows( QModelIndex(), rowCount()-num, rowCount()-1 );
 }

@@ -43,6 +43,12 @@ public:
   int          number() { return m_days.size(); }                  // return number of day types in plan
   QStringList  namesList() const;                                  // return list of day type names
   void         emitDataChangedRow( int );                          // emit data changed signal for row
+  void         emitNameChanged() const;                            // emit name changed signal
+
+  void         beginInsert( int );                                 // begin insert process
+  void         endInsert() { endInsertColumns(); }                 // end insert process
+  void         beginRemove( int );                                 // begin remove process
+  void         endRemove() { endRemoveColumns(); }                 // end remove process
 
   /********************* methods to support QAbstractTableModel ************************/
 
@@ -52,6 +58,9 @@ public:
   bool           setData( const QModelIndex&, const QVariant&, int );             // implement virtual set data
   QVariant       headerData( int, Qt::Orientation, int ) const;                   // implement virtual header data
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
+
+signals:
+  void         nameChanged() const;                                // signal that a day name has changed
 
 private:
   QList<Day*>     m_days;      // list of day types available to calendars

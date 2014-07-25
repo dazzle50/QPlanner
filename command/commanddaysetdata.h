@@ -56,16 +56,33 @@ public:
 
     // ensure table row is refreshed, and plan re-scheduled if needed
     plan->days()->emitDataChangedRow( m_row );
+    if ( m_column == Day::SECTION_NAME ) plan->days()->emitNameChanged();
     if ( m_column != Day::SECTION_NAME ) plan->schedule();
   }
 
   void  undo()
   {
-    // revert day type to old definition
+    // revert day type to old definition, checking if table model number of columns changes
+    int oldColumns = plan->days()->columnCount();
     *( plan->day( m_row ) ) = m_old_day;
+    int newColumns = plan->days()->columnCount();
+    if ( oldColumns != newColumns )
+    {
+      // table model number of columns has changed, so needs special handling
+      plan->day( m_row )->m_periods = m_value.toInt();
+
+      if ( newColumns > oldColumns ) plan->days()->beginInsert( newColumns - oldColumns );
+      if ( newColumns < oldColumns ) plan->days()->beginRemove( oldColumns - newColumns );
+
+      *( plan->day( m_row ) ) = m_old_day;
+
+      if ( newColumns > oldColumns ) plan->days()->endInsert();
+      if ( newColumns < oldColumns ) plan->days()->endRemove();
+    }
 
     // ensure table row is refreshed, and plan re-scheduled if needed
     plan->days()->emitDataChangedRow( m_row );
+    if ( m_column == Day::SECTION_NAME ) plan->days()->emitNameChanged();
     if ( m_column != Day::SECTION_NAME ) plan->schedule();
   }
 

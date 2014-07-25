@@ -41,6 +41,13 @@ public:
   int            index( Calendar* c ) { return m_calendars.indexOf(c); }  // return index of calendar, or -1
   int            number() { return m_calendars.size(); }                  // return number of calendars in plan
   QStringList    namesList() const;                                       // return list of calendar names
+  void           emitDataChangedColumn( int );                            // emit data changed signal for column
+  void           emitNameChanged() const;                                 // emit name changed signal
+
+  void           beginInsert( int );                                      // begin insert process
+  void           endInsert() { endInsertRows(); }                         // end insert process
+  void           beginRemove( int );                                      // begin remove process
+  void           endRemove() { endRemoveRows(); }                         // end remove process
 
   /********************* methods to support QAbstractTableModel ************************/
 
@@ -50,6 +57,9 @@ public:
   bool           setData( const QModelIndex&, const QVariant&, int );             // implement virtual set data
   QVariant       headerData( int, Qt::Orientation, int ) const;                   // implement virtual header data
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
+
+signals:
+  void           nameChanged() const;                                    // signal that a calendar name has changed
 
 private:
   QList<Calendar*>   m_calendars;     // list of calendars available to plan

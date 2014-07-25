@@ -35,6 +35,7 @@ class Day;
 
 class Calendar
 {
+  friend class CommandCalendarSetData;
 public:
   Calendar();                                   // constructor
   Calendar( int );                              // constructor for initial default calendars
@@ -45,6 +46,8 @@ public:
   int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
   QString       name() const { return m_name; }                // return calendar name
 
+  static QVariant   headerData( int );                         // return row header data
+
   enum DefaultCalendarTypes
   {
     DEFAULT_CALENDAR = 0,
@@ -53,13 +56,13 @@ public:
     DEFAULT_MAX      = 2
   };
 
-  enum Rows
+  enum Sections
   {
-    ROW_NAME        = 0,
-    ROW_ANCHOR      = 1,
-    ROW_EXCEPTIONS  = 2,
-    ROW_CYCLELENGTH = 3,
-    ROW_NORMAL1     = 4
+    SECTION_NAME        = 0,
+    SECTION_ANCHOR      = 1,
+    SECTION_EXCEPTIONS  = 2,
+    SECTION_CYCLELENGTH = 3,
+    SECTION_NORMAL1     = 4
   };
 
 private:

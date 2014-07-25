@@ -20,6 +20,7 @@
 
 #include "day.h"
 #include "plan.h"
+#include "daysmodel.h"
 
 /*************************************************************************************************/
 /**************************** Single day type used in plan calendars *****************************/
@@ -159,8 +160,57 @@ QVariant  Day::data( int column, int role )
 
 void Day::setData( int col, const QVariant& value )
 {
-  // TODO
-  qDebug("%p Day::setData %i '%s'",this,col,qPrintable(value.toString()));
+  // set day type data based on column
+  if ( col == SECTION_NAME ) m_name = value.toString();
+
+  if ( col == SECTION_WORK ) m_work = value.toFloat();
+
+  if ( col == SECTION_PERIODS )
+  {
+   int newPeriods = value.toInt();
+
+   // determine number of columns before and after
+   int oldValue   = m_periods;
+   int oldColumns = plan->days()->columnCount();
+   m_periods      = newPeriods;
+   int newColumns = plan->days()->columnCount();
+   m_periods      = oldValue;
+
+   if ( newColumns > oldColumns ) plan->days()->beginInsert( newColumns - oldColumns );
+   if ( newColumns < oldColumns ) plan->days()->beginRemove( oldColumns - newColumns );
+
+   Time time = 0;
+   if ( m_periods > 0 ) time = m_end.at( m_periods-1 );
+   Time increment = (24*60-time)/(2*(newPeriods-m_periods)+1);
+
+   m_start.resize( newPeriods );
+   m_end.resize( newPeriods );
+
+   for( int p = m_periods ; p < newPeriods ; p++ )
+   {
+     time += increment;
+     m_start[p] = time;
+     time += increment;
+     m_end[p] = time;
+   }
+
+   m_periods = newPeriods;
+   calcMinutes();
+
+   if ( newColumns > oldColumns ) plan->days()->endInsert();
+   if ( newColumns < oldColumns ) plan->days()->endRemove();
+  }
+
+  if ( col >= SECTION_START )
+  {
+    // check if a start or an end
+    if ( (col-SECTION_START) % 2 == 0 )
+      m_start[ (col-SECTION_START) / 2 ] = XTime::time( value.toString() );
+    else
+      m_end[ (col-SECTION_END) / 2 ] = XTime::time( value.toString() );
+
+    calcMinutes();
+  }
 }
 
 /****************************************** headerData *******************************************/

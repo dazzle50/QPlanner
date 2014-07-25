@@ -34,44 +34,63 @@
 class CommandCalendarSetData : public QUndoCommand
 {
 public:
-  CommandCalendarSetData( int row, int col, const QVariant& new_value, const QVariant& old_value )
+  CommandCalendarSetData( const QModelIndex& index, const QVariant& value )
   {
     // set private variables for new and old values
-    m_row       = row;
-    m_column    = col;
-    m_new_value = new_value;
-    m_old_value = old_value;
+    m_row     = index.row();
+    m_column  = index.column();
+    m_old_cal = *( plan->calendar( m_column ) );
+    m_value   = value;
 
     // construct command description
-    setText( QString("Day %1 %2 = %3")
-             .arg( row )
-             //.arg( Calendar::headerData( col ).toString() )
-             .arg( new_value.toString() ) );
+    setText( QString("Calendar %1 %2 = %3")
+             .arg( m_column+1 )
+             .arg( Calendar::headerData( m_row ).toString() )
+             .arg( value.toString() ) );
   }
 
   void  redo()
   {
-    // update resource with new value
-    plan->calendar( m_row )->setData( m_column, m_new_value );
-    //plan->calendars()->emitDataChangedRow( m_row );
+    // update calendar with new value
+    plan->calendar( m_column )->setData( m_row, m_value );
 
-    if ( m_row != Calendar::ROW_NAME ) plan->schedule();
+    // ensure table row is refreshed, and plan re-scheduled if needed
+    plan->calendars()->emitDataChangedColumn( m_column );
+    if ( m_row == Calendar::SECTION_NAME ) plan->calendars()->emitNameChanged();
+    if ( m_row != Calendar::SECTION_NAME ) plan->schedule();
   }
 
   void  undo()
   {
-    // revert resource back to old value
-    plan->calendar( m_row )->setData( m_column, m_old_value );
-    //plan->calendars()->emitDataChangedRow( m_row );
+    // revert calendar to old definition, checking if table model number of rows changes
+    int oldRows = plan->calendars()->rowCount();
+    *( plan->calendar( m_column ) ) = m_old_cal;
+    int newRows = plan->calendars()->rowCount();
+    if ( oldRows != newRows )
+    {
+      // table model number of rows has changed, so needs special handling
+      plan->calendar( m_column )->m_cycleLength = m_value.toInt();
 
-    if ( m_row != Calendar::ROW_NAME ) plan->schedule();
+      if ( newRows > oldRows ) plan->calendars()->beginInsert( newRows - oldRows );
+      if ( newRows < oldRows ) plan->calendars()->beginRemove( oldRows - newRows );
+
+      *( plan->calendar( m_column ) ) = m_old_cal;
+
+      if ( newRows > oldRows ) plan->calendars()->endInsert();
+      if ( newRows < oldRows ) plan->calendars()->endRemove();
+    }
+
+    // ensure table row is refreshed, and plan re-scheduled if needed
+    plan->calendars()->emitDataChangedColumn( m_column );
+    if ( m_row == Calendar::SECTION_NAME ) plan->calendars()->emitNameChanged();
+    if ( m_row != Calendar::SECTION_NAME ) plan->schedule();
   }
 
 private:
   int       m_row;
   int       m_column;
-  QVariant  m_new_value;
-  QVariant  m_old_value;
+  Calendar  m_old_cal;  // need whole copy for undo since reducing cycle length will lose data
+  QVariant  m_value;
 };
 
 #endif // COMMANDCALENDARSETDATA_H

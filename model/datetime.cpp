@@ -37,6 +37,14 @@ Time XTime::time( int hours, int mins )
   return hours*60 + mins;
 }
 
+Time XTime::time( QString str )
+{
+  // return time from string "hh:mm" format
+  int hours = str.left(2).toInt();
+  int mins  = str.right(2).toInt();
+  return hours*60 + mins;
+}
+
 /******************************************* toString ********************************************/
 
 QString XTime::toString( Time t )

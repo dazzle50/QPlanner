@@ -33,6 +33,7 @@
 
 class Day
 {
+  friend class CommandDaySetData;
 public:
   Day();                                               // constructor
   Day( int );                                          // constructor

@@ -151,11 +151,35 @@ QStringList  DaysModel::namesList() const
   return list;
 }
 
-/******************************************* namesList *******************************************/
+/************************************** emitDataChangedRow ***************************************/
 
 void DaysModel::emitDataChangedRow( int row )
 {
   // emit data changed signal for row
   emit dataChanged( QAbstractTableModel::index( row, 0 ),
                     QAbstractTableModel::index( row, columnCount() ) );
+}
+
+/**************************************** emitNameChanged ****************************************/
+
+void DaysModel::emitNameChanged() const
+{
+  // emit name changed signal
+  emit nameChanged();
+}
+
+/****************************************** beginInsert ******************************************/
+
+void DaysModel::beginInsert( int num )
+{
+  // begin process of appending number of columns to table model
+  beginInsertColumns( QModelIndex(), columnCount(), columnCount()+num-1 );
+}
+
+/****************************************** beginRemove ******************************************/
+
+void DaysModel::beginRemove( int num )
+{
+  // begin process of removing number of columns to table model
+  beginRemoveColumns( QModelIndex(), columnCount()-num, columnCount()-1 );
 }

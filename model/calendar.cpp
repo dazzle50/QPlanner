@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "plan.h"
+#include "calendarsmodel.h"
 #include "daysmodel.h"
 #include "calendar.h"
 #include "day.h"
@@ -116,9 +117,9 @@ QVariant  Calendar::data( int row, int role  = Qt::DisplayRole ) const
   // if role is EditRole, return appropriate edit value
   if ( role == Qt::EditRole )
   {
-    if ( row >= ROW_NORMAL1 )
+    if ( row >= SECTION_NORMAL1 )
     {
-      QString  name = m_normal.at(row - ROW_NORMAL1)->name();
+      QString  name = m_normal.at(row - SECTION_NORMAL1)->name();
       return   plan->days()->namesList().indexOf( name );
     }
 
@@ -129,14 +130,14 @@ QVariant  Calendar::data( int row, int role  = Qt::DisplayRole ) const
   // if role is DisplayRole, return appropriate display value
   if ( role == Qt::DisplayRole )
   {
-    if ( row == ROW_NAME )        return m_name;
-    if ( row == ROW_ANCHOR )      return XDate::qdate( m_cycleAnchor );
-    if ( row == ROW_EXCEPTIONS )  return m_exceptions.size();
-    if ( row == ROW_CYCLELENGTH ) return m_cycleLength;
+    if ( row == SECTION_NAME )        return m_name;
+    if ( row == SECTION_ANCHOR )      return XDate::qdate( m_cycleAnchor );
+    if ( row == SECTION_EXCEPTIONS )  return m_exceptions.size();
+    if ( row == SECTION_CYCLELENGTH ) return m_cycleLength;
 
-    if ( row >= m_cycleLength+ROW_NORMAL1 ) return QVariant();
+    if ( row >= m_cycleLength+SECTION_NORMAL1 ) return QVariant();
 
-    return m_normal.at(row - ROW_NORMAL1)->name();
+    return m_normal.at(row - SECTION_NORMAL1)->name();
   }
 
   // if role is TextAlignmentRole, return appropriate display alignment
@@ -148,20 +149,20 @@ QVariant  Calendar::data( int row, int role  = Qt::DisplayRole ) const
   // if role is BackgroundRole, return appropriate background colour
   if ( role == Qt::BackgroundRole )
   {
-    if ( row >= m_cycleLength+ROW_NORMAL1 ) return plan->nullCellColour();
+    if ( row >= m_cycleLength+SECTION_NORMAL1 ) return plan->nullCellColour();
     return QVariant();
   }
 
   // if role is ToolTipRole, return appropriate tool tip text
   if ( role == Qt::ToolTipRole )
   {
-    if ( row < m_cycleLength+ROW_NORMAL1 &&
-         row >= ROW_NORMAL1 )
+    if ( row < m_cycleLength+SECTION_NORMAL1 &&
+         row >= SECTION_NORMAL1 )
     {
       Date   anchor  = m_cycleAnchor;
       int    len     = m_cycleLength;
       int    normal  = ( XDate::currentDate() - anchor ) % len;
-      QDate  example = QDate::currentDate().addDays( row - ROW_NORMAL1 - normal );
+      QDate  example = QDate::currentDate().addDays( row - SECTION_NORMAL1 - normal );
       return example.toString( "ddd dd MMM yyyy" );
     }
     return QVariant( QVariant::String );
@@ -175,9 +176,52 @@ QVariant  Calendar::data( int row, int role  = Qt::DisplayRole ) const
 
 void Calendar::setData( int row, const QVariant& value )
 {
-  // TODO some checks that set data will be allowed, return false if not allowed
+  // set calendar data based on row
+  if ( row == SECTION_NAME ) m_name = value.toString();
 
-  qDebug("%p Calendar::setData %i '%s'",this,row,qPrintable(value.toString()));
+  if ( row == SECTION_ANCHOR ) m_cycleAnchor = XDate::date( value.toDate() );
 
+  if ( row == SECTION_CYCLELENGTH )
+  {
+    int newLength = value.toInt();
 
+    // determine number of rows before and after
+    int oldLength = m_cycleLength;
+    int oldRows = plan->calendars()->rowCount();
+    m_cycleLength = newLength;
+    int newRows = plan->calendars()->rowCount();
+    m_cycleLength = oldLength;
+
+    if ( newRows > oldRows ) plan->calendars()->beginInsert( newRows - oldRows );
+    if ( newRows < oldRows ) plan->calendars()->beginRemove( oldRows - newRows );
+
+    m_cycleLength = newLength;
+    m_normal.resize( newLength );
+
+    for( int l = oldLength ; l < newLength ; l++ )
+      m_normal[l] = plan->day( Day::DEFAULT_STANDARDWORK );
+
+    if ( newRows > oldRows ) plan->calendars()->endInsert();
+    if ( newRows < oldRows ) plan->calendars()->endRemove();
+  }
+
+  if ( row == SECTION_EXCEPTIONS ) qDebug("Calendar::setData - exceptions NOT IMPLEMENTED YET!");
+
+  if ( row >= SECTION_NORMAL1 )
+  {
+    qDebug("Calendar::setData - normals NOT IMPLEMENTED YET!");
+  }
+}
+
+/******************************************* headerData ******************************************/
+
+QVariant Calendar::headerData( int section )
+{
+  // return section vertical header title text
+  if ( section == Calendar::SECTION_NAME )        return "Name";
+  if ( section == Calendar::SECTION_ANCHOR )      return "Anchor";
+  if ( section == Calendar::SECTION_EXCEPTIONS )  return "Exceptions";
+  if ( section == Calendar::SECTION_CYCLELENGTH ) return "Cycle";
+
+  return QString("Normal %1").arg( section - Calendar::SECTION_NORMAL1 + 1 );
 }
