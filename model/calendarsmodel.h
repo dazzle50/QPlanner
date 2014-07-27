@@ -41,6 +41,8 @@ public:
   int            index( Calendar* c ) { return m_calendars.indexOf(c); }  // return index of calendar, or -1
   int            number() { return m_calendars.size(); }                  // return number of calendars in plan
   QStringList    namesList() const;                                       // return list of calendar names
+
+  void           setOverride( QModelIndex, QVariant, QString );           // set override for edit re-start
   void           emitDataChangedColumn( int );                            // emit data changed signal for column
   void           emitNameChanged() const;                                 // emit name changed signal
 
@@ -60,10 +62,14 @@ public:
 
 signals:
   void           nameChanged() const;                                    // signal that a calendar name has changed
+  void           editCell( const QModelIndex&,
+                           const QString& ) const;                       // signal that cell editing needs to continue
 
 private:
   QList<Calendar*>   m_calendars;     // list of calendars available to plan
 
+  QModelIndex     m_overrideIndex;    // with value can override model for edits in progress
+  QVariant        m_overrideValue;    // with index can override model for edits in progress
 };
 
 #endif // CALENDARSMODEL_H

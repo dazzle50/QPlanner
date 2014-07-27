@@ -45,6 +45,15 @@ public:
 public slots:
   void  slotUpdatePlanTab();         // ensure 'Plan' tab widgets are up-to-date
 
+  void  slotEditDayCell( const QModelIndex&,
+                         const QString& );          // slot for editing day type cell
+  void  slotEditCalendarCell( const QModelIndex&,
+                              const QString& );     // slot for editing calendar cell
+  void  slotEditResourceCell( const QModelIndex&,
+                              const QString& );     // slot for editing resource cell
+  void  slotEditTaskCell( const QModelIndex&,
+                          const QString& );         // slot for editing task cell
+
 private:
   Ui::MainTabWidget*   ui;           // user interface created using qt designer
 };

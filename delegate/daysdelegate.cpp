@@ -26,6 +26,7 @@
 #include "daysdelegate.h"
 #include "xtimeedit.h"
 #include "model/day.h"
+#include "model/daysmodel.h"
 
 /*************************************************************************************************/
 /******************** Delegate for displaying & editing day types data items *********************/
@@ -100,6 +101,24 @@ void  DaysDelegate::setModelData( QWidget* editor,
                                   QAbstractItemModel* model,
                                   const QModelIndex& index ) const
 {
+  // check to ensure no duplicate day type names
+  if ( index.column() == Day::SECTION_NAME )
+  {
+    DaysModel*  days = dynamic_cast<DaysModel*>( model );
+    QLineEdit*  line = dynamic_cast<QLineEdit*>( editor );
+    QString     name = line->text().simplified();
+
+    if ( days->nameIsDuplicate( name, index.row() ) )
+    {
+      days->setOverride( index, name, "Duplicate names not allowed." );
+      return;
+    }
+
+    // not duplicate so set model data with simplified name
+    model->setData( index, name );
+    return;
+  }
+
   // update the model value, method depends on editor which depends on column
   if ( index.column() >= Day::SECTION_START )
   {

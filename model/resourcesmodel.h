@@ -33,15 +33,17 @@ class ResourcesModel : public QAbstractTableModel
 {
   Q_OBJECT
 public:
-  ResourcesModel();                                                   // constructor
-  ~ResourcesModel();                                                  // destructor
+  ResourcesModel();                                                // constructor
+  ~ResourcesModel();                                               // destructor
 
-  void              initialise();                                     // create initial default contents
-  int               number();                                         // return number of resources in plan
+  void           initialise();                                     // create initial default contents
+  int            number();                                         // return number of resources in plan
 
-  Resource*         resource( int n );                                // return pointer to n'th resource
-  int               index( Resource* r )
-                      { return m_resources.indexOf(r); }              // return index of resource, or -1
+  Resource*      resource( int n );                                // return pointer to n'th resource
+  int            index( Resource* r )
+                      { return m_resources.indexOf(r); }           // return index of resource, or -1
+
+  void           setOverride( QModelIndex, QVariant, QString );    // set override for edit re-start
 
   /********************* methods to support QAbstractTableModel ************************/
 
@@ -52,8 +54,15 @@ public:
   QVariant       headerData( int, Qt::Orientation, int ) const;                   // implement virtual header data
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
 
+signals:
+  void         nameChanged() const;                                // signal that a day name has changed
+  void         editCell( const QModelIndex&,
+                         const QString& ) const;                   // signal that cell editing needs to continue
 private:
   QList<Resource*>  m_resources;       // list of resources available to plan
+
+  QModelIndex       m_overrideIndex;   // with value can override model for edits in progress
+  QVariant          m_overrideValue;   // with index can override model for edits in progress
 };
 
 #endif // RESOURCESMODEL_H

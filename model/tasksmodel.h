@@ -47,6 +47,8 @@ public:
   Task*          task( int n );                                   // return pointer to n'th task
   int            index( Task* t ) { return m_tasks.indexOf(t); }  // return index of task, or -1
 
+  void           setOverride( QModelIndex, QVariant, QString );   // set override for edit re-start
+
   /********************* methods to support QAbstractTableModel ************************/
 
   int            rowCount( const QModelIndex& parent = QModelIndex() ) const;     // implement virtual row count
@@ -56,11 +58,14 @@ public:
   QVariant       headerData( int, Qt::Orientation, int ) const;                   // implement virtual header data
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
 
+signals:
+  void           editCell( const QModelIndex&,
+                           const QString& ) const;                // signal that cell editing needs to continue
 private:
   QList<Task*>    m_tasks;             // list of tasks in plan
 
   QModelIndex     m_overrideIndex;     // with value can override model for edits in progress
-  QString         m_overrideValue;     // with index can override model for edits in progress
+  QVariant        m_overrideValue;     // with index can override model for edits in progress
 };
 
 #endif // TASKSMODEL_H

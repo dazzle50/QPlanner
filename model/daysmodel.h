@@ -42,6 +42,9 @@ public:
   int          index( Day* d ) { return m_days.indexOf(d); }       // return index of day type, or -1
   int          number() { return m_days.size(); }                  // return number of day types in plan
   QStringList  namesList() const;                                  // return list of day type names
+
+  bool         nameIsDuplicate(const QString& , int );             // return if name is a repeat
+  void         setOverride( QModelIndex, QVariant, QString );      // set override for edit re-start
   void         emitDataChangedRow( int );                          // emit data changed signal for row
   void         emitNameChanged() const;                            // emit name changed signal
 
@@ -61,9 +64,14 @@ public:
 
 signals:
   void         nameChanged() const;                                // signal that a day name has changed
+  void         editCell( const QModelIndex&,
+                         const QString& ) const;                   // signal that cell editing needs to continue
 
 private:
-  QList<Day*>     m_days;      // list of day types available to calendars
+  QList<Day*>     m_days;              // list of day types available to calendars
+
+  QModelIndex     m_overrideIndex;     // with value can override model for edits in progress
+  QVariant        m_overrideValue;     // with index can override model for edits in progress
 };
 
 #endif // DAYSMODEL_H

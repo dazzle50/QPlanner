@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QMessageBox>
+
 #include "maintabwidget.h"
 #include "ui_maintabwidget.h"
 
@@ -60,10 +62,6 @@ MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new 
   ui->calendarsView->setItemDelegate( cd );
   ui->resourcesView->setItemDelegate( rd );
   ui->tasksView->setItemDelegate( td );
-
-  // connect task delegate edit task cell to slot, queued so any earlier edit is finished and closed
-  //connect( td, SIGNAL(editTaskCell(QModelIndex,QString)),
-  //         this, SLOT(slotEditTaskCell(QModelIndex,QString)), Qt::QueuedConnection );
 
   // hide task 0 'plan summary' and resource 0 'unassigned'
   ui->tasksView->verticalHeader()->hideSection( 0 );
@@ -147,6 +145,62 @@ void MainTabWidget::endEdits()
   ui->daysView->endEdit();
 }
 
+/*************************************** slotEditDayCell *****************************************/
+
+void MainTabWidget::slotEditDayCell( const QModelIndex& index, const QString& warning )
+{
+  // slot to enable day type cell edit to be automatically re-started after validation failure
+  setCurrentWidget( ui->daysTab );
+  ui->daysView->setCurrentIndex( index );
+  QMessageBox::warning( ui->daysView, "Project Planner", warning, QMessageBox::Retry );
+  ui->daysView->edit( index );
+
+  // clear override
+  plan->days()->setOverride( QModelIndex(), QString(), QString() );
+}
+
+/************************************* slotEditCalendarCell **************************************/
+
+void MainTabWidget::slotEditCalendarCell( const QModelIndex& index, const QString& warning )
+{
+  // slot to enable calendar cell edit to be automatically re-started after validation failure
+  setCurrentWidget( ui->calendarsTab );
+  ui->calendarsView->setCurrentIndex( index );
+  QMessageBox::warning( ui->calendarsView, "Project Planner", warning, QMessageBox::Retry );
+  ui->calendarsView->edit( index );
+
+  // clear override
+  plan->calendars()->setOverride( QModelIndex(), QString(), QString() );
+}
+
+/************************************* slotEditResourceCell **************************************/
+
+void MainTabWidget::slotEditResourceCell( const QModelIndex& index, const QString& warning )
+{
+  // slot to enable resource cell edit to be automatically re-started after validation failure
+  setCurrentWidget( ui->resourcesTab );
+  ui->resourcesView->setCurrentIndex( index );
+  QMessageBox::warning( ui->resourcesView, "Project Planner", warning, QMessageBox::Retry );
+  ui->resourcesView->edit( index );
+
+  // clear override
+  plan->resources()->setOverride( QModelIndex(), QString(), QString() );
+}
+
+/*************************************** slotEditTaskCell ****************************************/
+
+void MainTabWidget::slotEditTaskCell( const QModelIndex& index, const QString& warning )
+{
+  // slot to enable task cell edit to be automatically re-started after validation failure
+  setCurrentWidget( ui->tasksGanttTab );
+  ui->tasksView->setCurrentIndex( index );
+  QMessageBox::warning( ui->tasksView, "Project Planner", warning, QMessageBox::Retry );
+  ui->tasksView->edit( index );
+
+  // clear override
+  plan->tasks()->setOverride( QModelIndex(), QString(), QString() );
+}
+
 /****************************************** setModels ********************************************/
 
 void MainTabWidget::setModels()
@@ -157,6 +211,16 @@ void MainTabWidget::setModels()
   ui->calendarsView->setModel( plan->calendars() );
   ui->daysView->setModel( plan->days() );
   ui->ganttView->setTable( ui->tasksView );
+
+  // connect model edit cell to slot, queued so any earlier edit is finished and closed
+  connect( plan->days(), SIGNAL(editCell(QModelIndex,QString)),
+           this, SLOT(slotEditDayCell(QModelIndex,QString)), Qt::QueuedConnection );
+  connect( plan->calendars(), SIGNAL(editCell(QModelIndex,QString)),
+           this, SLOT(slotEditCalendarCell(QModelIndex,QString)), Qt::QueuedConnection );
+  connect( plan->resources(), SIGNAL(editCell(QModelIndex,QString)),
+           this, SLOT(slotEditResourceCell(QModelIndex,QString)), Qt::QueuedConnection );
+  connect( plan->tasks(), SIGNAL(editCell(QModelIndex,QString)),
+           this, SLOT(slotEditTaskCell(QModelIndex,QString)), Qt::QueuedConnection );
 }
 
 /****************************************** updateGantt ******************************************/

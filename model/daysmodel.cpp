@@ -86,6 +86,11 @@ int DaysModel::columnCount( const QModelIndex& parent ) const
 
 QVariant DaysModel::data( const QModelIndex& index, int role  = Qt::DisplayRole ) const
 {
+  // if index matches override index, return override value
+  if ( index == m_overrideIndex )
+    if ( role == Qt::DisplayRole || role == Qt::EditRole )
+      return m_overrideValue;
+
   // if index is not valid, return an invalid QVariant
   if ( !index.isValid() ) return QVariant();
 
@@ -149,6 +154,30 @@ QStringList  DaysModel::namesList() const
     list << d->name();
 
   return list;
+}
+
+/**************************************** nameIsDuplicate ****************************************/
+
+bool DaysModel::nameIsDuplicate( const QString& name, int row )
+{
+  // if name matches a day type name on any other row return true
+  for ( int d = 0 ; d < m_days.size() ; d++ )
+    if ( d != row && name == m_days.at(d)->name() ) return true;
+
+  // no match found, so return false
+  return false;
+}
+
+/****************************************** setOverride ******************************************/
+
+void DaysModel::setOverride( QModelIndex index, QVariant value, QString error )
+{
+  // set model override values
+  m_overrideIndex = index;
+  m_overrideValue = value;
+
+  // if setting override with error msg, emit editCell signal
+  if ( !error.isEmpty() ) emit editCell( index, error );
 }
 
 /************************************** emitDataChangedRow ***************************************/
