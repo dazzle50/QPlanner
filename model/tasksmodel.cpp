@@ -69,18 +69,6 @@ Task* TasksModel::task( int n )
   return m_tasks.at(n);
 }
 
-/****************************************** setOverride ******************************************/
-
-void TasksModel::setOverride( QModelIndex index, QVariant value, QString error )
-{
-  // set model override values
-  m_overrideIndex = index;
-  m_overrideValue = value;
-
-  // if setting override with error msg, emit editCell signal
-  if ( !error.isEmpty() ) emit editCell( index, error );
-}
-
 /******************************************** number *********************************************/
 
 int TasksModel::number()

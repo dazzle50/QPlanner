@@ -57,18 +57,6 @@ Resource* ResourcesModel::resource( int n )
   return m_resources.at(n);
 }
 
-/****************************************** setOverride ******************************************/
-
-void ResourcesModel::setOverride( QModelIndex index, QVariant value, QString error )
-{
-  // set model override values
-  m_overrideIndex = index;
-  m_overrideValue = value;
-
-  // if setting override with error msg, emit editCell signal
-  if ( !error.isEmpty() ) emit editCell( index, error );
-}
-
 /****************************************** destructor *******************************************/
 
 ResourcesModel::~ResourcesModel()

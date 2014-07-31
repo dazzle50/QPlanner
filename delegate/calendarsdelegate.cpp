@@ -18,7 +18,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QDateEdit>
+#include <QComboBox>
+
 #include "calendarsdelegate.h"
+#include "model/calendar.h"
+#include "model/calendarsmodel.h"
+#include "model/daysmodel.h"
+#include "model/plan.h"
 
 /*************************************************************************************************/
 /********************* Delegate for displaying & editing calendar data items *********************/
@@ -37,12 +46,30 @@ QWidget*  CalendarsDelegate::createEditor( QWidget *parent,
                                            const QModelIndex& index ) const
 {
   // create different editors based on the row
-  switch ( index.row() )
+  if ( index.row() == Calendar::SECTION_CYCLELENGTH )
   {
-
-    default:
-      return QStyledItemDelegate::createEditor( parent, option, index );
+    QSpinBox* editor = dynamic_cast<QSpinBox*>( QStyledItemDelegate::createEditor( parent, option, index ) );
+    editor->setRange( 1, 99 );
+    return editor;
   }
+
+  if ( index.row() == Calendar::SECTION_ANCHOR )
+  {
+    QDateEdit* editor = dynamic_cast<QDateEdit*>( QStyledItemDelegate::createEditor( parent, option, index ) );
+    editor->setDateRange( QDate(1,1,1), QDate(7999,12,31) );
+    editor->setCalendarPopup( true );
+    return editor;
+  }
+
+  if ( index.row() >= Calendar::SECTION_NORMAL1 )
+  {
+    QComboBox*  combo = new QComboBox( parent );
+    combo->addItems( plan->days()->namesList() );
+    return combo;
+  }
+
+  // use default method for other rows
+  return QStyledItemDelegate::createEditor( parent, option, index );
 }
 
 /***************************************** setEditorData *****************************************/
@@ -50,13 +77,16 @@ QWidget*  CalendarsDelegate::createEditor( QWidget *parent,
 void  CalendarsDelegate::setEditorData( QWidget* editor, const QModelIndex& index) const
 {
   // set the editor initial value, method depends on editor which depends on row
-  switch ( index.row() )
+  if ( index.row() >= Calendar::SECTION_NORMAL1 )
   {
-
-    default:
-      QStyledItemDelegate::setEditorData( editor, index );
-      return;
+    QComboBox* days = dynamic_cast<QComboBox*>( editor );
+    QString    name = index.model()->data( index, Qt::EditRole ).toString();
+    days->setCurrentText( name );
+    return;
   }
+
+  QStyledItemDelegate::setEditorData( editor, index );
+  return;
 }
 
 /***************************************** setModelData ******************************************/
@@ -65,12 +95,26 @@ void  CalendarsDelegate::setModelData( QWidget* editor,
                                        QAbstractItemModel* model,
                                        const QModelIndex& index ) const
 {
-  // update the model value, method depends on editor which depends on row
-  switch ( index.row() )
+  // check to ensure no duplicate calendar names
+  if ( index.row() == Calendar::SECTION_NAME )
   {
+    CalendarsModel*  cals = dynamic_cast<CalendarsModel*>( model );
+    QLineEdit*       line = dynamic_cast<QLineEdit*>( editor );
+    QString          name = line->text().simplified();
 
-    default:
-      QStyledItemDelegate::setModelData( editor, model, index );
+    if ( cals->nameIsDuplicate( name, index.column() ) )
+    {
+      cals->setOverride( index, name );
+      emit editCell( index, "Duplicate names not allowed." );
       return;
+    }
+
+    // not duplicate so set model data with simplified name
+    model->setData( index, name );
+    return;
   }
+
+  // use default method for other rows
+  QStyledItemDelegate::setModelData( editor, model, index );
+  return;
 }

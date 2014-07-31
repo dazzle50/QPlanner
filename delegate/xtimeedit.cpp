@@ -45,13 +45,15 @@ void XTimeEdit::stepBy( int steps )
   {
     case QTimeEdit::SecondSection:  // really minutes!
       newTime = time().addSecs( steps );
-      if ( newTime > maximumTime() ) break;
+      if ( newTime > maximumTime() ) newTime = maximumTime();
+      if ( newTime < minimumTime() ) newTime = minimumTime();
       QTimeEdit::setTime( newTime );
       break;
 
     case QTimeEdit::MinuteSection:  // really hours!
       newTime = time().addSecs( steps*60 );
-      if ( newTime > maximumTime() ) break;
+      if ( newTime > maximumTime() ) newTime = maximumTime();
+      if ( newTime < minimumTime() ) newTime = minimumTime();
       QTimeEdit::setTime( newTime );
       break;
 

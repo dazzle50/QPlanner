@@ -68,6 +68,9 @@ Plan::Plan()
   m_datetime_format = "ddd dd/MM/yyyy hh:mm";
   m_calendar        = nullptr;
   stretchTasks      = true;
+
+  // connect models so name changes are correctly reflected
+  connect( m_days, SIGNAL(nameChanged()), m_calendars, SLOT(slotDayNameChange()) );
 }
 
 /****************************************** destructor *******************************************/

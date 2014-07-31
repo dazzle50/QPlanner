@@ -168,18 +168,6 @@ bool DaysModel::nameIsDuplicate( const QString& name, int row )
   return false;
 }
 
-/****************************************** setOverride ******************************************/
-
-void DaysModel::setOverride( QModelIndex index, QVariant value, QString error )
-{
-  // set model override values
-  m_overrideIndex = index;
-  m_overrideValue = value;
-
-  // if setting override with error msg, emit editCell signal
-  if ( !error.isEmpty() ) emit editCell( index, error );
-}
-
 /************************************** emitDataChangedRow ***************************************/
 
 void DaysModel::emitDataChangedRow( int row )

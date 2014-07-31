@@ -47,7 +47,8 @@ public:
   Task*          task( int n );                                   // return pointer to n'th task
   int            index( Task* t ) { return m_tasks.indexOf(t); }  // return index of task, or -1
 
-  void           setOverride( QModelIndex, QVariant, QString );   // set override for edit re-start
+  void           setOverride( QModelIndex i, QVariant v )
+                   { m_overrideIndex = i; m_overrideValue = v; }  // set model override values
 
   /********************* methods to support QAbstractTableModel ************************/
 

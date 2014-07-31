@@ -117,12 +117,7 @@ QVariant  Calendar::data( int row, int role  = Qt::DisplayRole ) const
   // if role is EditRole, return appropriate edit value
   if ( role == Qt::EditRole )
   {
-    if ( row >= SECTION_NORMAL1 )
-    {
-      QString  name = m_normal.at(row - SECTION_NORMAL1)->name();
-      return   plan->days()->namesList().indexOf( name );
-    }
-
+    // no special handling
     // if not handled above return DisplayRole
     role = Qt::DisplayRole;
   }
@@ -209,7 +204,10 @@ void Calendar::setData( int row, const QVariant& value )
 
   if ( row >= SECTION_NORMAL1 )
   {
-    qDebug("Calendar::setData - normals NOT IMPLEMENTED YET!");
+    int normal = row - SECTION_NORMAL1;
+    Q_ASSERT( normal < m_cycleLength );
+    int i = plan->days()->namesList().indexOf( value.toString() );
+    m_normal[ normal ] = plan->day( i );
   }
 }
 

@@ -32,7 +32,7 @@
 class XTimeEdit : public QTimeEdit
 {
 public:
-  XTimeEdit( QWidget*, Time, Time );    // constructor
+  XTimeEdit( QWidget*, Time, Time );     // constructor
 
   void     stepBy( int );                // reimplemented to have rollover wrapping on stepping
   QString  toString();                   // get time in string "hh:mm" format

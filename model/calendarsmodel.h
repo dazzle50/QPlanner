@@ -42,7 +42,9 @@ public:
   int            number() { return m_calendars.size(); }                  // return number of calendars in plan
   QStringList    namesList() const;                                       // return list of calendar names
 
-  void           setOverride( QModelIndex, QVariant, QString );           // set override for edit re-start
+  bool           nameIsDuplicate( const QString&, int );                  // return if name is a repeat
+  void           setOverride( QModelIndex i, QVariant v )
+                   { m_overrideIndex = i; m_overrideValue = v; }          // set model override values
   void           emitDataChangedColumn( int );                            // emit data changed signal for column
   void           emitNameChanged() const;                                 // emit name changed signal
 
@@ -59,6 +61,9 @@ public:
   bool           setData( const QModelIndex&, const QVariant&, int );             // implement virtual set data
   QVariant       headerData( int, Qt::Orientation, int ) const;                   // implement virtual header data
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
+
+public slots:
+  void           slotDayNameChange();                                    // slot to receive day name changed signal
 
 signals:
   void           nameChanged() const;                                    // signal that a calendar name has changed

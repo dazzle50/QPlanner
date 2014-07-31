@@ -43,8 +43,9 @@ public:
   int          number() { return m_days.size(); }                  // return number of day types in plan
   QStringList  namesList() const;                                  // return list of day type names
 
-  bool         nameIsDuplicate(const QString& , int );             // return if name is a repeat
-  void         setOverride( QModelIndex, QVariant, QString );      // set override for edit re-start
+  bool         nameIsDuplicate( const QString&, int );             // return if name is a repeat
+  void         setOverride( QModelIndex i, QVariant v )
+                   { m_overrideIndex = i; m_overrideValue = v; }   // set model override values
   void         emitDataChangedRow( int );                          // emit data changed signal for row
   void         emitNameChanged() const;                            // emit name changed signal
 
@@ -63,9 +64,7 @@ public:
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
 
 signals:
-  void         nameChanged() const;                                // signal that a day name has changed
-  void         editCell( const QModelIndex&,
-                         const QString& ) const;                   // signal that cell editing needs to continue
+  void           nameChanged() const;                              // signal that a day name has changed
 
 private:
   QList<Day*>     m_days;              // list of day types available to calendars

@@ -27,6 +27,7 @@
 #include "xtimeedit.h"
 #include "model/day.h"
 #include "model/daysmodel.h"
+#include "model/plan.h"
 
 /*************************************************************************************************/
 /******************** Delegate for displaying & editing day types data items *********************/
@@ -72,7 +73,24 @@ QWidget*  DaysDelegate::createEditor( QWidget *parent,
 
     default:
       // custom editor for period starts/ends
-      return new XTimeEdit( parent, 0, 24*60 );
+      Day* day = plan->day( index.row() );
+      Time min = 0;
+      if ( index.column() > Day::SECTION_START )
+      {
+        // if column is not first start, set min to one minute past time in cell to left
+        QVariant value = day->data( index.column()-1, Qt::EditRole );
+        min = XTime::time( value.toString() ) + 1;
+      }
+
+      Time max = 24*60;
+      if ( index.column() < day->periods()*2+Day::SECTION_START-1 )
+      {
+        // if column is not last end, set max to one minute before time in cell to right
+        QVariant value = day->data( index.column()+1, Qt::EditRole );
+        max = XTime::time( value.toString() ) - 1;
+      }
+
+      return new XTimeEdit( parent, min, max );
   }
 }
 
@@ -101,6 +119,31 @@ void  DaysDelegate::setModelData( QWidget* editor,
                                   QAbstractItemModel* model,
                                   const QModelIndex& index ) const
 {
+  // check to ensure sufficient time after last end for increased num of work periods
+  if ( index.column() == Day::SECTION_PERIODS )
+  {
+    DaysModel*  days     = dynamic_cast<DaysModel*>( model );
+    QSpinBox*   spin     = dynamic_cast<QSpinBox*>( editor );
+    int         newValue = spin->value();
+    int         oldValue = model->data( index ).toInt();
+
+    if ( oldValue > 0 && newValue > oldValue )
+    {
+      // check at least two minutes for each increase in num of work periods
+      Time end = days->day( index.row() )->end( oldValue - 1 );
+      if ( ( 24*60 - end ) / ( newValue - oldValue ) < 2 )
+      {
+        days->setOverride( index, newValue );
+        emit editCell( index, "Insufficient time for this increase in number of work periods." );
+        return;
+      }
+    }
+
+    // sufficient time so set model data with new value
+    model->setData( index, newValue );
+    return;
+  }
+
   // check to ensure no duplicate day type names
   if ( index.column() == Day::SECTION_NAME )
   {
@@ -110,7 +153,8 @@ void  DaysDelegate::setModelData( QWidget* editor,
 
     if ( days->nameIsDuplicate( name, index.row() ) )
     {
-      days->setOverride( index, name, "Duplicate names not allowed." );
+      days->setOverride( index, name );
+      emit editCell( index, "Duplicate names not allowed." );
       return;
     }
 

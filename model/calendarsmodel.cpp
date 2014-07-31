@@ -155,16 +155,25 @@ QStringList  CalendarsModel::namesList() const
   return list;
 }
 
-/****************************************** setOverride ******************************************/
+/**************************************** nameIsDuplicate ****************************************/
 
-void CalendarsModel::setOverride( QModelIndex index, QVariant value, QString error )
+bool CalendarsModel::nameIsDuplicate( const QString& name, int col )
 {
-  // set model override values
-  m_overrideIndex = index;
-  m_overrideValue = value;
+  // if name matches a calendar name on any other column return true
+  for ( int c = 0 ; c < m_calendars.size() ; c++ )
+    if ( c != col && name == m_calendars.at(c)->name() ) return true;
 
-  // if setting override with error msg, emit editCell signal
-  if ( !error.isEmpty() ) emit editCell( index, error );
+  // no match found, so return false
+  return false;
+}
+
+/*************************************** slotDayNameChange ***************************************/
+
+void CalendarsModel::slotDayNameChange()
+{
+  // slot to receive day name changed signal, update all rows Normal1 and below
+  emit dataChanged( QAbstractTableModel::index( Calendar::SECTION_NORMAL1, 0 ),
+                    QAbstractTableModel::index( rowCount(), columnCount() ) );
 }
 
 /************************************ emitDataChangedColumn **************************************/

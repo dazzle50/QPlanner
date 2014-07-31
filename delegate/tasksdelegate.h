@@ -29,6 +29,7 @@
 
 class TasksDelegate : public QStyledItemDelegate
 {
+  Q_OBJECT
 public:
   TasksDelegate();                                          // constructor
 
@@ -40,6 +41,10 @@ public:
   void     setModelData( QWidget*,
                          QAbstractItemModel*,
                          const QModelIndex& ) const;        // update the model from editor data
+
+signals:
+  void     editCell( const QModelIndex&,
+                     const QString& ) const;                // signal that cell editing needs to continue
 };
 
 #endif // TASKSDELEGATE_H

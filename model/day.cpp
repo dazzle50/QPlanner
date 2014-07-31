@@ -181,7 +181,12 @@ void Day::setData( int col, const QVariant& value )
 
    Time time = 0;
    if ( m_periods > 0 ) time = m_end.at( m_periods-1 );
-   Time increment = (24*60-time)/(2*(newPeriods-m_periods)+1);
+   Time increment = ( 24*60 - time ) / ( 2 * ( newPeriods - m_periods ) );
+   if ( increment > 4*60 && increment < 8*60 ) increment = 4*60;
+   if ( increment > 2*60 && increment < 4*60 ) increment = 2*60;
+   if ( increment >   60 && increment < 2*60 ) increment =   60;
+   if ( increment >   30 && increment <   60 ) increment =   30;
+   if ( increment >   10 && increment <   30 ) increment =   10;
 
    m_start.resize( newPeriods );
    m_end.resize( newPeriods );

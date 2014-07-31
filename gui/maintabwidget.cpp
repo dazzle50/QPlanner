@@ -63,6 +63,16 @@ MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new 
   ui->resourcesView->setItemDelegate( rd );
   ui->tasksView->setItemDelegate( td );
 
+  // connect delegate edit cell to slot, queued so any earlier edit is finished and closed
+  connect( dd, SIGNAL(editCell(QModelIndex,QString)),
+           this, SLOT(slotEditDayCell(QModelIndex,QString)), Qt::QueuedConnection );
+  connect( cd, SIGNAL(editCell(QModelIndex,QString)),
+           this, SLOT(slotEditCalendarCell(QModelIndex,QString)), Qt::QueuedConnection );
+  connect( rd, SIGNAL(editCell(QModelIndex,QString)),
+           this, SLOT(slotEditResourceCell(QModelIndex,QString)), Qt::QueuedConnection );
+  connect( td, SIGNAL(editCell(QModelIndex,QString)),
+           this, SLOT(slotEditTaskCell(QModelIndex,QString)), Qt::QueuedConnection );
+
   // hide task 0 'plan summary' and resource 0 'unassigned'
   ui->tasksView->verticalHeader()->hideSection( 0 );
   ui->resourcesView->verticalHeader()->hideSection( 0 );
@@ -110,7 +120,7 @@ MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new 
   ui->calendarsView->horizontalHeader()->setDefaultSectionSize( 150 );
 
   // set initial column widths for day types table view
-  ui->daysView->horizontalHeader()->setDefaultSectionSize( 70 );
+  ui->daysView->horizontalHeader()->setDefaultSectionSize( 60 );
   ui->daysView->setColumnWidth( Day::SECTION_NAME, 150 );
   ui->daysView->setColumnWidth( Day::SECTION_WORK,  50 );
   ui->daysView->setColumnWidth( Day::SECTION_PERIODS, 50 );
@@ -132,6 +142,18 @@ MainTabWidget::~MainTabWidget()
 {
   // free up memory used by the ui
   delete ui;
+}
+
+/****************************************** setModels ********************************************/
+
+void MainTabWidget::setModels()
+{
+  // ensure table views are connected to correct models
+  ui->tasksView->setModel( plan->tasks() );
+  ui->resourcesView->setModel( plan->resources() );
+  ui->calendarsView->setModel( plan->calendars() );
+  ui->daysView->setModel( plan->days() );
+  ui->ganttView->setTable( ui->tasksView );
 }
 
 /****************************************** endEdits *********************************************/
@@ -156,7 +178,7 @@ void MainTabWidget::slotEditDayCell( const QModelIndex& index, const QString& wa
   ui->daysView->edit( index );
 
   // clear override
-  plan->days()->setOverride( QModelIndex(), QString(), QString() );
+  plan->days()->setOverride( QModelIndex(), QString() );
 }
 
 /************************************* slotEditCalendarCell **************************************/
@@ -170,7 +192,7 @@ void MainTabWidget::slotEditCalendarCell( const QModelIndex& index, const QStrin
   ui->calendarsView->edit( index );
 
   // clear override
-  plan->calendars()->setOverride( QModelIndex(), QString(), QString() );
+  plan->calendars()->setOverride( QModelIndex(), QString() );
 }
 
 /************************************* slotEditResourceCell **************************************/
@@ -184,7 +206,7 @@ void MainTabWidget::slotEditResourceCell( const QModelIndex& index, const QStrin
   ui->resourcesView->edit( index );
 
   // clear override
-  plan->resources()->setOverride( QModelIndex(), QString(), QString() );
+  plan->resources()->setOverride( QModelIndex(), QString() );
 }
 
 /*************************************** slotEditTaskCell ****************************************/
@@ -198,29 +220,7 @@ void MainTabWidget::slotEditTaskCell( const QModelIndex& index, const QString& w
   ui->tasksView->edit( index );
 
   // clear override
-  plan->tasks()->setOverride( QModelIndex(), QString(), QString() );
-}
-
-/****************************************** setModels ********************************************/
-
-void MainTabWidget::setModels()
-{
-  // ensure table views are connected to correct models
-  ui->tasksView->setModel( plan->tasks() );
-  ui->resourcesView->setModel( plan->resources() );
-  ui->calendarsView->setModel( plan->calendars() );
-  ui->daysView->setModel( plan->days() );
-  ui->ganttView->setTable( ui->tasksView );
-
-  // connect model edit cell to slot, queued so any earlier edit is finished and closed
-  connect( plan->days(), SIGNAL(editCell(QModelIndex,QString)),
-           this, SLOT(slotEditDayCell(QModelIndex,QString)), Qt::QueuedConnection );
-  connect( plan->calendars(), SIGNAL(editCell(QModelIndex,QString)),
-           this, SLOT(slotEditCalendarCell(QModelIndex,QString)), Qt::QueuedConnection );
-  connect( plan->resources(), SIGNAL(editCell(QModelIndex,QString)),
-           this, SLOT(slotEditResourceCell(QModelIndex,QString)), Qt::QueuedConnection );
-  connect( plan->tasks(), SIGNAL(editCell(QModelIndex,QString)),
-           this, SLOT(slotEditTaskCell(QModelIndex,QString)), Qt::QueuedConnection );
+  plan->tasks()->setOverride( QModelIndex(), QString() );
 }
 
 /****************************************** updateGantt ******************************************/

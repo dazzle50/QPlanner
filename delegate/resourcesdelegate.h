@@ -29,6 +29,7 @@
 
 class ResourcesDelegate : public QStyledItemDelegate
 {
+  Q_OBJECT
 public:
   ResourcesDelegate();                                      // constructor
 
@@ -40,6 +41,10 @@ public:
   void     setModelData( QWidget*,
                          QAbstractItemModel*,
                          const QModelIndex& ) const;        // update the model from editor data
+
+signals:
+  void     editCell( const QModelIndex&,
+                     const QString& ) const;                // signal that cell editing needs to continue
 };
 
 #endif // RESOURCESDELEGATE_H
