@@ -34,37 +34,39 @@
 class CommandResourceSetData : public QUndoCommand
 {
 public:
-  CommandResourceSetData( int row, int col, const QVariant& new_value, const QVariant& old_value )
+  CommandResourceSetData( const QModelIndex& index, const QVariant& value )
   {
     // set private variables for new and old values
-    m_row       = row;
-    m_column    = col;
-    m_new_value = new_value;
-    m_old_value = old_value;
+    m_row       = index.row();
+    m_column    = index.column();
+    m_new_value = value;
+    m_old_value = index.data( Qt::EditRole );
 
     // construct command description
     setText( QString("Resource %1 %2 = %3")
-             .arg( row )
-             .arg( Resource::headerData( col ).toString() )
-             .arg( new_value.toString() ) );
+             .arg( m_row )
+             .arg( Resource::headerData( m_column ).toString() )
+             .arg( value.toString() ) );
   }
 
   void  redo()
   {
     // update resource with new value
     plan->resource( m_row )->setData( m_column, m_new_value );
-    //plan->resources()->emitDataChangedRow( m_row );
 
-    if ( m_row != Resource::SECTION_COMMENT ) plan->schedule();
+    // ensure table row is refreshed, and plan re-scheduled if needed
+    plan->resources()->emitDataChangedRow( m_row );
+    if ( m_column != Resource::SECTION_COMMENT ) plan->schedule();
   }
 
   void  undo()
   {
     // revert resource back to old value
     plan->resource( m_row )->setData( m_column, m_old_value );
-    //plan->resources()->emitDataChangedRow( m_row );
 
-    if ( m_row != Resource::SECTION_COMMENT ) plan->schedule();
+    // ensure table row is refreshed, and plan re-scheduled if needed
+    plan->resources()->emitDataChangedRow( m_row );
+    if ( m_column != Resource::SECTION_COMMENT ) plan->schedule();
   }
 
 private:

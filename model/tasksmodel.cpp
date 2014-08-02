@@ -177,7 +177,7 @@ bool TasksModel::setData( const QModelIndex& index, const QVariant& value, int r
   if ( value == data( index, role ) ) return false;
 
   // set data via undo/redo command
-  //plan->undostack()->push( new CommandTaskSetData( index, value ) );
+  plan->undostack()->push( new CommandTaskSetData( index, value ) );
 }
 
 /****************************************** headerData *******************************************/
@@ -214,4 +214,13 @@ Qt::ItemFlags TasksModel::flags( const QModelIndex& index ) const
 
   // otherwise cell is enabled, selectable, editable
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+}
+
+/************************************** emitDataChangedRow ***************************************/
+
+void TasksModel::emitDataChangedRow( int row )
+{
+  // emit data changed signal for row
+  emit dataChanged( QAbstractTableModel::index( row, 0 ),
+                    QAbstractTableModel::index( row, columnCount() ) );
 }

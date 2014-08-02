@@ -45,6 +45,10 @@ public:
 signals:
   void     editCell( const QModelIndex&,
                      const QString& ) const;                // signal that cell editing needs to continue
+
+private:
+  QValidator*  m_validator_initials;                        // validator for initials
+  QValidator*  m_validator_name;                            // validator for name/org/group/role/alias
 };
 
 #endif // RESOURCESDELEGATE_H

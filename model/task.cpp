@@ -271,6 +271,32 @@ void  Task::setData( int col, const QVariant& value )
 
   qDebug("%p Task::setData %i '%s'",this,col,qPrintable(value.toString()));
 
+  // if the task was null determine a suitable default indent
+  bool wasNull = false;
+  if ( isNull() )
+  {
+    //Task* above = plan->tasks()->nonNullTaskAbove( this );
+    //if ( above && above->isSummary() ) m_indent = above->indent() + 1;
+    //if ( above && !above->isSummary() ) m_indent = above->indent();
+    //wasNull = true;
+  }
+
+  // update task (should only be called by undostack)
+  if ( col == SECTION_TITLE )    m_title        = value.toString();
+  if ( col == SECTION_DURATION ) m_duration     = value.toString();
+  if ( col == SECTION_WORK )     m_work         = value.toString();
+  if ( col == SECTION_TYPE )     m_type         = value.toInt();
+  //if ( col == SECTION_START )    m_start        = value.toDateTime();
+  //if ( col == SECTION_END )      m_end          = value.toDateTime();
+  //if ( col == SECTION_PREDS )    m_predecessors = value.toString();
+  //if ( col == SECTION_DEADLINE ) m_deadline     = value.toDateTime();
+  //if ( col == SECTION_RES )      m_resources    = value.toString();
+  if ( col == SECTION_COST )     m_cost         = value.toReal();
+  if ( col == SECTION_PRIORITY ) m_priority     = value.toInt() * 1000000;
+  if ( col == SECTION_COMMENT )  m_comment      = value.toString();
+
+  // call set summaries if was null
+  //if ( wasNull ) plan->tasks()->setSummaries();
 }
 
 /********************************************* work **********************************************/

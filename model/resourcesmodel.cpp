@@ -35,6 +35,14 @@ ResourcesModel::ResourcesModel() : QAbstractTableModel()
   m_resources.append( new Resource(true) );
 }
 
+/****************************************** destructor *******************************************/
+
+ResourcesModel::~ResourcesModel()
+{
+  // delete all resources in model
+  foreach( Resource* r, m_resources ) delete r;
+}
+
 /****************************************** initialise ******************************************/
 
 void ResourcesModel::initialise()
@@ -55,14 +63,6 @@ Resource* ResourcesModel::resource( int n )
   Q_ASSERT( n >= 0 );
   Q_ASSERT( n < m_resources.size() );
   return m_resources.at(n);
-}
-
-/****************************************** destructor *******************************************/
-
-ResourcesModel::~ResourcesModel()
-{
-  // delete all resources in model
-  foreach( Resource* r, m_resources ) delete r;
 }
 
 /******************************************** number *********************************************/
@@ -129,7 +129,7 @@ bool ResourcesModel::setData( const QModelIndex& index,
   if ( value == data( index, role ) ) return false;
 
   // set data via undo/redo command
-  //plan->undostack()->push( new CommandResourceSetData( index, value ) );
+  plan->undostack()->push( new CommandResourceSetData( index, value ) );
 }
 
 /****************************************** headerData *******************************************/
@@ -158,4 +158,25 @@ Qt::ItemFlags ResourcesModel::flags( const QModelIndex& index ) const
 
   // otherwise item is selectable/enabled/editable
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+}
+
+/************************************** emitDataChangedRow ***************************************/
+
+void ResourcesModel::emitDataChangedRow( int row )
+{
+  // emit data changed signal for row
+  emit dataChanged( QAbstractTableModel::index( row, 0 ),
+                    QAbstractTableModel::index( row, columnCount() ) );
+}
+
+/************************************** initialsIsDuplicate **************************************/
+
+bool ResourcesModel::initialsIsDuplicate( const QString& id, int row )
+{
+  // if id matches a resources initials on any other row return true
+  for ( int r = 0 ; r < m_resources.size() ; r++ )
+    if ( r != row && id == m_resources.at(r)->initials() ) return true;
+
+  // no match found, so return false
+  return false;
 }

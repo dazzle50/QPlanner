@@ -34,42 +34,50 @@
 class CommandTaskSetData : public QUndoCommand
 {
 public:
-  CommandTaskSetData( Task* old_task, int col, const QVariant& new_value )
+  CommandTaskSetData( const QModelIndex& index, const QVariant& value )
   {
     // set private variables for new and old values
-    m_old_task  = *old_task;
-    m_row       = plan->index( old_task );
-    m_column    = col;
-    m_new_value = new_value;
+    m_row      = index.row();
+    m_column   = index.column();
+    m_old_task = *( plan->task( m_row ) );
+    m_value    = value;
 
     // construct command description
     setText( QString("Task %1 %2 = %3")
-             .arg( m_row )
-             .arg( Task::headerData( col ).toString() )
-             .arg( new_value.toString() ) );
+             .arg( m_row+1 )
+             .arg( Task::headerData( m_column ).toString() )
+             .arg( value.toString() ) );
   }
 
   void  redo()
   {
     // update task with new value
-    plan->task( m_row )->setData( m_column, m_new_value );
-    plan->schedule();
+    plan->task( m_row )->setData( m_column, m_value );
+
+    // ensure table row is refreshed, and plan re-scheduled if needed
+    plan->tasks()->emitDataChangedRow( m_row );
+    if ( m_column != Task::SECTION_TITLE &&
+         m_column != Task::SECTION_COMMENT &&
+         m_column != Task::SECTION_DEADLINE ) plan->schedule();
   }
 
   void  undo()
   {
     // revert task back to old values
-    Task* task = plan->task( m_row );
-    *task = m_old_task;
-    //if ( task->isNull() ) plan->tasks()->setSummaries();
-    plan->schedule();
+    *( plan->task( m_row ) ) = m_old_task;
+
+    // ensure table row is refreshed, and plan re-scheduled if needed
+    plan->tasks()->emitDataChangedRow( m_row );
+    if ( m_column != Task::SECTION_TITLE &&
+         m_column != Task::SECTION_COMMENT &&
+         m_column != Task::SECTION_DEADLINE ) plan->schedule();
   }
 
 private:
   Task      m_old_task;
   int       m_row;
   int       m_column;
-  QVariant  m_new_value;
+  QVariant  m_value;
 };
 
 #endif // COMMANDTASKSETDATA_H

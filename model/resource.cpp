@@ -136,10 +136,25 @@ QVariant  Resource::data( int column, int role )
 
 /******************************************** setData ********************************************/
 
-void  Resource::setData( int col, const QVariant& new_value )
+void  Resource::setData( int col, const QVariant& value )
 {
-  // TODO some checks that set data will be allowed, return false if not allowed
+  qDebug("%p Resource::setData %i '%s'",this,col,qPrintable(value.toString()));
 
-  qDebug("%p Resource::setData %i '%s'",this,col,qPrintable(new_value.toString()));
+  // update resource (should only be called by undostack)
+  if ( col == SECTION_INITIALS ) m_initials     = value.toString();
+  if ( col == SECTION_NAME )     m_name         = value.toString();
+  if ( col == SECTION_ORG )      m_org          = value.toString();
+  if ( col == SECTION_GROUP )    m_group        = value.toString();
+  if ( col == SECTION_ROLE )     m_role         = value.toString();
+  if ( col == SECTION_ALIAS )    m_alias        = value.toString();
+  if ( col == SECTION_AVAIL )    m_availability = value.toFloat();
+  if ( col == SECTION_CALENDAR ) m_calendar     = plan->calendar( value.toInt() );
+  //if ( col == SECTION_START )    m_start        = value.toDate();
+  //if ( col == SECTION_END )      m_end          = value.toDate();
+  if ( col == SECTION_COST )     m_cost         = value.toFloat();
+  if ( col == SECTION_COMMENT )  m_comment      = value.toString();
 
+  if ( m_calendar == nullptr ) m_calendar = plan->calendar();
+  if ( isNull() ) m_calendar = nullptr;
+  //plan->resources()->updateAssignable();
 }

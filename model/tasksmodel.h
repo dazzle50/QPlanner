@@ -47,6 +47,7 @@ public:
   Task*          task( int n );                                   // return pointer to n'th task
   int            index( Task* t ) { return m_tasks.indexOf(t); }  // return index of task, or -1
 
+  void           emitDataChangedRow( int );                       // emit data changed signal for row
   void           setOverride( QModelIndex i, QVariant v )
                    { m_overrideIndex = i; m_overrideValue = v; }  // set model override values
 

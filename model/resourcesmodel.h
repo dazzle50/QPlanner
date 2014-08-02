@@ -43,6 +43,8 @@ public:
   int            index( Resource* r )
                       { return m_resources.indexOf(r); }           // return index of resource, or -1
 
+  bool           initialsIsDuplicate( const QString&, int );       // return if initials is a repeat
+  void           emitDataChangedRow( int );                        // emit data changed signal for row
   void           setOverride( QModelIndex i, QVariant v )
                    { m_overrideIndex = i; m_overrideValue = v; }   // set model override values
 
