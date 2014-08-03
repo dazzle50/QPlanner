@@ -75,6 +75,16 @@ public:
   const static DateTime    MIN_DATETIME = 0;        // min permissible DateTime value
   const static QDateTime   ANCHOR_QDATETIME;        // anchor QDateTime for DateTime zero
 
+  enum Interval
+  {
+    INTERVAL_YEAR,                     // Interval is one year
+    INTERVAL_HALFYEAR,                 // Interval is half a year
+    INTERVAL_QUARTERYEAR,              // Interval is quarter year
+    INTERVAL_MONTH,                    // Interval is one month
+    INTERVAL_WEEK,                     // Interval is one week
+    INTERVAL_DAY                       // Interval is one day
+  };
+
   static DateTime    datetime( QDateTime );         // return DateTime from QDateTime
   static QDateTime   qdatetime( DateTime );         // return QDateTime from DateTime
   static DateTime    currentDateTime();             // return DateTime for current date-time

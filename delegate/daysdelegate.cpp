@@ -151,6 +151,13 @@ void  DaysDelegate::setModelData( QWidget* editor,
     QLineEdit*  line = dynamic_cast<QLineEdit*>( editor );
     QString     name = line->text().simplified();
 
+    if ( name.isEmpty() )
+    {
+      days->setOverride( index, name );
+      emit editCell( index, "Blank names not allowed." );
+      return;
+    }
+
     if ( days->nameIsDuplicate( name, index.row() ) )
     {
       days->setOverride( index, name );
@@ -158,7 +165,7 @@ void  DaysDelegate::setModelData( QWidget* editor,
       return;
     }
 
-    // not duplicate so set model data with simplified name
+    // not blank nor duplicate so set model data with simplified name
     model->setData( index, name );
     return;
   }

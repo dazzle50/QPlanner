@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     delegate/calendarsdelegate.cpp \
     delegate/resourcesdelegate.cpp \
     delegate/tasksdelegate.cpp \
-    delegate/xtimeedit.cpp
+    delegate/xtimeedit.cpp \
+    gui/ganttchart.cpp \
+    gui/ganttscale.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -58,7 +60,9 @@ HEADERS  += \
     delegate/calendarsdelegate.h \
     delegate/resourcesdelegate.h \
     delegate/tasksdelegate.h \
-    delegate/xtimeedit.h
+    delegate/xtimeedit.h \
+    gui/ganttchart.h \
+    gui/ganttscale.h
 
 FORMS += \
     gui/mainwindow.ui \

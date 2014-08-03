@@ -20,8 +20,11 @@
 
 #include <QMenu>
 #include <QResizeEvent>
+#include <QVBoxLayout>
 
 #include "ganttview.h"
+#include "ganttchart.h"
+#include "ganttscale.h"
 
 /*************************************************************************************************/
 /**************************** GanttView shows tasks in a gantt format ****************************/
@@ -43,7 +46,7 @@ GanttView::GanttView( QWidget* parent ) : QScrollArea( parent )
 void GanttView::setTable( QTableView* table )
 {
   // sets the table associated with the gantt
-  //if ( m_chart ) m_chart->setTable( table );
+  if ( m_chart ) m_chart->setTable( table );
 }
 
 /******************************************* createGantt *****************************************/
@@ -51,7 +54,6 @@ void GanttView::setTable( QTableView* table )
 void GanttView::createGantt( QWidget* view )
 {
   // create widget to display the gantt scales + chart
-  /*
   m_view = view;
   m_view->setContextMenuPolicy( Qt::CustomContextMenu );
   connect( m_view, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)),
@@ -62,18 +64,18 @@ void GanttView::createGantt( QWidget* view )
   m_upperScale->setStart( m_start );
   m_upperScale->setInterval( XDateTime::INTERVAL_MONTH );
   m_upperScale->setLabelFormat( "MMMM-yyyy" );
-  m_upperScale->setSecsPerPixel( m_secsPP );
+  m_upperScale->setMinsPerPixel( m_minsPP );
 
   m_lowerScale = new GanttScale( m_view );
   m_lowerScale->setStart( m_start );
   m_lowerScale->setInterval( XDateTime::INTERVAL_WEEK );
   m_lowerScale->setLabelFormat( "dd-MMM" );
-  m_lowerScale->setSecsPerPixel( m_secsPP );
+  m_lowerScale->setMinsPerPixel( m_minsPP );
 
   m_chart = new GanttChart( m_view );
   m_chart->setStart( m_start );
   m_chart->setEnd( m_end );
-  m_chart->setSecsPerPixel( m_secsPP );
+  m_chart->setMinsPerPixel( m_minsPP );
 
   // set layout to be vertical
   QVBoxLayout*  layout = new QVBoxLayout( m_view );
@@ -88,7 +90,6 @@ void GanttView::createGantt( QWidget* view )
   setWidget( m_view );
   setFrameStyle( 0 );
   setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-  */
 }
 
 /******************************************* contextMenu *****************************************/
@@ -119,7 +120,7 @@ void GanttView::contextMenu( QPoint )
 
 void  GanttView::slotZoomIn()
 {
-  // decrease secs per pixel to zoom in on chart & scales
+  // decrease mins per pixel to zoom in on chart & scales
   setMinsPP( m_minsPP / 1.414 );
   setWidth();
 }
@@ -128,12 +129,12 @@ void  GanttView::slotZoomIn()
 
 void  GanttView::slotZoomOut()
 {
-  // increase secs per pixel to zoom out on chart & scales
+  // increase mins per pixel to zoom out on chart & scales
   setMinsPP( m_minsPP * 1.414 );
 
   // zoom around centre of chart if chart width less than view width
   //if ( m_chart->chartWidth() < width() )
-  //  setStart( m_start.addSecs( -m_secsPP * ( width() - m_chart->chartWidth() ) / 2 ) );
+  //  setStart( m_start.addSecs( -m_minsPP * ( width() - m_chart->chartWidth() ) / 2 ) );
 
   // ensure view width is never less than chart width
   setWidth();
@@ -149,10 +150,10 @@ void  GanttView::slotZoomFit()
   DateTime  end    = plan->stretch( plan->end() );
   m_view->setFixedWidth( width() );
 
-  // if start or end is invalid, eg before any tasks, keep existing start and secsPP
+  // if start or end is invalid, eg before any tasks, keep existing start and minsPP
   if ( !start.isValid() || !end.isValid() )
   {
-    setEnd( m_start.addSecs( width() * m_secsPP ) );
+    setEnd( m_start.addSecs( width() * m_minsPP ) );
     return;
   }
 
@@ -161,7 +162,7 @@ void  GanttView::slotZoomFit()
   setStart( start.addSecs( -margin ) );
   setEnd( end.addSecs( margin ) );
 
-  // set secs per pixel to show entire chart duration in displayed width
+  // set mins per pixel to show entire chart duration in displayed width
   setMinsPP( double( m_start.secsTo( m_end ) ) / width() );
   */
 }
@@ -212,9 +213,9 @@ void GanttView::setMinsPP( double mpp )
 {
   // set gantt minutes per pixel
   m_minsPP = mpp;
-  //m_upperScale->setSecsPerPixel( m_minsPP );
-  //m_lowerScale->setSecsPerPixel( m_minsPP );
-  //m_chart->setSecsPerPixel( m_minsPP );
+  //m_upperScale->setMinsPerPixel( m_minsPP );
+  //m_lowerScale->setMinsPerPixel( m_minsPP );
+  //m_chart->setMinsPerPixel( m_minsPP );
 }
 
 /******************************************* setWidth ********************************************/

@@ -102,6 +102,13 @@ void  CalendarsDelegate::setModelData( QWidget* editor,
     QLineEdit*       line = dynamic_cast<QLineEdit*>( editor );
     QString          name = line->text().simplified();
 
+    if ( name.isEmpty() )
+    {
+      cals->setOverride( index, name );
+      emit editCell( index, "Blank names not allowed." );
+      return;
+    }
+
     if ( cals->nameIsDuplicate( name, index.column() ) )
     {
       cals->setOverride( index, name );
@@ -109,7 +116,7 @@ void  CalendarsDelegate::setModelData( QWidget* editor,
       return;
     }
 
-    // not duplicate so set model data with simplified name
+    // not blank nor duplicate so set model data with simplified name
     model->setData( index, name );
     return;
   }

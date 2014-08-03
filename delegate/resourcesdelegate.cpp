@@ -112,6 +112,13 @@ void  ResourcesDelegate::setModelData( QWidget* editor,
       QLineEdit*       line = dynamic_cast<QLineEdit*>( editor );
       QString          id   = line->text().simplified();
 
+      if ( id.isEmpty() )
+      {
+        res->setOverride( index, id );
+        emit editCell( index, "Blank initials not allowed." );
+        return;
+      }
+
       if ( res->initialsIsDuplicate( id, index.row() ) )
       {
         res->setOverride( index, id );
@@ -119,7 +126,7 @@ void  ResourcesDelegate::setModelData( QWidget* editor,
         return;
       }
 
-      // not duplicate so set model data with simplified name
+      // not blank nor duplicate so set model data with simplified id
       model->setData( index, id   );
       return;
     }

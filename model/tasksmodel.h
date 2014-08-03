@@ -61,6 +61,7 @@ public:
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
 
 signals:
+  void           ganttChanged();                                  // signal tasks could have changed so redraw gantt chart
   void           editCell( const QModelIndex&,
                            const QString& ) const;                // signal that cell editing needs to continue
 private:

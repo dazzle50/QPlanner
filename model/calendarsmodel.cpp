@@ -103,7 +103,7 @@ QVariant CalendarsModel::headerData( int section, Qt::Orientation orientation, i
   if ( role != Qt::DisplayRole ) return QVariant();
 
   if ( orientation == Qt::Vertical ) return Calendar::headerData( section );
-  return m_calendars.at(section)->name();
+  return QString("Calendar %1").arg( section+1 );
 }
 
 /******************************************** rowCount *******************************************/
