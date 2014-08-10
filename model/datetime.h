@@ -41,7 +41,7 @@ public:
   static Time      time( QString );            // return Time from HH:MM string
   static QString   toString( Time );           // return HH:MM string from Time
 
-  // CANNOT convert Time to QTime because Time can represent *24:00* unlike QTime
+  // CANNOT convert Time to QTime because Time can represent 24:00 *unlike* QTime
 };
 
 /*************************************************************************************************/
@@ -52,6 +52,10 @@ class XDate
 {
 public:
   const static Date    NULL_DATE = -1;         // Date value that represents null
+  const static Date    MIN_DATE;               // min permissible Date value
+  const static Date    MAX_DATE;               // max permissible Date value
+  const static QDate   MIN_QDATE;              // min permissible QDate compatible with Date
+  const static QDate   MAX_QDATE;              // max permissible QDate compatible with Date
   const static QDate   ANCHOR_QDATE;           // anchor QDate for Date zero
   const static qint64  ANCHOR_JULIAN;          // anchor QDate julian for Date zero
 
@@ -71,8 +75,10 @@ class XDateTime
 {
 public:
   const static DateTime    NULL_DATETIME = -1;      // DateTime value that represents null
-  const static DateTime    MAX_DATETIME = -2;       // max permissible DateTime value
-  const static DateTime    MIN_DATETIME = 0;        // min permissible DateTime value
+  const static DateTime    MIN_DATETIME;            // min permissible DateTime value
+  const static DateTime    MAX_DATETIME;            // max permissible DateTime value
+  const static QDateTime   MIN_QDATETIME;           // min permissible QDateTime compatible with DateTime
+  const static QDateTime   MAX_QDATETIME;           // max permissible QDateTime compatible with DateTime
   const static QDateTime   ANCHOR_QDATETIME;        // anchor QDateTime for DateTime zero
 
   enum Interval

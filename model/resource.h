@@ -42,6 +42,8 @@ public:
   bool              isNull() const { return m_initials.isNull(); }   // is the task null (blank)
   QString           initials() const { return m_initials; }          // return initials
   Calendar*         calendar() const { return m_calendar; }          // return resource calendar
+  Date              start() const;                                   // return resource start date
+  Date              end() const;                                     // return resource end date
 
   enum sections                            // sections to be displayed by view
   {

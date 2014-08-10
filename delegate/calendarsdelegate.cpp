@@ -56,7 +56,7 @@ QWidget*  CalendarsDelegate::createEditor( QWidget *parent,
   if ( index.row() == Calendar::SECTION_ANCHOR )
   {
     QDateEdit* editor = dynamic_cast<QDateEdit*>( QStyledItemDelegate::createEditor( parent, option, index ) );
-    editor->setDateRange( QDate(1,1,1), QDate(7999,12,31) );
+    editor->setDateRange( XDate::MIN_QDATE, XDate::MAX_QDATE );
     editor->setCalendarPopup( true );
     return editor;
   }
@@ -76,15 +76,7 @@ QWidget*  CalendarsDelegate::createEditor( QWidget *parent,
 
 void  CalendarsDelegate::setEditorData( QWidget* editor, const QModelIndex& index) const
 {
-  // set the editor initial value, method depends on editor which depends on row
-  if ( index.row() >= Calendar::SECTION_NORMAL1 )
-  {
-    QComboBox* days = dynamic_cast<QComboBox*>( editor );
-    QString    name = index.model()->data( index, Qt::EditRole ).toString();
-    days->setCurrentText( name );
-    return;
-  }
-
+  // set the editor initial value, use default method
   QStyledItemDelegate::setEditorData( editor, index );
   return;
 }

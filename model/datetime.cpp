@@ -62,8 +62,13 @@ QString XTime::toString( Time t )
 /********************** XDate provides static methods to support Date type ***********************/
 /*************************************************************************************************/
 
-const QDate  XDate::ANCHOR_QDATE = QDate( 1, 1, 1 );
-const qint64 XDate::ANCHOR_JULIAN = ANCHOR_QDATE.toJulianDay();
+const QDate  XDate::ANCHOR_QDATE  = QDate( 1, 1, 1 );
+const qint64 XDate::ANCHOR_JULIAN = XDate::ANCHOR_QDATE.toJulianDay();
+
+const QDate  XDate::MIN_QDATE = XDate::ANCHOR_QDATE;
+const QDate  XDate::MAX_QDATE = QDate( 7999, 12, 31 );
+const Date   XDate::MIN_DATE  = XDate::date( XDate::MIN_QDATE );
+const Date   XDate::MAX_DATE  = XDate::date( XDate::MAX_QDATE );
 
 /********************************************* date **********************************************/
 
@@ -126,6 +131,10 @@ QString XDate::toString( Date d, QString format )
 /*************************************************************************************************/
 
 const QDateTime  XDateTime::ANCHOR_QDATETIME = QDateTime( XDate::ANCHOR_QDATE );
+const QDateTime  XDateTime::MIN_QDATETIME    = QDateTime( XDate::MIN_QDATE );
+const QDateTime  XDateTime::MAX_QDATETIME    = QDateTime( XDate::MAX_QDATE ).addSecs( 86340 );
+const DateTime   XDateTime::MIN_DATETIME     = XDateTime::datetime( XDateTime::MIN_QDATETIME );
+const DateTime   XDateTime::MAX_DATETIME     = XDateTime::datetime( XDateTime::MAX_QDATETIME );
 
 /****************************************** qdatetime ********************************************/
 

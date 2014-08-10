@@ -18,12 +18,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "resourcesdelegate.h"
-#include "model/resource.h"
-#include "model/resourcesmodel.h"
-
 #include <QLineEdit>
 #include <QDateEdit>
+#include <QComboBox>
+
+#include "resourcesdelegate.h"
+#include "xdateedit.h"
+#include "model/resource.h"
+#include "model/resourcesmodel.h"
+#include "model/calendarsmodel.h"
+#include "model/plan.h"
 
 /*************************************************************************************************/
 /********************* Delegate for displaying & editing resource data items *********************/
@@ -71,10 +75,28 @@ QWidget*  ResourcesDelegate::createEditor( QWidget *parent,
     case Resource::SECTION_START:
     case Resource::SECTION_END:
     {
-      QDateEdit* editor = dynamic_cast<QDateEdit*>( QStyledItemDelegate::createEditor( parent, option, index ) );
-      editor->setDateRange( QDate(1,1,1), QDate(7999,12,31) );
-      editor->setCalendarPopup( true );
-      return editor;
+      XDateEdit*  edit  = new XDateEdit( parent );
+      Resource*   res   = plan->resource( index.row() );
+      QDate       date  = index.data( Qt::EditRole ).toDate();
+      if ( date.isNull() ) date = QDate::currentDate();
+      edit->setCalendarPopup( true );
+      edit->setDate( date );
+
+      if ( index.column() == Resource::SECTION_START )
+        // if start, can be any date equal or less then end
+        edit->setDateRange( XDate::MIN_QDATE, XDate::qdate( res->end() ) );
+      else
+        // if end, can be any date equal or greater than start
+        edit->setDateRange( XDate::qdate( res->start() ), XDate::MAX_QDATE );
+
+      return edit;
+    }
+
+    case Resource::SECTION_CALENDAR:
+    {
+      QComboBox*  combo = new QComboBox( parent );
+      combo->addItems( plan->calendars()->namesList() );
+      return combo;
     }
 
     default:
@@ -86,14 +108,8 @@ QWidget*  ResourcesDelegate::createEditor( QWidget *parent,
 
 void  ResourcesDelegate::setEditorData( QWidget* editor, const QModelIndex& index) const
 {
-  // set the editor initial value, method depends on editor which depends on column
-  switch ( index.column() )
-  {
-
-    default:
-      QStyledItemDelegate::setEditorData( editor, index );
-      return;
-  }
+  // set the editor initial value, use default method
+  QStyledItemDelegate::setEditorData( editor, index );
 }
 
 /***************************************** setModelData ******************************************/
@@ -142,6 +158,17 @@ void  ResourcesDelegate::setModelData( QWidget* editor,
       QString          name = line->text().simplified();
       model->setData( index, name );
       return;
+    }
+
+    case Resource::SECTION_START:
+    case Resource::SECTION_END:
+    {
+      XDateEdit* edit = dynamic_cast<XDateEdit*>( editor );
+      if ( edit->isNull )
+      {
+        model->setData( index, QDate() );
+        return;
+      }
     }
 
     default:

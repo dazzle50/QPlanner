@@ -23,6 +23,7 @@
 #include "plan.h"
 #include "resource.h"
 #include "calendar.h"
+#include "calendarsmodel.h"
 
 /*************************************************************************************************/
 /************************************* Single plan resource **************************************/
@@ -96,7 +97,6 @@ QVariant  Resource::data( int column, int role )
     if ( column == SECTION_END )      return XDate::qdate( m_end );
     if ( column == SECTION_AVAIL )    return m_availability;
     if ( column == SECTION_COST )     return m_cost;
-    if ( column == SECTION_CALENDAR ) return plan->index( m_calendar );
 
     // for all other columns return the DisplayRole for EditRole
     role = Qt::DisplayRole;
@@ -138,8 +138,6 @@ QVariant  Resource::data( int column, int role )
 
 void  Resource::setData( int col, const QVariant& value )
 {
-  qDebug("%p Resource::setData %i '%s'",this,col,qPrintable(value.toString()));
-
   // update resource (should only be called by undostack)
   if ( col == SECTION_INITIALS ) m_initials     = value.toString();
   if ( col == SECTION_NAME )     m_name         = value.toString();
@@ -148,13 +146,36 @@ void  Resource::setData( int col, const QVariant& value )
   if ( col == SECTION_ROLE )     m_role         = value.toString();
   if ( col == SECTION_ALIAS )    m_alias        = value.toString();
   if ( col == SECTION_AVAIL )    m_availability = value.toFloat();
-  if ( col == SECTION_CALENDAR ) m_calendar     = plan->calendar( value.toInt() );
-  //if ( col == SECTION_START )    m_start        = value.toDate();
-  //if ( col == SECTION_END )      m_end          = value.toDate();
+  if ( col == SECTION_START )    m_start        = XDate::date( value.toDate() );
+  if ( col == SECTION_END )      m_end          = XDate::date( value.toDate() );
   if ( col == SECTION_COST )     m_cost         = value.toFloat();
   if ( col == SECTION_COMMENT )  m_comment      = value.toString();
+
+  if ( col == SECTION_CALENDAR )
+  {
+    int i      = plan->calendars()->namesList().indexOf( value.toString() );
+    m_calendar = plan->calendar( i );
+  }
 
   if ( m_calendar == nullptr ) m_calendar = plan->calendar();
   if ( isNull() ) m_calendar = nullptr;
   //plan->resources()->updateAssignable();
+}
+
+/********************************************* start *********************************************/
+
+Date Resource::start() const
+{
+  // if start is not set, return min date
+  if ( m_start == XDate::NULL_DATE ) return XDate::MIN_DATE;
+  return m_start;
+}
+
+/********************************************** end **********************************************/
+
+Date Resource::end() const
+{
+  // if end is not set, return max date
+  if ( m_end == XDate::NULL_DATE ) return XDate::MAX_DATE;
+  return m_end;
 }
