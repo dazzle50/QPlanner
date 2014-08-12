@@ -71,6 +71,7 @@ Plan::Plan()
 
   // connect models so name changes are correctly reflected
   connect( m_days, SIGNAL(nameChanged()), m_calendars, SLOT(slotDayNameChange()) );
+  connect( m_calendars, SIGNAL(nameChanged()), m_resources, SLOT(slotCalendarNameChange()) );
 }
 
 /****************************************** destructor *******************************************/

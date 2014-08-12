@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     delegate/xtimeedit.cpp \
     gui/ganttchart.cpp \
     gui/ganttscale.cpp \
-    delegate/xdateedit.cpp
+    delegate/xdateedit.cpp \
+    delegate/timespanspinbox.cpp \
+    delegate/xdatetimeedit.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -64,7 +66,9 @@ HEADERS  += \
     delegate/xtimeedit.h \
     gui/ganttchart.h \
     gui/ganttscale.h \
-    delegate/xdateedit.h
+    delegate/xdateedit.h \
+    delegate/timespanspinbox.h \
+    delegate/xdatetimeedit.h
 
 FORMS += \
     gui/mainwindow.ui \

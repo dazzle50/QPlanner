@@ -22,6 +22,7 @@
 
 #include "plan.h"
 #include "task.h"
+#include "datetime.h"
 
 /*************************************************************************************************/
 /*************************************** Single plan task ****************************************/
@@ -40,6 +41,9 @@ Task::Task()
   m_priority    = 100 * 1000000;
   m_duration    = TimeSpan("1d");
   m_work        = TimeSpan("1d");
+  m_start       = XDateTime::NULL_DATETIME;
+  m_end         = XDateTime::NULL_DATETIME;
+  m_deadline    = XDateTime::NULL_DATETIME;
 }
 
 /****************************************** constructor ******************************************/
@@ -56,6 +60,9 @@ Task::Task( bool planSummary )
   m_cost        = 0.0;
   m_priority    = 100 * 1000000;
   m_comment     = "Plan summary";
+  m_start       = XDateTime::NULL_DATETIME;
+  m_end         = XDateTime::NULL_DATETIME;
+  m_deadline    = XDateTime::NULL_DATETIME;
 }
 
 /****************************************** headerData *******************************************/
@@ -255,10 +262,10 @@ QVariant  Task::dataDisplayRole( int col ) const
 QString  Task::typeToString( int type )
 {
   // return type string description equivalent
-  if ( type == TYPE_ASAP_FWORK )   return "ASAP - work bound";
-  if ( type == TYPE_ASAP_FDUR )    return "ASAP - duration bound";
-  if ( type == TYPE_SON_FWORK )    return "Start on - work bound";
-  if ( type == TYPE_SON_FDUR )     return "Start on - duration bound";
+  if ( type == TYPE_ASAP_FWORK )   return "ASAP - work";
+  if ( type == TYPE_ASAP_FDUR )    return "ASAP - duration";
+  if ( type == TYPE_SON_FWORK )    return "Start on - work";
+  if ( type == TYPE_SON_FDUR )     return "Start on - duration";
   if ( type == TYPE_FIXED_PERIOD ) return "Fixed period";
   return "";
 }

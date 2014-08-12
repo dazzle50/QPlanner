@@ -21,6 +21,7 @@
 #include <QLineEdit>
 #include <QDateEdit>
 #include <QComboBox>
+#include <QDoubleSpinBox>
 
 #include "resourcesdelegate.h"
 #include "xdateedit.h"
@@ -97,6 +98,14 @@ QWidget*  ResourcesDelegate::createEditor( QWidget *parent,
       QComboBox*  combo = new QComboBox( parent );
       combo->addItems( plan->calendars()->namesList() );
       return combo;
+    }
+
+    case Resource::SECTION_AVAIL:
+    {
+        QDoubleSpinBox*  editor = new QDoubleSpinBox( parent );
+        editor->setDecimals( 2 );
+        editor->setRange( 0.0, 9e9 );
+        return editor;
     }
 
     default:

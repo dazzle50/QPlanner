@@ -160,6 +160,15 @@ Qt::ItemFlags ResourcesModel::flags( const QModelIndex& index ) const
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
 }
 
+/************************************ slotCalendarNameChange *************************************/
+
+void ResourcesModel::slotCalendarNameChange()
+{
+  // slot to receive calendar name changed signal, update Calendar column
+  emit dataChanged( QAbstractTableModel::index( 0, Resource::SECTION_CALENDAR ),
+                    QAbstractTableModel::index( rowCount(), Resource::SECTION_CALENDAR ) );
+}
+
 /************************************** emitDataChangedRow ***************************************/
 
 void ResourcesModel::emitDataChangedRow( int row )

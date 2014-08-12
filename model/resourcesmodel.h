@@ -57,6 +57,9 @@ public:
   QVariant       headerData( int, Qt::Orientation, int ) const;                   // implement virtual header data
   Qt::ItemFlags  flags( const QModelIndex& ) const;                               // implement virtual return flags
 
+public slots:
+  void           slotCalendarNameChange();                         // slot to receive calendar name changed signal
+
 signals:
   void         nameChanged() const;                                // signal that a day name has changed
   void         editCell( const QModelIndex&,

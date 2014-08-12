@@ -113,7 +113,7 @@ QVariant  Resource::data( int column, int role )
     if ( column == SECTION_ALIAS )    return m_alias;
     if ( column == SECTION_START )    return XDate::toString( m_start );
     if ( column == SECTION_END )      return XDate::toString( m_end );
-    if ( column == SECTION_AVAIL )    return QString("%1").arg( m_availability, 0, 'f', 1 );
+    if ( column == SECTION_AVAIL )    return QString("%1").arg( m_availability );
     if ( column == SECTION_COST )     return QString("%1").arg( m_cost, 0, 'f', 1 );;
     if ( column == SECTION_CALENDAR ) return m_calendar->name();
     if ( column == SECTION_COMMENT )  return m_comment;
