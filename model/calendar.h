@@ -37,14 +37,19 @@ class Calendar
 {
   friend class CommandCalendarSetData;
 public:
-  Calendar();                                   // constructor
-  Calendar( int );                              // constructor for initial default calendars
+  Calendar();                                                  // constructor
+  Calendar( int );                                             // constructor for initial default calendars
+
+  QString       name() const { return m_name; }                // return calendar name
+  int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
+
+  Day*          day( Date );                                   // return day type for given date
+  Day*          day( DateTime );                               // return day type for given date-time
+  DateTime      workUp( DateTime );                            // return date-time now or future when working
+  DateTime      workDown( DateTime );                          // return date-time now or past when working
 
   QVariant      data( int, int ) const;                        // return data for row & role
   void          setData( int, const QVariant& );               // set data value for column
-
-  int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
-  QString       name() const { return m_name; }                // return calendar name
 
   static QVariant   headerData( int );                         // return row header data
 

@@ -86,7 +86,21 @@ public:
   QDateTime        savedWhen() { return m_saved_when; }             // return saved datetime
   QString          notes() { return m_notes; }                      // return notes text
 
+  void             setTitle( QString t ) { m_title = t; }           // set title
+  void             setStart( DateTime dt ) { m_start = dt; }        // set start
+  void             setDatetimeFormat( QString f )
+                     { m_datetime_format = f; }                     // set datetime format
+  void             setCalendar( Calendar* c ) { m_calendar = c; }   // set plan default calendar
+  void             setCalendar( int c )
+                     { m_calendar = calendar(c); }                  // set plan default calendar
+  void             setNotes( QString n ) { m_notes = n; }           // set notes text
+
+  void             emitPlanUpdated()
+                     { emit signalPlanUpdated(); }                  // emit signalPlanUpdated
   bool             stretchTasks;                                    // flag if gantt task bars stretched to use full 24h day
+
+signals:
+  void  signalPlanUpdated();            // signal to say plan properties updated
 
 private:
   TasksModel*      m_tasks;             // model of plan tasks

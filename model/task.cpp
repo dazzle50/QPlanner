@@ -282,6 +282,8 @@ void  Task::setData( int col, const QVariant& value )
   bool wasNull = false;
   if ( isNull() )
   {
+    // TODO
+    Q_UNUSED( wasNull );
     //Task* above = plan->tasks()->nonNullTaskAbove( this );
     //if ( above && above->isSummary() ) m_indent = above->indent() + 1;
     //if ( above && !above->isSummary() ) m_indent = above->indent();

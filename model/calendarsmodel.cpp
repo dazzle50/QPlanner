@@ -93,6 +93,7 @@ bool CalendarsModel::setData( const QModelIndex& index, const QVariant& value, i
 
   // set data via undo/redo command
   plan->undostack()->push( new CommandCalendarSetData( index, value ) );
+  return true;
 }
 
 /****************************************** headerData *******************************************/

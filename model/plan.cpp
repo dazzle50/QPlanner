@@ -95,7 +95,7 @@ void  Plan::initialise()
   m_calendars->initialise();
 
   m_calendar = calendar( Calendar::DEFAULT_CALENDAR );
-  //m_start    = m_calendar->workUp( QDateTime( QDate::currentDate(), QTime(0,0,0) ) );
+  m_start    = m_calendar->workUp( XDate::currentDate() * 1440 );
 
   m_resources->initialise();
   m_tasks->initialise();

@@ -44,6 +44,17 @@ public:
   Time       start( int n ) { return m_start.at(n); }  // return work period start
   Time       end( int n ) { return m_end.at(n); }      // return work period end
 
+  bool       isWorking() { return m_periods > 0; }     // return if day has work periods
+  int        minutes() { return m_minutes; }           // return num of minutes in day
+  Time       start();                                  // return day start time or NULL time if non-working day
+  Time       end();                                    // return day end time or NULL time if non-working day
+  Time       workUp( Time );                           // return time now or future when working or NULL time
+  Time       workDown( Time );                         // return time now or past when working or NULL time
+  float      workDone( Time );                         // return days equiv work done start to time
+  float      workToGo( Time );                         // return days equiv work togo time to end
+  int        minsDone( Time );                         // return num of minutes done start to time
+  int        minsToGo( Time );                         // return num of minutes togo time to end
+
   QVariant   data( int, int );                         // return data for column & role
   void       setData( int, const QVariant& );          // set data value for column
 

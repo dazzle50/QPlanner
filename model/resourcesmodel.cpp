@@ -130,6 +130,7 @@ bool ResourcesModel::setData( const QModelIndex& index,
 
   // set data via undo/redo command
   plan->undostack()->push( new CommandResourceSetData( index, value ) );
+  return true;
 }
 
 /****************************************** headerData *******************************************/

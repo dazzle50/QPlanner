@@ -45,13 +45,13 @@ MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent ), ui( new Ui::M
   resize( 900, 450 );
 
   // ensure plan tab and is kept up-to-date when plan signals changes
-  //connect( plan, SIGNAL(signalPlanUpdated()), m_tabs, SLOT(slotUpdatePlanTab()),
-  //         Qt::UniqueConnection );
+  connect( plan, SIGNAL(signalPlanUpdated()), m_tabs, SLOT(slotUpdatePlanTab()),
+           Qt::UniqueConnection );
 
   // ensure menus and plan tab are kept up-to-date when current tab changes
-  //slotTabChange( m_tabs->currentIndex() );
-  //connect( m_tabs, SIGNAL(currentChanged(int)), this, SLOT(slotTabChange(int)),
-  //         Qt::UniqueConnection );
+  slotTabChange( m_tabs->currentIndex() );
+  connect( m_tabs, SIGNAL(currentChanged(int)), this, SLOT(slotTabChange(int)),
+           Qt::UniqueConnection );
 
   // update edit menu with undostack undo & redo actions
   setModels();
@@ -207,6 +207,8 @@ void MainWindow::slotStretchTasks( bool checked )
   // if stretch tasks flag is changed, trigger redraw of gantt
   m_tabs->endEdits();
 
+  // TODO
+  Q_UNUSED( checked );
 }
 
 /***************************************** slotNewWindow *****************************************/

@@ -191,6 +191,9 @@ void GanttChart::paintEvent( QPaintEvent* event )
 
 void GanttChart::drawDependencies( QPainter* p, int y, int h )
 {
+  Q_UNUSED( p );
+  Q_UNUSED( y );
+  Q_UNUSED( h );
   // determine first and last task visible
   /*
   int first = m_table->rowAt( y );
@@ -255,6 +258,7 @@ void GanttChart::drawTasks( QPainter* p, int y, int h )
   if ( first < 0 ) first = 0;
   if ( last  < 0 ) last  = plan->tasks()->rowCount() - 1;
 
+  Q_UNUSED( p );
   // for each row draw the gantt task
   //for( int row=first ; row<=last ; row++ )
   //  plan->task(row)->ganttData()->drawTask( p, m_table->rowViewportPosition(row) + ( m_table->rowHeight(row) / 2 ),

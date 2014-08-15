@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <QMessageBox>
+#include <QUndoStack>
 
 #include "maintabwidget.h"
 #include "ui_maintabwidget.h"
@@ -32,6 +33,8 @@
 #include "model/resource.h"
 #include "model/tasksmodel.h"
 #include "model/task.h"
+
+#include "command/commandpropertieschange.h"
 
 #include "delegate/daysdelegate.h"
 #include "delegate/calendarsdelegate.h"
@@ -243,6 +246,7 @@ int MainTabWidget::indexOfTasksTab()
 
 void MainTabWidget::updatePlan()
 {
+  qDebug("MainTabWidget::updatePlan()");
   // check if we need to update plan from 'Plan' tab widgets
   if ( ui->title->text()                                != plan->title()  ||
        XDateTime::datetime( ui->planStart->dateTime() ) != plan->start()  ||
@@ -250,12 +254,12 @@ void MainTabWidget::updatePlan()
        ui->dateTimeFormat->text()                       != plan->datetimeFormat() ||
        ui->notesEdit->toPlainText()                     != plan->notes() )
   {
-    //plan->undostack()->push( new CommandPropertiesChange(
-    //                           ui->title->text(),                   plan->title(),
-    //                           ui->planStart->dateTime(),           plan->start(),
-    //                           ui->defaultCalendar->currentIndex(), plan->index( plan->calendar() ),
-    //                           ui->dateTimeFormat->text(),          plan->datetimeFormat(),
-    //                           ui->notesEdit->toPlainText(),        plan->notes()) );
+    plan->undostack()->push( new CommandPropertiesChange(
+      ui->title->text(),                   plan->title(),
+      XDateTime::datetime( ui->planStart->dateTime() ), plan->start(),
+      ui->defaultCalendar->currentIndex(), plan->index( plan->calendar() ),
+      ui->dateTimeFormat->text(),          plan->datetimeFormat(),
+      ui->notesEdit->toPlainText(),        plan->notes()) );
   }
 }
 
@@ -271,6 +275,8 @@ void MainTabWidget::slotUpdatePlanTab()
   ui->planBeginning->setCursorPosition( 0 );
   ui->planBeginning->setToolTip( XDateTime::toString( plan->beginning(), plan->datetimeFormat() ) );
 
+  ui->planStart->setTimeSpec( Qt::UTC );
+  ui->planStart->setDateTimeRange( XDateTime::MIN_QDATETIME, XDateTime::MAX_QDATETIME );
   ui->planStart->setDateTime( XDateTime::qdatetime( plan->start() ) );
   ui->planStart->setToolTip( XDateTime::toString( plan->start(), plan->datetimeFormat() ) );
 

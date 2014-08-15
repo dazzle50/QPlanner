@@ -223,3 +223,66 @@ QVariant Calendar::headerData( int section )
 
   return QString("Normal %1").arg( section - Calendar::SECTION_NORMAL1 + 1 );
 }
+
+/********************************************** day **********************************************/
+
+Day*  Calendar::day( Date date )
+{
+  // if exception exists return it, otherwise return normal cycle day
+  if ( m_exceptions.contains( date ) ) return m_exceptions.value( date );
+
+  int normal = ( date - m_cycleAnchor ) % m_cycleLength;
+  if ( normal < 0 ) normal += m_cycleLength;
+
+  return m_normal.at( normal );
+}
+
+/********************************************** day **********************************************/
+
+Day*  Calendar::day( DateTime dt )
+{
+  // convert date-time to date by dividing by num of mins in day
+  return day( dt / 1440 );
+}
+
+/******************************************** workUp *********************************************/
+
+DateTime Calendar::workUp( DateTime dt )
+{
+  // return date-time now or future when working
+  Date  date = dt / 1440;
+  Day*  day  = Calendar::day( date );
+  Time  time = day->workUp( dt % 1440 );
+
+  // if day work-up time is null, need to move forward a day until a working day is found
+  if ( time == XTime::NULL_TIME )
+  {
+    do
+      day = Calendar::day( ++date );
+    while ( !day->isWorking() );
+    return date*1440 + day->start();
+  }
+
+  return date*1440 + time;
+}
+
+/******************************************* workDown ********************************************/
+
+DateTime Calendar::workDown( DateTime dt )
+{
+  // return date-time now or past when working
+  Date  date = dt / 1440;
+  Day*  day  = Calendar::day( date );
+  Time  time = day->workDown( dt % 1440 );
+
+  // if day work-down time is null, need to move back a day until a working day is found
+  if ( time == XTime::NULL_TIME )
+  {
+    do
+      day = Calendar::day( --date );
+    while ( !day->isWorking() );
+    return date*1440 + day->end();
+  }
+
+  return date*1440 + time;
+}

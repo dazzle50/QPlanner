@@ -130,9 +130,9 @@ QString XDate::toString( Date d, QString format )
 /****************** XDateTime provides static methods to support DateTime type *******************/
 /*************************************************************************************************/
 
-const QDateTime  XDateTime::ANCHOR_QDATETIME = QDateTime( XDate::ANCHOR_QDATE );
-const QDateTime  XDateTime::MIN_QDATETIME    = QDateTime( XDate::MIN_QDATE );
-const QDateTime  XDateTime::MAX_QDATETIME    = QDateTime( XDate::MAX_QDATE ).addSecs( 86340 );
+const QDateTime  XDateTime::ANCHOR_QDATETIME = QDateTime( XDate::ANCHOR_QDATE, QTime(0,0), Qt::UTC );
+const QDateTime  XDateTime::MIN_QDATETIME    = QDateTime( XDate::MIN_QDATE, QTime(0,0), Qt::UTC );
+const QDateTime  XDateTime::MAX_QDATETIME    = QDateTime( XDate::MAX_QDATE, QTime(23,59), Qt::UTC );
 const DateTime   XDateTime::MIN_DATETIME     = XDateTime::datetime( XDateTime::MIN_QDATETIME );
 const DateTime   XDateTime::MAX_DATETIME     = XDateTime::datetime( XDateTime::MAX_QDATETIME );
 
@@ -151,7 +151,7 @@ QDateTime XDateTime::qdatetime( DateTime dt )
 {
   // return QDateTime from quint32 DateTime
   if ( dt == NULL_DATETIME ) return QDateTime();
-  return ANCHOR_QDATETIME.addSecs( dt*60 );
+  return ANCHOR_QDATETIME.addSecs( dt *  60LL );
 }
 
 /****************************************** currentDate ******************************************/
@@ -175,6 +175,6 @@ QString XDateTime::toString( DateTime dt, QString format )
   // return string in specified format from Date
   if ( dt == XDateTime::NULL_DATETIME ) return QString( "NA" );
 
-  QDateTime qdatetime = ANCHOR_QDATETIME.addSecs( dt*60 );
+  QDateTime qdatetime = ANCHOR_QDATETIME.addSecs( dt * 60LL );
   return qdatetime.toString( format );
 }

@@ -232,3 +232,86 @@ QVariant  Day::headerData( int section )
   else
     return QString("End %1").arg( (section-SECTION_END) / 2 + 1 );
 }
+
+/********************************************* start *********************************************/
+
+Time Day::start()
+{
+  // return day start time or NULL time if non-working day
+  if ( m_periods < 1 ) return XTime::NULL_TIME;
+  return m_start.at( 0 );
+}
+
+/********************************************** end **********************************************/
+
+Time Day::end()
+{
+  // return day end time or NULL time if non-working day
+  if ( m_periods < 1 ) return XTime::NULL_TIME;
+  return m_end.at( m_periods-1 );
+}
+
+/******************************************** workUp *********************************************/
+
+Time Day::workUp( Time t )
+{
+  // return time now or future when working or NULL time
+  for( int p=0 ; p<m_periods ; p++ )
+  {
+    if ( t <= m_start.at(p) ) return m_start.at(p);
+    if ( t >= m_start.at(p) && t < m_end.at(p) ) return t;
+  }
+  return XTime::NULL_TIME;
+}
+
+/******************************************* workDown ********************************************/
+
+Time Day::workDown( Time t )
+{
+  // return time now or past when working or NULL time
+  for( int p=m_periods-1 ; p>=0 ; p-- )
+  {
+    if ( t >= m_end.at(p) ) return m_end.at(p);
+    if ( t >= m_start.at(p) && t < m_end.at(p) ) return t;
+  }
+  return XTime::NULL_TIME;
+}
+
+/******************************************* workDone ********************************************/
+
+float Day::workDone( Time t )
+{
+  // return days equivalent work done start to time
+  return ( m_work * minsDone( t ) ) / m_minutes;
+}
+
+/******************************************* workToGo ********************************************/
+
+float Day::workToGo( Time t )
+{
+  // return days equivalent work togo time to end
+  return ( m_work * minsToGo( t ) ) / m_minutes;
+}
+
+/******************************************* minsDone ********************************************/
+
+int Day::minsDone( Time t )
+{
+  // return number of minutes done from start to time
+  int done = 0;
+  for( int p=0 ; p<m_periods ; p++ )
+  {
+    if ( t <= m_start.at(p) ) return done;
+    if ( t >= m_start.at(p) && t <= m_end.at(p) ) return done + m_end.at(p) - t;
+    done += m_end.at(p) - m_start.at(p);
+  }
+  return done;
+}
+
+/******************************************* minsToGo ********************************************/
+
+int Day::minsToGo( Time t )
+{
+  // return number of minutes togo from time to end
+  return m_minutes - minsDone( t );
+}

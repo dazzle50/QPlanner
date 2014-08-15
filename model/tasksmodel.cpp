@@ -178,6 +178,7 @@ bool TasksModel::setData( const QModelIndex& index, const QVariant& value, int r
 
   // set data via undo/redo command
   plan->undostack()->push( new CommandTaskSetData( index, value ) );
+  return true;
 }
 
 /****************************************** headerData *******************************************/

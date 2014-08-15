@@ -68,7 +68,8 @@ HEADERS  += \
     gui/ganttscale.h \
     delegate/xdateedit.h \
     delegate/timespanspinbox.h \
-    delegate/xdatetimeedit.h
+    delegate/xdatetimeedit.h \
+    command/commandpropertieschange.h
 
 FORMS += \
     gui/mainwindow.ui \
