@@ -286,3 +286,207 @@ DateTime Calendar::workDown( DateTime dt )
 
   return date*1440 + time;
 }
+
+/********************************************* addXXX ********************************************/
+
+DateTime  Calendar::addTimeSpan( DateTime start, TimeSpan ts )
+{
+  // check if start is valid date-time
+  if ( start == XDateTime::NULL_DATETIME )
+  {
+    qWarning("Calendar::addTimeSpan - invalid start");
+    return start;
+  }
+
+  // if timespan is zero length return original start
+  if ( ts.number() == 0.0f ) return start;
+
+  // return date-time moved by TimeSpan
+  if ( ts.units() == TimeSpan::UNIT_MINUTES ) return addMinutes( start, ts.number() );
+  if ( ts.units() == TimeSpan::UNIT_HOURS )   return addMinutes( start, ts.number()*60.0 );
+  if ( ts.units() == TimeSpan::UNIT_DAYS )    return addDays(    start, ts.number() );
+  if ( ts.units() == TimeSpan::UNIT_WEEKS )   return addWeeks(   start, ts.number() );
+  if ( ts.units() == TimeSpan::UNIT_MONTHS )  return addMonths(  start, ts.number() );
+  if ( ts.units() == TimeSpan::UNIT_YEARS )   return addYears(   start, ts.number() );
+
+  // unknown timespace units - should never happen!
+  qWarning("Calendar::addTimeSpan - unknown timespace units '%c'",ts.units());
+  return start;
+}
+
+DateTime  Calendar::addMinutes( DateTime start, int mins )
+{
+  // check that secs is not zero
+  if ( mins == 0 ) return start;         // nothing to add
+
+  // if secs is positive go forward in time, else go backwards
+  if ( mins > 0 )
+  {
+    // use up any remaining working minutes on start date
+    Date  date  = start / 1440;
+    Day*  today = day( date );
+    int toGo  = today->minsToGo( start % 1440 );
+    if ( toGo == mins ) return date*1440 + today->end();
+    if ( toGo >  mins ) return date*1440 + today->doMins( start % 1440, mins );
+
+    // to go was insufficient so move to next day
+    date++;
+    mins -= toGo;
+
+    // repeat forever until no need to move to next day
+    while ( true )
+    {
+      // check if found finish date
+      today = day( date );
+      if ( today->minutes() == mins ) return date*1440 + today->end();
+      if ( today->minutes() >  mins ) return date*1440 + today->doMins( 0, mins );
+
+      // not finished so move to next day
+      date++;
+      mins -= today->minutes();
+    }
+  }
+  else
+  {
+    // work backwards on any minutes done on start date
+    mins = -mins;
+    Date  date  = start / 1440;
+    Day*  today = day( date );
+    int done  = today->minsDone( start % 1440 );
+    if ( done == mins ) return date*1440 + today->start();
+    if ( done >  mins ) return date*1440 + today->doMins( today->start(), done - mins );
+
+    // done was insufficient so move to previous day
+    date++;
+    mins -= done;
+
+    // repeat forever until no need to move to previous day
+    while ( true )
+    {
+      // check if found finish date
+      today = day( date );
+      if ( today->minutes() == mins ) return date*1440 + today->start();
+      if ( today->minutes() >  mins ) return date*1440 + today->doMins( today->start(), today->minutes() - mins );
+
+      // not finished so move to previous day
+      date--;
+      mins -= today->minutes();
+    }
+  }
+}
+
+DateTime  Calendar::addDays( DateTime start, float days )
+{
+  // check that days is not zero
+  if ( days == 0.0f ) return start;         // nothing to add
+
+  // if days is positive go forward in time, else go backwards
+  if ( days > 0.0f )
+  {
+    // use up any remaining working time on start date
+    Date  date  = start / 1440;
+    Day*  today = day( date );
+    float toGo  = today->workToGo( start % 1440 );
+    if ( toGo == days ) return date*1440 + today->end();
+    if ( toGo >  days ) return date*1440 + today->doWork( start % 1440, days );
+
+    // to go was insufficient so move to next day
+    date++;
+    days -= toGo;
+
+    // repeat forever until no need to move to next day
+    while ( true )
+    {
+      // check if found finish date
+      today = day( date );
+      if ( today->work() == days ) return date*1440 + today->end();
+      if ( today->work() >  days ) return date*1440 + today->doWork( 0, days );
+
+      // not finished so move to next day
+      date++;
+      days -= today->work();
+    }
+  }
+  else
+  {
+    // work backwards on any work done on start date
+    days = -days;
+    Date  date  = start / 1440;
+    Day*  today = day( date );
+    float done  = today->workDone( start % 1440 );
+    if ( done == days ) return date*1440 + today->start();
+    if ( done >  days ) return date*1440 + today->doWork( today->start(), done - days );
+
+    // done was insufficient so move to previous day
+    date--;
+    days -= done;
+
+    // repeat forever until no need to move to previous day
+    while ( true )
+    {
+      // check if found finish date
+      today = day( date );
+      if ( today->work() == days ) return date*1440 + today->start();
+      if ( today->work() >  days ) return date*1440 + today->doWork( today->start(), today->work() - days );
+
+      // not finished so move to previous day
+      date--;
+      days -= today->work();
+    }
+  }
+}
+
+DateTime  Calendar::addWeeks( DateTime start, float weeks )
+{
+  // return date-time moved by weeks (7 day week ignores non-working days)
+  return start + weeks*7*1440;
+}
+
+DateTime  Calendar::addMonths( DateTime start, float months )
+{
+  // return date-time moved by months
+  int       whole    = floor(months);
+  float     fraction = months - whole;
+  QDateTime qdt      = XDateTime::qdatetime( start );
+  qdt = qdt.addMonths( whole );
+
+  if ( fraction == 0.0f ) return XDateTime::datetime( qdt );
+  QDate date1 = qdt.date();
+  QDate date2 = date1.addMonths(1);
+  int   diff  = date2.toJulianDay() - date1.toJulianDay();
+  return XDateTime::datetime( qdt.addDays( diff * fraction ) );
+}
+
+DateTime  Calendar::addYears( DateTime start, float years )
+{
+  // return date-time moved by years
+  int       whole    = floor(years);
+  float     fraction = years - whole;
+  QDateTime qdt      = XDateTime::qdatetime( start );
+
+  if ( fraction == 0.0f ) return XDateTime::datetime( qdt.addYears( whole ) );
+  return addMonths( XDateTime::datetime( qdt.addYears( whole ) ), fraction*12.0f );
+}
+
+/****************************************** workBetween ******************************************/
+
+TimeSpan Calendar::workBetween( DateTime start, DateTime end )
+{
+  // return work between two dates
+  if ( start == XDateTime::NULL_DATETIME || end== XDateTime::NULL_DATETIME ) return TimeSpan( 0.0f, TimeSpan::UNIT_DAYS );
+  if ( start == end ) return TimeSpan( 0.0f, TimeSpan::UNIT_DAYS );
+  if ( start >  end ) qSwap( start, end );
+  Date  sd   = start/1440;
+  Date  ed   = end/1440;
+  Day*  day  = Calendar::day( sd );
+  float work = day->workToGo( start % 1440 );
+
+  if ( sd == ed ) return TimeSpan( work - day->workToGo( end % 1440 ), TimeSpan::UNIT_DAYS );
+
+  for( Date date = sd+1 ; date < ed ; date++ )
+    work += Calendar::day( date )->work();
+
+  work += Calendar::day( ed )->workDone( end % 1440 );
+
+  return TimeSpan( work, TimeSpan::UNIT_DAYS );
+}

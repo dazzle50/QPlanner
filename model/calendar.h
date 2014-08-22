@@ -26,6 +26,7 @@
 #include <QHash>
 
 #include "datetime.h"
+#include "timespan.h"
 
 class Day;
 
@@ -47,6 +48,14 @@ public:
   Day*          day( DateTime );                               // return day type for given date-time
   DateTime      workUp( DateTime );                            // return date-time now or future when working
   DateTime      workDown( DateTime );                          // return date-time now or past when working
+
+  DateTime      addTimeSpan( DateTime, TimeSpan );             // return date-time moved by TimeSpan
+  DateTime      addMinutes( DateTime, int );                   // return date-time moved by minutes
+  DateTime      addDays( DateTime, float );                    // return date-time moved by days
+  DateTime      addWeeks( DateTime, float );                   // return date-time moved by weeks
+  DateTime      addMonths( DateTime, float );                  // return date-time moved by months
+  DateTime      addYears( DateTime, float );                   // return date-time moved by years
+  TimeSpan      workBetween( DateTime, DateTime );             // return timespan between two date-times
 
   QVariant      data( int, int ) const;                        // return data for row & role
   void          setData( int, const QVariant& );               // set data value for column

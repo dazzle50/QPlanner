@@ -314,3 +314,19 @@ void MainTabWidget::slotUpdatePlanTab()
 
   ui->notesEdit->setPlainText( plan->notes() );
 }
+
+/************************************** tasksSelectionModel **************************************/
+
+QItemSelectionModel* MainTabWidget::tasksSelectionModel()
+{
+  // return selection model for tasks table view
+  return ui->tasksView->selectionModel();
+}
+
+/************************************* tasksSelectionIndexes *************************************/
+
+QModelIndexList  MainTabWidget::tasksSelectionIndexes()
+{
+  // return selected indexes on tasks table view
+  return ui->tasksView->selectionModel()->selection().indexes();
+}

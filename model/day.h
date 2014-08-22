@@ -54,6 +54,8 @@ public:
   float      workToGo( Time );                         // return days equiv work togo time to end
   int        minsDone( Time );                         // return num of minutes done start to time
   int        minsToGo( Time );                         // return num of minutes togo time to end
+  Time       doWork( Time , float ) const;             // return time after doing some working day
+  Time       doMins( Time , int ) const;               // return time after doing some working minutes
 
   QVariant   data( int, int );                         // return data for column & role
   void       setData( int, const QVariant& );          // set data value for column

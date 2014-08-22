@@ -334,6 +334,24 @@ QString Task::predecessorsString() const
   return "TODO"; //TODO m_predecessors.toString();
 }
 
+/**************************************** hasPredecessor *****************************************/
+
+bool  Task::hasPredecessor( Task* other ) const
+{
+  // return true if task is predecessor
+  if ( m_predecessors.hasPredecessor( other ) ) return true;
+
+  // if task is summary, then sub-tasks are implict predecessors
+  if ( m_summaryEnd > 0 )
+  {
+    int thisNum  = plan->index( (Task*)this );
+    int otherNum = plan->index( other );
+    if ( otherNum > thisNum && otherNum <= m_summaryEnd ) return true;
+  }
+
+  return false;
+}
+
 /********************************************* work **********************************************/
 
 float Task::work() const

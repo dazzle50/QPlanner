@@ -22,6 +22,9 @@
 #define MAINTABWIDGET_H
 
 #include <QTabWidget>
+#include <QModelIndexList>
+
+class QItemSelectionModel;
 
 /*************************************************************************************************/
 /***************************** Tabbed widget containing main screens *****************************/
@@ -41,6 +44,9 @@ public:
   void  updatePlan();                // update plan from 'Plan' tab widgets
   void  updateGantt();               // trigger gantt widget redraw
   int   indexOfTasksTab();           // return index of tasks tab
+
+  QItemSelectionModel*  tasksSelectionModel();    // return selection model for tasks table view
+  QModelIndexList       tasksSelectionIndexes();  // return selected indexes on tasks table view
 
 public slots:
   void  slotUpdatePlanTab();         // ensure 'Plan' tab widgets are up-to-date

@@ -35,7 +35,6 @@ class TimeSpan
 public:
   enum span_type
   {
-    UNIT_SECONDS   = 'S',
     UNIT_MINUTES   = 'M',
     UNIT_HOURS     = 'H',
     UNIT_DAYS      = 'd',
@@ -74,7 +73,7 @@ public:
       m_units = UNIT_DAYS;   // no units specified so assume 'days'
     else
     {
-      if ( QString("SMHdwmy").contains(lastchr) )   // check if valid units
+      if ( QString("MHdwmy").contains(lastchr) )   // check if valid units
       {
         m_units = lastchr.at(0).toLatin1();
         str.chop(1);
@@ -91,8 +90,8 @@ public:
     m_num = str.toDouble( &ok );
     if ( !ok ) m_units = UNIT_INVALID;    // check remainder converted to number ok
 
-    // only allow integer seconds
-    if ( m_units == UNIT_SECONDS ) m_num = floor(m_num);
+    // only allow integer minutes
+    if ( m_units == UNIT_MINUTES ) m_num = floor(m_num);
   }
 
 /******************************************** methods ********************************************/

@@ -26,10 +26,10 @@
 
 #include "datetime.h"
 #include "timespan.h"
+#include "predecessors.h"
 
 class GanttData;
 class TimeSpan;
-class Predecessors;
 class TaskResources;
 
 /*************************************************************************************************/
@@ -70,7 +70,9 @@ public:
   bool              predecessorsOK() const;                       // return true if no forbidden predecessors
   QString           predecessorsClean();                          // clean & return task predecessors
   QString           predecessorsString() const;                   // return task predecessors as string
-  void              setPredecessors( QString p ) { /* TODO m_predecessors = p; */; }    // set task predecessors
+  void              setPredecessors( QString p ) { m_predecessors = p; }    // set task predecessors
+  bool              hasPredecessor( Task* ) const;                // return true if other task is predecessor of this task
+  Predecessors&     predecessors() { return m_predecessors; }     // return task predecessors by reference
 
   static bool       scheduleOrder( Task*, Task* );                // less than function for qSort
   void              schedule();                                   // schedule task
@@ -119,7 +121,7 @@ private:
   DateTime        m_start;           // start date-time of task
   DateTime        m_end;             // end date-time of task
   TimeSpan        m_work;            // work effort for task
-  //Predecessors    m_predecessors;    // task predecessors
+  Predecessors    m_predecessors;    // task predecessors
   //TaskResources   m_resources;       // resources allocated to task
   char            m_type;            // see enumerator task_type
   int             m_priority;        // overall task priority (0 to 999 times one million)

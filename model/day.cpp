@@ -315,3 +315,33 @@ int Day::minsToGo( Time t )
   // return number of minutes togo from time to end
   return m_minutes - minsDone( t );
 }
+
+/******************************************** doWork *********************************************/
+
+Time  Day::doWork( Time time, float work ) const
+{
+  // calculate number of minutes to move forward
+  int mins = int( 0.5 + m_minutes * work / m_work );
+  return doMins( time, mins );
+}
+
+/******************************************** doMins *********************************************/
+
+Time  Day::doMins( Time time, int mins ) const
+{
+  // if no periods than can't do any work
+  if ( m_periods == 0 ) return XTime::NULL_TIME;
+
+  // move forward by number of working minutes
+  for( int p=0 ; p < m_periods ; p++ )
+  {
+    if ( time < m_start.at(p) ) time = m_start.at(p);
+    int toGo = m_end.at(p) - time;
+    if ( mins <= toGo ) return time + mins;
+    mins -= toGo;
+    time = 0;
+  }
+
+  qWarning("Day::doMins - ERROR asked to do more minutes work than remains!!!");
+  return XTime::NULL_TIME;
+}

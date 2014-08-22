@@ -20,11 +20,13 @@
 
 #include <QDateTimeEdit>
 #include <QComboBox>
+#include <QPainter>
 
 #include "tasksdelegate.h"
 #include "timespanspinbox.h"
 #include "xdatetimeedit.h"
 #include "model/task.h"
+#include "model/plan.h"
 
 /*************************************************************************************************/
 /********************** Delegate for displaying & editing task data items ************************/
@@ -117,5 +119,48 @@ void  TasksDelegate::setModelData( QWidget* editor,
     default:
       QStyledItemDelegate::setModelData( editor, model, index );
       return;
+  }
+}
+
+/********************************************* paint *********************************************/
+
+void  TasksDelegate::paint( QPainter* painter,
+                            const QStyleOptionViewItem& option,
+                            const QModelIndex& index ) const
+{
+  // get Qt to paint the table cell as normal
+  QStyledItemDelegate::paint( painter, option, index );
+
+  // check if we need to add a summary task show/hide subtasks symbol
+  if ( index.column() == Task::SECTION_TITLE &&
+       plan->task( index.row() )->isSummary() )
+  {
+    QRect cell   = option.rect;
+    int   indent = 10 * plan->task( index.row() )->indent() + 5;
+    QRect sym    = QRect( cell.x() + indent, cell.center().y() - 4, 9, 9 );
+
+    painter->setPen( Qt::black );
+    painter->drawLine( sym.x()+2, sym.center().y(), sym.right()-2, sym.center().y() );
+
+    if ( !plan->task( index.row() )->isExpanded() )
+      painter->drawLine( sym.center().x(), sym.y()+2, sym.center().x(), sym.bottom()-2 );
+
+    painter->setPen( Qt::gray );
+    painter->drawRect( sym.adjusted(0,0,-1,-1) );
+  }
+}
+
+/**************************************** initStyleOption ****************************************/
+
+void  TasksDelegate::initStyleOption( QStyleOptionViewItem* option,
+                                      const QModelIndex& index ) const
+{
+  QStyledItemDelegate::initStyleOption( option, index );
+
+  // if column is title section, indent depending on indent level
+  if ( index.column() == Task::SECTION_TITLE )
+  {
+    int indent = 10 * ( plan->task( index.row() )->indent() + 1.6 );
+    option->rect.setX( option->rect.x() + indent );
   }
 }

@@ -41,7 +41,7 @@ void  TimeSpanSpinBox::setUnits( char units )
   setSuffix( QString(" %1").arg(units) );
 
   // if units is seconds, no decimal places otherwise two decimal places
-  if ( units == TimeSpan::UNIT_SECONDS ) setDecimals( 0 );
+  if ( units == TimeSpan::UNIT_MINUTES ) setDecimals( 0 );
   else                                   setDecimals( 2 );
 }
 
@@ -68,10 +68,8 @@ QValidator::State  TimeSpanSpinBox::validate( QString& text, int& pos ) const
   char  units = text.at(pos-1).toLatin1();
 
   if ( units == 'h' ) units = TimeSpan::UNIT_HOURS;
-  if ( units == 's' ) units = TimeSpan::UNIT_SECONDS;
 
-  if ( units == TimeSpan::UNIT_SECONDS ||
-       units == TimeSpan::UNIT_MINUTES ||
+  if ( units == TimeSpan::UNIT_MINUTES ||
        units == TimeSpan::UNIT_HOURS   ||
        units == TimeSpan::UNIT_DAYS    ||
        units == TimeSpan::UNIT_WEEKS   ||

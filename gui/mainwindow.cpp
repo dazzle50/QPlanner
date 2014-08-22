@@ -26,6 +26,8 @@
 #include "ui_mainwindow.h"
 #include "maintabwidget.h"
 #include "model/plan.h"
+#include "model/tasksmodel.h"
+#include "model/task.h"
 
 /*************************************************************************************************/
 /********************* Main application window showing tabbed main screens ***********************/
@@ -78,6 +80,24 @@ void MainWindow::setModels()
   // set undostack for undoview
   if ( m_undoview != nullptr ) m_undoview->setStack( plan->undostack() );
 
+  // set models for each main tab widget
+  m_tabs->setModels();
+  foreach( MainTabWidget* tabs, m_windows )
+    if (tabs)
+    {
+      tabs->setModels();
+      tabs->updateGantt();
+    }
+
+  // ensure is task data changed, indent & outdent are enabled correctly
+  connect( plan->tasks(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+           this, SLOT(slotTaskDataChanged(QModelIndex,QModelIndex)),
+           Qt::UniqueConnection );
+
+  // ensure when select changes on tasks view, indent & outdent are enabled correctly
+  connect( m_tabs->tasksSelectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+           this, SLOT(slotTaskSelectionChanged(QItemSelection,QItemSelection)),
+           Qt::UniqueConnection );
 }
 
 /******************************************* message *********************************************/
@@ -94,12 +114,49 @@ void MainWindow::message( QString msg )
   ui->statusBar->showMessage( msg );
 }
 
+/************************************** slotTaskDataChanged **************************************/
+
+void MainWindow::slotTaskDataChanged( const QModelIndex& index, const QModelIndex& )
+{
+  // ensure if task becomes not-null (because title added) check if indent/outdent affected
+  if ( index.column() == Task::SECTION_TITLE )
+    slotTaskSelectionChanged( QItemSelection(), QItemSelection() );
+}
+
+/*********************************** slotTaskSelectionChanged ************************************/
+
+void MainWindow::slotTaskSelectionChanged( const QItemSelection&, const QItemSelection& )
+{
+  // task selection has changed, determine unique rows selected
+  QSet<int>  rows;
+  foreach( QModelIndex index, m_tabs->tasksSelectionIndexes() )
+    rows.insert( index.row() );
+
+  // ensure indent & outdent actions only enabled is action possible
+  bool inEnable  = false;
+  bool outEnable = false;
+
+  foreach( int row, rows )
+  {
+    if ( plan->tasks()->canIndent( row ) )  inEnable = true;
+    if ( plan->tasks()->canOutdent( row ) ) outEnable = true;
+  }
+
+  ui->actionIndent->setEnabled( inEnable );
+  ui->actionOutdent->setEnabled( outEnable );
+}
+
 /******************************************* slotIndent ******************************************/
 
 void MainWindow::slotIndent()
 {
   // indent task(s) - determine unique rows selected
+  m_tabs->endEdits();
+  QSet<int>  rows;
+  foreach( QModelIndex index, m_tabs->tasksSelectionIndexes() )
+    rows.insert( index.row() );
 
+  plan->tasks()->indentRows( rows );
 }
 
 /****************************************** slotOutdent ******************************************/
@@ -107,7 +164,12 @@ void MainWindow::slotIndent()
 void MainWindow::slotOutdent()
 {
   // outdent task(s) - determine unique rows selected
+  m_tabs->endEdits();
+  QSet<int>  rows;
+  foreach( QModelIndex index, m_tabs->tasksSelectionIndexes() )
+    rows.insert( index.row() );
 
+  plan->tasks()->outdentRows( rows );
 }
 
 /****************************************** slotFileNew ******************************************/

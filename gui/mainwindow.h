@@ -25,6 +25,7 @@
 #include <QPointer>
 
 class QUndoView;
+class QItemSelection;
 class MainTabWidget;
 
 /*************************************************************************************************/
@@ -60,6 +61,11 @@ public slots:
   void slotFilePrintPreview();                 // slot for file print preview action
   void slotFileExit();                         // slot for file exit application action
   void slotAboutQPlanner();                    // slot for about qplanner action
+
+  void slotTaskSelectionChanged( const QItemSelection&,
+                                 const QItemSelection& );   // slot for task selection change
+  void slotTaskDataChanged( const QModelIndex&,
+                            const QModelIndex& );           // slot for task data change
 
 private:
   Ui::MainWindow*         ui;                  // user interface created using qt designer
