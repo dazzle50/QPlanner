@@ -69,7 +69,10 @@ HEADERS  += \
     delegate/xdateedit.h \
     delegate/timespanspinbox.h \
     delegate/xdatetimeedit.h \
-    command/commandpropertieschange.h
+    command/commandpropertieschange.h \
+    command/commandtaskindent.h \
+    command/commandtaskoutdent.h \
+    model/task_schedule.h
 
 FORMS += \
     gui/mainwindow.ui \

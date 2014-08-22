@@ -42,6 +42,14 @@ public:
   Task();                                                         // constructor (normal)
   Task( bool );                                                   // constructor (plan summary)
 
+  bool              isNull() const { return m_title.isNull(); }   // is this task null (blank)
+  QString           name() const { return m_title; }              // return name of task (i.e. title)
+  DateTime          start() const;                                // return task (or summary) start date-time
+  DateTime          end() const;                                  // return task (or summary) end date-time
+  TimeSpan          duration() const;                             // return task (or summary) duration
+  float             work() const;                                 // return task (or summary) work (in days)
+  int               priority() const { return m_priority; }       // return task priority
+
   static QVariant   headerData( int );                            // return column header data
   QVariant          dataDisplayRole( int ) const;                 // return display text for cell
   QVariant          dataEditRole( int ) const;                    // return cell data ready for editor
@@ -59,12 +67,16 @@ public:
   int               indent() const { return m_indent; }           // return task (or summary) indent level
   void              setIndent( short i ) { m_indent = i; }        // set task indent level
 
-  bool              isNull() const { return m_title.isNull(); }   // is this task null (blank)
-  QString           name() const { return m_title; }              // return name of task (i.e. title)
-  DateTime          start() const;                                // return task (or summary) start date-time
-  DateTime          end() const;                                  // return task (or summary) end date-time
-  TimeSpan          duration() const;                             // return task (or summary) duration
-  float             work() const;                                 // return task (or summary) work (in days)
+  bool              predecessorsOK() const;                       // return true if no forbidden predecessors
+  QString           predecessorsClean();                          // clean & return task predecessors
+  QString           predecessorsString() const;                   // return task predecessors as string
+  void              setPredecessors( QString p ) { /* TODO m_predecessors = p; */; }    // set task predecessors
+
+  static bool       scheduleOrder( Task*, Task* );                // less than function for qSort
+  void              schedule();                                   // schedule task
+  void              schedule_ASAP_FDUR();                         // schedule ASAP fixed duration
+  DateTime          scheduleStart() const;                        // determine start based on predecessors
+  DateTime          scheduleEnd_ASAP_FDUR() const;                // determine end based on duration
 
   static QString    typeToString( int );                          // return type string equivalent
 

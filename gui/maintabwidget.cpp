@@ -246,7 +246,6 @@ int MainTabWidget::indexOfTasksTab()
 
 void MainTabWidget::updatePlan()
 {
-  qDebug("MainTabWidget::updatePlan()");
   // check if we need to update plan from 'Plan' tab widgets
   if ( ui->title->text()                                != plan->title()  ||
        XDateTime::datetime( ui->planStart->dateTime() ) != plan->start()  ||

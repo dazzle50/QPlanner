@@ -20,7 +20,10 @@
 
 #include "tasksmodel.h"
 #include "task.h"
+
 #include "command/commandtasksetdata.h"
+#include "command/commandtaskindent.h"
+#include "command/commandtaskoutdent.h"
 
 /*************************************************************************************************/
 /**************************** Table model containing all plan tasks ******************************/
@@ -86,7 +89,29 @@ int TasksModel::number()
 void TasksModel::schedule()
 {
   // re-schedule tasks - first construct list of tasks in correct order
-  qDebug("TasksModel::schedule()");
+  qDebug("TasksModel::schedule() -------------------- cycle started ----------------------");
+  QList<Task*>   scheduleList;
+  scheduleList.reserve( m_tasks.size() );
+
+  foreach( Task* t, m_tasks )
+    if ( !t->isNull() ) scheduleList.append( t );
+  //---------qDebug("Tasks to schedule = %i",scheduleList.size());
+  qSort( scheduleList.begin(), scheduleList.end(), Task::scheduleOrder );
+
+  // ensure task resourcing quick access container is up-to-date
+  //TODO foreach( Task* t, scheduleList )
+  //TODO   t->resourceProcess();
+
+  // re-schedule each task
+  foreach( Task* t, scheduleList )
+  {
+    //---------qDebug("Post sort %i %s",plan->index(t),qPrintable(t->name()));
+    t->schedule();
+  }
+
+  // now scheduling has completed update both tasks table view and gantt view
+  emit dataChanged( QAbstractTableModel::index( 0, 0 ), QAbstractTableModel::index( rowCount(), columnCount() ) );
+  emit ganttChanged();
 }
 
 /***************************************** planBeginning *****************************************/
@@ -224,4 +249,128 @@ void TasksModel::emitDataChangedRow( int row )
   // emit data changed signal for row
   emit dataChanged( QAbstractTableModel::index( row, 0 ),
                     QAbstractTableModel::index( row, columnCount() ) );
+}
+
+/***************************************** setSummaries ******************************************/
+
+void TasksModel::setSummaries()
+{
+  // recalc summaries for all tasks, start by assembling list of non-null tasks
+  QList<Task*>  nonNull;
+  for( int t = 0 ; t < m_tasks.size() ; t++ )
+  {
+    Task*  task = m_tasks.at( t );
+    if ( !task->isNull() ) nonNull.append( task );
+  }
+
+  // last non-null task cannot be summary
+  if ( nonNull.isEmpty() ) return;
+  nonNull.last()->setNotSummary();
+
+  // set summaries for all other non-null tasks
+  for( int t = 0 ; t < nonNull.size()-1 ; t++ )
+  {
+    // assume not summary until discovered otherwise
+    nonNull.at(t)->setNotSummary();
+
+    // check if summary
+    int  indent = nonNull.at(t)->indent();
+    if ( indent < nonNull.at(t+1)->indent() )
+    {
+      int last = t + 1;
+      while ( last+1 < nonNull.size() && indent < nonNull.at(last+1)->indent() ) last++;
+      nonNull.at(t)->setSummaryEnd( plan->index( nonNull.at(last) ) );
+    }
+  }
+}
+
+/*************************************** nonNullTaskAbove ****************************************/
+
+Task*  TasksModel::nonNullTaskAbove( Task* t )
+{
+  // returns pointer to first non-null task above, or nullptr if none
+  if ( index(t) <= 0 ) return nullptr;
+
+  int r = index(t) - 1;
+  while ( r > 0 && task(r)->isNull() ) r--;
+  if ( task(r)->isNull() ) return nullptr;
+  return task(r);
+}
+
+/****************************************** canIndent ********************************************/
+
+bool  TasksModel::canIndent( int row )
+{
+  // return true if task can be indented
+  if ( row == 0 ) return false;
+  if ( task(row)->isNull() ) return false;
+
+  // non-null above is same or higher indent
+  int r = row - 1;
+  while ( r > 0 && task(r)->isNull() ) r--;
+  if ( task(r)->isNull() ) return false;
+  if ( task(r)->indent() < task(row)->indent() ) return false;
+  return true;
+}
+
+/****************************************** canOutdent *******************************************/
+
+bool  TasksModel::canOutdent( int row )
+{
+  // return true if task can be outdented
+  if ( task(row)->isNull() ) return false;
+  if ( task(row)->indent() == 0 ) return false;
+  return true;
+}
+
+/******************************************* indentRows ******************************************/
+
+bool  TasksModel::indentRows( QSet<int> rows )
+{
+  // only allow rows that can be intended
+  foreach( int row, rows )
+    if ( !canIndent(row) ) rows.remove(row);
+
+  // if summary being indented, ensure all subtasks also included
+  foreach( int row, rows )
+    if ( task(row)->isSummary() )
+    {
+      for( int r=row+1 ; r <= task(row)->summaryEnd() ; r++ )
+        if ( !task(r)->isNull() ) rows.insert(r);
+    }
+
+  // check for predecessors that would become forbidden
+  //TODO if ( predecessorsIndentOk( rows ) == false ) return false;
+
+  // do indenting via undo/redo command
+  plan->undostack()->push( new CommandTaskIndent( rows ) );
+
+  // return true to say successful indenting
+  return true;
+}
+
+/******************************************* outdentRows *****************************************/
+
+bool  TasksModel::outdentRows( QSet<int> rows )
+{
+  // only allow rows that can be intended
+  foreach( int row, rows )
+    if ( !canOutdent(row) ) rows.remove(row);
+
+  // if summary being outdented, ensure all subtasks also included
+  foreach( int row, rows )
+    if ( task(row)->isSummary() )
+    {
+      for( int r=row+1 ; r <= task(row)->summaryEnd() ; r++ )
+        if ( !task(r)->isNull() ) rows.insert(r);
+    }
+
+  // check for predecessors that would become forbidden
+  //TODO if ( predecessorsOutdentOk( rows ) == false ) return false;
+
+  // do outdenting via undo/redo command
+  plan->undostack()->push( new CommandTaskOutdent( rows ) );
+
+  // return true to say successful outdenting
+  return true;
 }

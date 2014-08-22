@@ -22,6 +22,7 @@
 #define TASKSMODEL_H
 
 #include <QAbstractTableModel>
+#include <QSet>
 
 #include "datetime.h"
 
@@ -48,6 +49,12 @@ public:
   int            index( Task* t ) { return m_tasks.indexOf(t); }  // return index of task, or -1
 
   void           emitDataChangedRow( int );                       // emit data changed signal for row
+  bool           canIndent( int );                                // return true if task can be indented
+  bool           canOutdent( int );                               // return true if task can be outdented
+  bool           indentRows( QSet<int> );                         // indent selected rows
+  bool           outdentRows( QSet<int> );                        // outdent selected rows
+  Task*          nonNullTaskAbove( Task* );                       // returns task ptr or nullptr if none
+  void           setSummaries();                                  // recalc summaries for all tasks
   void           setOverride( QModelIndex i, QVariant v )
                    { m_overrideIndex = i; m_overrideValue = v; }  // set model override values
 

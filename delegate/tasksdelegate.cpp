@@ -55,6 +55,7 @@ QWidget*  TasksDelegate::createEditor( QWidget *parent,
       QDateTimeEdit*  editor = dynamic_cast<QDateTimeEdit*>( QStyledItemDelegate::createEditor( parent, option, index ) );
       QDateTime       dt     = index.data( Qt::EditRole ).toDateTime();
       if ( dt.isNull() ) dt = QDateTime::currentDateTime();
+      editor->setTimeSpec( Qt::UTC );
       editor->setDateTimeRange( XDateTime::MIN_QDATETIME, XDateTime::MAX_QDATETIME );
       editor->setCalendarPopup( true );
       editor->setDateTime( dt );
@@ -66,6 +67,7 @@ QWidget*  TasksDelegate::createEditor( QWidget *parent,
       XDateTimeEdit*  editor = new XDateTimeEdit( parent );
       QDateTime       dt     = index.data( Qt::EditRole ).toDateTime();
       if ( dt.isNull() ) dt = QDateTime::currentDateTime();
+      editor->setTimeSpec( Qt::UTC );
       editor->setDateTimeRange( XDateTime::MIN_QDATETIME, XDateTime::MAX_QDATETIME );
       editor->setCalendarPopup( true );
       editor->setDateTime( dt );
