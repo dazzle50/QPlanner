@@ -230,7 +230,7 @@ QVariant  Task::dataDisplayRole( int col ) const
   // return appropriate display text from plan data
   if ( col == SECTION_TITLE ) return m_title;
 
-  if ( col == SECTION_DURATION ) return "TODO";  //duration().toString();
+  if ( col == SECTION_DURATION ) return duration().toString();
 
   if ( col == SECTION_WORK ) return TimeSpan( work(), TimeSpan::UNIT_DAYS ).toString();
 
@@ -423,4 +423,14 @@ DateTime Task::end() const
   }
 
   return m_end;
+}
+
+/******************************************* duration ********************************************/
+
+TimeSpan Task::duration() const
+{
+  // return task or summary duration
+  if ( isSummary() ) return plan->calendar()->workBetween( m_gantt.start(), m_gantt.end() );
+
+  return m_duration;
 }

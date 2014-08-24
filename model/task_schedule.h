@@ -35,8 +35,8 @@
 bool  Task::scheduleOrder( Task* t1, Task* t2 )
 {
   // less than function for qSort - firstly if predecessor
-  //TODO if ( t1->hasPredecessor( t2 ) ) return false;
-  //TODO if ( t2->hasPredecessor( t1 ) ) return true;
+  if ( t1->hasPredecessor( t2 ) ) return false;
+  if ( t2->hasPredecessor( t1 ) ) return true;
 
   // otherwise, by priority and index
   return ( t1->m_priority - plan->index(t1) ) > ( t2->m_priority - plan->index(t2) );
@@ -47,7 +47,6 @@ bool  Task::scheduleOrder( Task* t1, Task* t2 )
 void  Task::schedule()
 {
   // schedule individual task
-
   switch ( m_type )
   {
     case TYPE_ASAP_FDUR:
@@ -77,11 +76,11 @@ void  Task::schedule()
 void  Task::schedule_ASAP_FDUR()
 {
   qDebug("Task::schedule_ASAP_FDUR() STARTING !!! %i %s",plan->index(this),qPrintable(m_title));
-/*
+
   // schedule ASAP Fixed DURation task
   m_start = scheduleStart();
   m_end   = scheduleEnd_ASAP_FDUR();
-
+/*
   // register resource employment for each assigned resources
   QHash<Resource*, float>::iterator i;
   for( i = m_resources.alloc.begin() ; i != m_resources.alloc.end() ; ++i )
@@ -122,24 +121,21 @@ void  Task::schedule_ASAP_FDUR()
     }
     while ( start < end );
   }
-
+*/
   // set gantt task bar data
   if ( isSummary() ) m_gantt.setSummary( this->start(), this->end() );
   else               m_gantt.setTask( m_start, m_end );
 
-
   qDebug("Task::schedule_ASAP_FDUR() UNFINISHED !!! %i %s (%s) (%s)",plan->index(this),
-         qPrintable(m_title), qPrintable(m_start.toString()), qPrintable(m_end.toString()) );
-*/
+         qPrintable(m_title), qPrintable(XDateTime::toString(m_start)), qPrintable(XDateTime::toString(m_end)) );
 }
 
 /***************************************** scheduleStart *****************************************/
 
 DateTime  Task::scheduleStart() const
 {
-/*
   // get start based on this task's predecessors
-  QDateTime  start = plan->calendar()->workUp( m_predecessors.start() );
+  DateTime  start = plan->calendar()->workUp( m_predecessors.start() );
 
   // if indented also check start against summary(s) predecessors
   int index = plan->index( (Task*)this );
@@ -150,29 +146,26 @@ DateTime  Task::scheduleStart() const
             plan->task(index)->indent() >= indent ) index--;
 
     // if start from summary predecessors is later, use it instead
-    QDateTime summaryStart = plan->calendar()->workUp( plan->task(index)->predecessors().start() );
+    DateTime summaryStart = plan->calendar()->workUp( plan->task(index)->predecessors().start() );
     if ( summaryStart > start ) start = summaryStart;
   }
 
   // if not set by predecessors, task start is plan start
-  if ( start <= plan->calendar()->workUp( plan->MIN_DATETIME ) ) return plan->start();
+  if ( start <= plan->calendar()->workUp( XDateTime::MIN_DATETIME ) ) return plan->start();
 
   return start;
-*/
 }
 
 /************************************* scheduleEnd_ASAP_FDUR *************************************/
 
 DateTime  Task::scheduleEnd_ASAP_FDUR() const
 {
-/*
   // determine end of fixed duration task using plan calendar
-  QDateTime end = plan->calendar()->addTimeSpan( m_start, m_duration );
+  DateTime end = plan->calendar()->addTimeSpan( m_start, m_duration );
   end = plan->calendar()->workDown( end );
   if ( end < m_start ) return m_start;
 
   return end;
-*/
 }
 
 #endif // TASK_SCHEDULE_H

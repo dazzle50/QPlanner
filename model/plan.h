@@ -98,6 +98,7 @@ public:
   void             emitPlanUpdated()
                      { emit signalPlanUpdated(); }                  // emit signalPlanUpdated
   bool             stretchTasks;                                    // flag if gantt task bars stretched to use full 24h day
+  DateTime         stretch( DateTime dt );                          // return date-time stretched if necessary
 
 signals:
   void  signalPlanUpdated();            // signal to say plan properties updated

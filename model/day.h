@@ -43,6 +43,7 @@ public:
   quint8     periods() { return m_periods; }           // return number of work periods
   Time       start( int n ) { return m_start.at(n); }  // return work period start
   Time       end( int n ) { return m_end.at(n); }      // return work period end
+  Time       stretch( Time  ) const;                   // return time as if whole 24 hrs is working (for gantt drawing)
 
   bool       isWorking() { return m_periods > 0; }     // return if day has work periods
   int        minutes() { return m_minutes; }           // return num of minutes in day

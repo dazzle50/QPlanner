@@ -20,6 +20,7 @@
 
 #include "plan.h"
 #include "daysmodel.h"
+#include "day.h"
 #include "calendarsmodel.h"
 #include "calendar.h"
 #include "resourcesmodel.h"
@@ -99,4 +100,19 @@ void  Plan::initialise()
 
   m_resources->initialise();
   m_tasks->initialise();
+}
+
+/********************************************* stretch *******************************************/
+
+DateTime  Plan::stretch( DateTime dt )
+{
+  // return date-time stretched across full 24 hrs if plan stretchTasks flag is true
+  if ( stretchTasks )
+  {
+    Time time = m_calendar->day( dt/1440 )->stretch( dt%1440 );
+    return dt - dt%1440 + time;
+  }
+
+  // plan stretchTasks flag not true, so return original date-time
+  return dt;
 }

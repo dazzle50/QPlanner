@@ -27,8 +27,8 @@
 #include "datetime.h"
 #include "timespan.h"
 #include "predecessors.h"
+#include "ganttdata.h"
 
-class GanttData;
 class TimeSpan;
 class TaskResources;
 
@@ -49,6 +49,7 @@ public:
   TimeSpan          duration() const;                             // return task (or summary) duration
   float             work() const;                                 // return task (or summary) work (in days)
   int               priority() const { return m_priority; }       // return task priority
+  GanttData*        ganttData() { return &m_gantt; }              // return pointer to gantt data
 
   static QVariant   headerData( int );                            // return column header data
   QVariant          dataDisplayRole( int ) const;                 // return display text for cell
@@ -114,7 +115,7 @@ private:
   short           m_indent;          // task indent level, zero for no indent
   int             m_summaryEnd;      // last sub-task id, or -1 for non-summaries
   bool            m_expanded;        // if summary, is task expanded
-  //GanttData       m_gantt;           // data for drawing task gantt
+  GanttData       m_gantt;           // data for drawing task gantt
 
   QString         m_title;           // free text title
   TimeSpan        m_duration;        // duration of task

@@ -345,3 +345,20 @@ Time  Day::doMins( Time time, int mins ) const
   qWarning("Day::doMins - ERROR asked to do more minutes work than remains!!!");
   return XTime::NULL_TIME;
 }
+
+/******************************************** stretch ********************************************/
+
+Time  Day::stretch( Time now ) const
+{
+  // if no working times return orginal date-time
+  if ( m_periods == 0 ) return now;
+
+  Time s = m_start.at( 0 );
+  Time e = m_end.at( m_periods-1 );
+  if ( now <= s ) return 0;
+  if ( now >= e ) return 1439;
+
+  // stretch time component so it uses whole 24 hours
+  double scale = 1440.0 / ( e - s );
+  return int( scale * ( now - s ) );
+}
