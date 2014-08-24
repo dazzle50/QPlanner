@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     delegate/timespanspinbox.cpp \
     delegate/xdatetimeedit.cpp \
     model/predecessors.cpp \
-    model/ganttdata.cpp
+    model/ganttdata.cpp \
+    model/taskresources.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -76,7 +77,8 @@ HEADERS  += \
     command/commandtaskoutdent.h \
     model/task_schedule.h \
     model/predecessors.h \
-    model/ganttdata.h
+    model/ganttdata.h \
+    model/taskresources.h
 
 FORMS += \
     gui/mainwindow.ui \

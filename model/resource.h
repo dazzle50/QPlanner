@@ -44,6 +44,8 @@ public:
   Calendar*         calendar() const { return m_calendar; }          // return resource calendar
   Date              start() const;                                   // return resource start date
   Date              end() const;                                     // return resource end date
+  QList<QString>    assignable() const;                              // return assignable names
+  bool              hasTag( QString ) const;                         // return true if tag matches
 
   enum sections                            // sections to be displayed by view
   {

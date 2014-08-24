@@ -22,6 +22,7 @@
 
 #include "plan.h"
 #include "resource.h"
+#include "resourcesmodel.h"
 #include "calendar.h"
 #include "calendarsmodel.h"
 
@@ -159,7 +160,7 @@ void  Resource::setData( int col, const QVariant& value )
 
   if ( m_calendar == nullptr ) m_calendar = plan->calendar();
   if ( isNull() ) m_calendar = nullptr;
-  //plan->resources()->updateAssignable();
+  plan->resources()->updateAssignable();
 }
 
 /********************************************* start *********************************************/
@@ -178,4 +179,43 @@ Date Resource::end() const
   // if end is not set, return max date
   if ( m_end == XDate::NULL_DATE ) return XDate::MAX_DATE;
   return m_end;
+}
+
+/******************************************** hasTag *********************************************/
+
+bool Resource::hasTag( QString tag ) const
+{
+  // return true if tag matches on of the free text fields
+  if ( tag == m_initials ) return true;
+  if ( tag == m_name )     return true;
+  if ( tag == m_org )      return true;
+  if ( tag == m_group )    return true;
+  if ( tag == m_role )     return true;
+  if ( tag == m_alias )    return true;
+
+  return false;
+}
+
+/****************************************** assignable *******************************************/
+
+QList<QString>  Resource::assignable() const
+{
+  // return assignable names
+  QList<QString>  list;
+  QString         temp;
+
+  temp = m_initials;
+  if ( !temp.isEmpty() ) list << temp;
+  temp = m_name;
+  if ( !temp.isEmpty() ) list << temp;
+  temp = m_org;
+  if ( !temp.isEmpty() ) list << temp;
+  temp = m_group;
+  if ( !temp.isEmpty() ) list << temp;
+  temp = m_role;
+  if ( !temp.isEmpty() ) list << temp;
+  temp = m_alias;
+  if ( !temp.isEmpty() ) list << temp;
+
+  return list;
 }

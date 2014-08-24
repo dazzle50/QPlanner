@@ -190,3 +190,28 @@ bool ResourcesModel::initialsIsDuplicate( const QString& id, int row )
   // no match found, so return false
   return false;
 }
+
+/**************************************** updateAssignable ***************************************/
+
+void ResourcesModel::updateAssignable()
+{
+  // start with an empty set
+  m_assignable.clear();
+
+  // determine assignable list
+  foreach( Resource* res, m_resources )
+    foreach( QString str, res->assignable() )
+      m_assignable.insert( str );
+}
+
+/**************************************** resourceSet ***************************************/
+
+QSet<Resource*> ResourcesModel::resourceSet( QString tag )
+{
+  // return set of resources that have tag
+  QSet<Resource*>  set;
+  foreach( Resource* res, m_resources )
+    if ( res->hasTag( tag ) ) set.insert( res );
+
+  return set;
+}

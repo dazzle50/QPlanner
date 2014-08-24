@@ -20,12 +20,14 @@
 
 #include <QDateTimeEdit>
 #include <QComboBox>
+#include <QLineEdit>
 #include <QPainter>
 
 #include "tasksdelegate.h"
 #include "timespanspinbox.h"
 #include "xdatetimeedit.h"
 #include "model/task.h"
+#include "model/tasksmodel.h"
 #include "model/plan.h"
 
 /*************************************************************************************************/
@@ -50,6 +52,13 @@ QWidget*  TasksDelegate::createEditor( QWidget *parent,
     case Task::SECTION_DURATION:
     case Task::SECTION_WORK:
       return new TimeSpanSpinBox( parent );
+
+    case Task::SECTION_PRIORITY:
+    {
+      QSpinBox* editor = dynamic_cast<QSpinBox*>( QStyledItemDelegate::createEditor( parent, option, index ) );
+      editor->setRange( 0, 999 );
+      return editor;
+    }
 
     case Task::SECTION_START:
     case Task::SECTION_END:
@@ -99,6 +108,25 @@ void  TasksDelegate::setEditorData( QWidget* editor, const QModelIndex& index) c
   // set the editor initial value, method depends on editor which depends on column
   switch ( index.column() )
   {
+    case Task::SECTION_DURATION:
+    case Task::SECTION_WORK:
+    {
+      TimeSpanSpinBox*  spin  = dynamic_cast<TimeSpanSpinBox*>( editor );
+      QString           value = index.data( Qt::EditRole ).toString();
+      TimeSpan          ts    = TimeSpan( value );
+      spin->setValue( ts.number() );
+      spin->setUnits( ts.units() );
+      return;
+    }
+
+    case Task::SECTION_DEADLINE:
+    {
+      XDateTimeEdit*  edit = dynamic_cast<XDateTimeEdit*>( editor );
+      QDateTime       dt   = index.data( Qt::EditRole ).toDateTime();
+      if ( dt.isNull() ) dt = XDateTime::qdatetime( plan->task( index.row() )->end() );
+      edit->setDateTime( dt );
+      return;
+    }
 
     default:
       QStyledItemDelegate::setEditorData( editor, index );
@@ -115,6 +143,57 @@ void  TasksDelegate::setModelData( QWidget* editor,
   // update the model value, method depends on editor which depends on column
   switch ( index.column() )
   {
+    case Task::SECTION_DURATION:
+    case Task::SECTION_WORK:
+    {
+      TimeSpanSpinBox*  spin  = dynamic_cast<TimeSpanSpinBox*>( editor );
+      model->setData( index, spin->text() );
+      return;
+    }
+
+    case Task::SECTION_PREDS:
+    {
+      QLineEdit*  line  = dynamic_cast<QLineEdit*>( editor );
+      QString     value = line->text().simplified();
+
+      QString     error = Predecessors::validate( value, index.row() );
+      if ( error.isEmpty() )
+        model->setData( index, value );
+      else
+      {
+        // set override so when edit re-starts it picks up what user had started to enter
+        dynamic_cast<TasksModel*>( model )->setOverride( index, value );
+        emit editCell( index, error );
+      }
+      return;
+    }
+
+    case Task::SECTION_RES:
+    {
+      QLineEdit*  line  = dynamic_cast<QLineEdit*>( editor );
+      QString     value = line->text().simplified();
+
+      QString     error = TaskResources::validate( value );
+      if ( error.isEmpty() )
+        model->setData( index, value );
+      else
+      {
+        // set override so when edit re-starts it picks up what user had started to enter
+        dynamic_cast<TasksModel*>( model )->setOverride( index, value );
+        emit editCell( index, error );
+      }
+      return;
+    }
+
+    case Task::SECTION_DEADLINE:
+    {
+      XDateTimeEdit* edit = dynamic_cast<XDateTimeEdit*>( editor );
+      if ( edit->isNull )
+      {
+        model->setData( index, QDateTime() );
+        return;
+      }
+    }
 
     default:
       QStyledItemDelegate::setModelData( editor, model, index );

@@ -133,23 +133,11 @@ QVariant  Task::dataEditRole( int col ) const
 
   if ( col == SECTION_TYPE  ) return m_type;  // return m_types as int for QComboBox index
 
-  if ( col == SECTION_START )
-  {
-    if ( m_start == XDateTime::NULL_DATETIME ) return XDateTime::qdatetime( plan->start() );
-    return XDateTime::qdatetime( m_start );
-  }
+  if ( col == SECTION_START ) return XDateTime::qdatetime( m_start );
 
-  if ( col == SECTION_END )
-  {
-    if ( m_end == XDateTime::NULL_DATETIME ) return XDateTime::qdatetime( plan->start() );
-    return XDateTime::qdatetime( m_end );
-  }
+  if ( col == SECTION_END ) return XDateTime::qdatetime( m_end );
 
-  if ( col == SECTION_DEADLINE )
-  {
-    if ( m_deadline == XDateTime::NULL_DATETIME ) return XDateTime::qdatetime( plan->start() );
-    return XDateTime::qdatetime( m_deadline );
-  }
+  if ( col == SECTION_DEADLINE ) return XDateTime::qdatetime( m_deadline );
 
   if ( col == SECTION_WORK )
   {
@@ -244,13 +232,13 @@ QVariant  Task::dataDisplayRole( int col ) const
 
   if ( col == SECTION_END ) return XDateTime::toString( end(), plan->datetimeFormat() );
 
-  if ( col == SECTION_PREDS ) return "TODO"; //m_predecessors.toString();
+  if ( col == SECTION_PREDS ) return m_predecessors.toString();
 
   if ( col == SECTION_DEADLINE ) return XDateTime::toString( m_deadline, plan->datetimeFormat() );
 
-  if ( col == SECTION_RES ) return "TODO"; //m_resources.toString();
+  if ( col == SECTION_RES ) return m_resources.toString();
 
-  if ( col == SECTION_COST ) return QString("$ %1").arg( m_cost );
+  if ( col == SECTION_COST ) return QString("£ %1").arg( m_cost );
 
   if ( col == SECTION_PRIORITY ) return m_priority / 1000000;
 
@@ -295,9 +283,9 @@ void  Task::setData( int col, const QVariant& value )
   if ( col == SECTION_TYPE )     m_type         = value.toInt();
   if ( col == SECTION_START )    m_start        = XDateTime::datetime( value.toDateTime() );
   if ( col == SECTION_END )      m_end          = XDateTime::datetime( value.toDateTime() );
-  //if ( col == SECTION_PREDS )    m_predecessors = value.toString();
+  if ( col == SECTION_PREDS )    m_predecessors = value.toString();
   if ( col == SECTION_DEADLINE ) m_deadline     = XDateTime::datetime( value.toDateTime() );
-  //if ( col == SECTION_RES )      m_resources    = value.toString();
+  if ( col == SECTION_RES )      m_resources    = value.toString();
   if ( col == SECTION_COST )     m_cost         = value.toReal();
   if ( col == SECTION_PRIORITY ) m_priority     = value.toInt() * 1000000;
   if ( col == SECTION_COMMENT )  m_comment      = value.toString();
@@ -315,7 +303,7 @@ void  Task::setData( int col, const QVariant& value )
 bool Task::predecessorsOK() const
 {
   // returns string with forbidden predecessors removed
-  return true; //TODO m_predecessors.areOK( plan->index((Task*)this) );
+  return m_predecessors.areOK( plan->index((Task*)this) );
 }
 
 /************************************** predecessorsClean ****************************************/
@@ -323,7 +311,7 @@ bool Task::predecessorsOK() const
 QString Task::predecessorsClean()
 {
   // remove forbidden and then return string
-  return "TODO"; //TODO m_predecessors.clean( plan->index((Task*)this) );
+  return m_predecessors.clean( plan->index((Task*)this) );
 }
 
 /************************************* predecessorsString ****************************************/
@@ -331,7 +319,7 @@ QString Task::predecessorsClean()
 QString Task::predecessorsString() const
 {
   // return task predecessors as string
-  return "TODO"; //TODO m_predecessors.toString();
+  return m_predecessors.toString();
 }
 
 /**************************************** hasPredecessor *****************************************/

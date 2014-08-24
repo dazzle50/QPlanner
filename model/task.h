@@ -28,9 +28,9 @@
 #include "timespan.h"
 #include "predecessors.h"
 #include "ganttdata.h"
+#include "taskresources.h"
 
 class TimeSpan;
-class TaskResources;
 
 /*************************************************************************************************/
 /*************************************** Single plan task ****************************************/
@@ -123,7 +123,7 @@ private:
   DateTime        m_end;             // end date-time of task
   TimeSpan        m_work;            // work effort for task
   Predecessors    m_predecessors;    // task predecessors
-  //TaskResources   m_resources;       // resources allocated to task
+  TaskResources   m_resources;       // resources allocated to task
   char            m_type;            // see enumerator task_type
   int             m_priority;        // overall task priority (0 to 999 times one million)
   DateTime        m_deadline;        // task warning deadline

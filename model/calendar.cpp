@@ -226,7 +226,7 @@ QVariant Calendar::headerData( int section )
 
 /********************************************** day **********************************************/
 
-Day*  Calendar::day( Date date )
+Day*  Calendar::day( Date date ) const
 {
   // if exception exists return it, otherwise return normal cycle day
   if ( m_exceptions.contains( date ) ) return m_exceptions.value( date );
@@ -239,15 +239,23 @@ Day*  Calendar::day( Date date )
 
 /********************************************** day **********************************************/
 
-Day*  Calendar::day( DateTime dt )
+Day*  Calendar::day( DateTime dt ) const
 {
   // convert date-time to date by dividing by num of mins in day
-  return day( dt / 1440 );
+  return day( Date(dt / 1440) );
+}
+
+/****************************************** isWorking ********************************************/
+
+bool Calendar::isWorking( Date date ) const
+{
+  // return whether date is working or not
+  return day( date )->isWorking();
 }
 
 /******************************************** workUp *********************************************/
 
-DateTime Calendar::workUp( DateTime dt )
+DateTime Calendar::workUp( DateTime dt ) const
 {
   // return date-time now or future when working
   Date  date = dt / 1440;
@@ -268,7 +276,7 @@ DateTime Calendar::workUp( DateTime dt )
 
 /******************************************* workDown ********************************************/
 
-DateTime Calendar::workDown( DateTime dt )
+DateTime Calendar::workDown( DateTime dt ) const
 {
   // return date-time now or past when working
   Date  date = dt / 1440;

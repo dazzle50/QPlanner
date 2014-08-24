@@ -22,6 +22,7 @@
 #define RESOURCESMODEL_H
 
 #include <QAbstractTableModel>
+#include <QSet>
 
 class Resource;
 
@@ -48,6 +49,11 @@ public:
   void           setOverride( QModelIndex i, QVariant v )
                    { m_overrideIndex = i; m_overrideValue = v; }   // set model override values
 
+  void           updateAssignable();                               // determine assignable list
+  QSet<Resource*> resourceSet( QString );                          // return set of resources that have tag
+  bool           isAssignable( const QString& tag ) const
+                   { return m_assignable.contains( tag ); }        // is tag assignable?
+
   /********************* methods to support QAbstractTableModel ************************/
 
   int            rowCount( const QModelIndex& parent = QModelIndex() ) const;     // implement virtual row count
@@ -66,6 +72,7 @@ signals:
                          const QString& ) const;                   // signal that cell editing needs to continue
 private:
   QList<Resource*>  m_resources;       // list of resources available to plan
+  QSet<QString>     m_assignable;      // set of assignable resource tag(s)
 
   QModelIndex       m_overrideIndex;   // with value can override model for edits in progress
   QVariant          m_overrideValue;   // with index can override model for edits in progress

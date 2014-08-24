@@ -43,11 +43,12 @@ public:
 
   QString       name() const { return m_name; }                // return calendar name
   int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
+  bool          isWorking( Date ) const;
 
-  Day*          day( Date );                                   // return day type for given date
-  Day*          day( DateTime );                               // return day type for given date-time
-  DateTime      workUp( DateTime );                            // return date-time now or future when working
-  DateTime      workDown( DateTime );                          // return date-time now or past when working
+  Day*          day( Date ) const;                             // return day type for given date
+  Day*          day( DateTime ) const;                         // return day type for given date-time
+  DateTime      workUp( DateTime ) const;                      // return date-time now or future when working
+  DateTime      workDown( DateTime ) const;                    // return date-time now or past when working
 
   DateTime      addTimeSpan( DateTime, TimeSpan );             // return date-time moved by TimeSpan
   DateTime      addMinutes( DateTime, int );                   // return date-time moved by minutes

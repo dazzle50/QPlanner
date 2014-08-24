@@ -103,7 +103,7 @@ void  DaysDelegate::setEditorData( QWidget* editor, const QModelIndex& index) co
   {
     // column is a start or end which uses special time editor
     XTimeEdit* timeEditor = dynamic_cast<XTimeEdit*>( editor );
-    QString newTime = index.model()->data( index, Qt::EditRole ).toString();
+    QString newTime = index.data( Qt::EditRole ).toString();
     timeEditor->setTime( newTime );
     return;
   }

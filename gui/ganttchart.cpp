@@ -195,7 +195,6 @@ void GanttChart::drawDependencies( QPainter* p, int y, int h )
   Q_UNUSED( y );
   Q_UNUSED( h );
   // determine first and last task visible
-  /*
   int first = m_table->rowAt( y );
   int last  = m_table->rowAt( y+h );
   if ( first < 0 ) first = 0;
@@ -245,7 +244,6 @@ void GanttChart::drawDependencies( QPainter* p, int y, int h )
         task->ganttData()->drawDependencySS( p, thisY, otherY, num, m_start, m_minsPP );
     }
   }
-  */
 }
 
 /******************************************* drawTasks *******************************************/
@@ -260,9 +258,9 @@ void GanttChart::drawTasks( QPainter* p, int y, int h )
 
   Q_UNUSED( p );
   // for each row draw the gantt task
-  //for( int row=first ; row<=last ; row++ )
-  //  plan->task(row)->ganttData()->drawTask( p, m_table->rowViewportPosition(row) + ( m_table->rowHeight(row) / 2 ),
-  //                                          m_start, m_minsPP, plan->task(row)->dataDisplayRole( Task::SECTION_RES ).toString() );
+  for( int row=first ; row<=last ; row++ )
+    plan->task(row)->ganttData()->drawTask( p, m_table->rowViewportPosition(row) + ( m_table->rowHeight(row) / 2 ),
+                                            m_start, m_minsPP, plan->task(row)->dataDisplayRole( Task::SECTION_RES ).toString() );
 }
 
 /*************************************** shadeNonWorkingDays **************************************/
@@ -272,33 +270,32 @@ void GanttChart::shadeNonWorkingDays( QPainter* p, int x, int y, int w, int h )
   // fill in white background
   p->fillRect( x, y, w, h, Qt::white );
 
-  /*
   // not practical to shade non working days if one day less than one pixel
-  if ( m_minsPP > 86400 ) return;
+  if ( m_minsPP > 1440 ) return;
 
   // use plan current default calendar
   Calendar*  calendar = plan->calendar();
 
   // setup internal variable
-  QDate  dateStart = m_start.addSecs( int( m_minsPP * (x-1) ) ).date();
-  QDate  dateEnd   = m_start.addSecs( int( m_minsPP * (x+w) ) ).date();
+  Date  dateStart = ( m_start + int( m_minsPP * (x-1) ) ) / 1440;
+  Date  dateEnd   = ( m_start + int( m_minsPP * (x+w) ) ) / 1440;
   int    xs = -1, xe;
   QBrush brush( QColor("#F5F5F5") );
 
   // for each date check if working and shade accordingly
-  for( QDate date = dateStart; date <= dateEnd; date=date.addDays(1) )
+  for( Date date = dateStart; date <= dateEnd; date++ )
   {
     // find m_start of non-working days
     if ( xs<0 && !calendar->isWorking(date) )
     {
-      xs = int( m_start.secsTo( QDateTime(date) ) / m_minsPP ) + 1;
+      xs = int( ( date*1440 - m_start ) / m_minsPP ) + 1;
       if ( xs < 0 ) xs = 0;
     }
 
     // find m_end of non-working days and shade the period
     if ( xs>=0 && calendar->isWorking(date) )
     {
-      xe = int( m_start.secsTo( QDateTime(date) ) / m_minsPP );
+      xe = int( ( date*1440 - m_start ) / m_minsPP );
       p->fillRect( xs, y, xe-xs, h, brush );
       xs = -1;
     }
@@ -306,5 +303,4 @@ void GanttChart::shadeNonWorkingDays( QPainter* p, int x, int y, int w, int h )
 
   // shade any remaining non-working days
   if (xs>=0) p->fillRect( xs, y, width(), h, brush );
-  */
 }
