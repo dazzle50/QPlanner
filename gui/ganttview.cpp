@@ -26,6 +26,8 @@
 #include "ganttchart.h"
 #include "ganttscale.h"
 
+#include "model/plan.h"
+
 /*************************************************************************************************/
 /**************************** GanttView shows tasks in a gantt format ****************************/
 /*************************************************************************************************/
@@ -103,10 +105,10 @@ void GanttView::contextMenu( QPoint )
   menu.addAction( "Zoom out", this, SLOT(slotZoomOut()) );
   menu.addAction( "Zoom fit", this, SLOT(slotZoomFit()) );
   menu.addSeparator();
-  //m_upperScale->menu()->setTitle( "Upper scale" );
-  //menu.addMenu( m_upperScale->menu() );
-  //m_lowerScale->menu()->setTitle( "Lower scale" );
-  //menu.addMenu( m_lowerScale->menu() );
+  m_upperScale->menu()->setTitle( "Upper scale" );
+  menu.addMenu( m_upperScale->menu() );
+  m_lowerScale->menu()->setTitle( "Lower scale" );
+  menu.addMenu( m_lowerScale->menu() );
   menu.addAction( "Non working days" );
   menu.addAction( "Current date" );
   menu.addAction( "Upper scale mark" );
@@ -133,8 +135,8 @@ void  GanttView::slotZoomOut()
   setMinsPP( m_minsPP * 1.414 );
 
   // zoom around centre of chart if chart width less than view width
-  //if ( m_chart->chartWidth() < width() )
-  //  setStart( m_start.addSecs( -m_minsPP * ( width() - m_chart->chartWidth() ) / 2 ) );
+  if ( m_chart->chartWidth() < width() )
+    setStart( m_start - m_minsPP * ( width() - m_chart->chartWidth() ) / 2 );
 
   // ensure view width is never less than chart width
   setWidth();
@@ -145,26 +147,24 @@ void  GanttView::slotZoomOut()
 void  GanttView::slotZoomFit()
 {
   // determine plan beginning and end to show, and set view new fixed width
-  /*
   DateTime  start  = plan->stretch( plan->beginning() );
   DateTime  end    = plan->stretch( plan->end() );
   m_view->setFixedWidth( width() );
 
   // if start or end is invalid, eg before any tasks, keep existing start and minsPP
-  if ( !start.isValid() || !end.isValid() )
+  if ( start == XDateTime::NULL_DATETIME || end == XDateTime::NULL_DATETIME )
   {
-    setEnd( m_start.addSecs( width() * m_minsPP ) );
+    setEnd( m_start + width() * m_minsPP );
     return;
   }
 
   // add margins to start and end
-  qint64 margin = 1 + start.secsTo( end ) / 32;
-  setStart( start.addSecs( -margin ) );
-  setEnd( end.addSecs( margin ) );
+  qint64 margin = 1 + ( start - end ) / 32;
+  setStart( start - margin );
+  setEnd( end + margin );
 
   // set mins per pixel to show entire chart duration in displayed width
-  setMinsPP( double( m_start.secsTo( m_end ) ) / width() );
-  */
+  setMinsPP( double( m_end - m_start ) / width() );
 }
 
 /******************************************* resizeEvent *****************************************/
@@ -172,7 +172,7 @@ void  GanttView::slotZoomFit()
 void GanttView::resizeEvent( QResizeEvent* event )
 {
   // ensure view height just fits the scroll area height
-  //m_view->setFixedHeight( event->size().height() );
+  m_view->setFixedHeight( event->size().height() );
   setWidth();
 
   // call QScrollArea::resizeEvent to handle horizontal scroll bar etc
@@ -184,7 +184,7 @@ void GanttView::resizeEvent( QResizeEvent* event )
 int GanttView::scaleHeight()
 {
   // return the height of the gantt scales (upper & lower)
-  return 50; //m_upperScale->height() + m_lowerScale->height();
+  return m_upperScale->height() + m_lowerScale->height();
 }
 
 /******************************************* setStart ********************************************/
@@ -193,9 +193,9 @@ void GanttView::setStart( DateTime start )
 {
   // set gantt start date-time
   m_start = start;
-  //m_upperScale->setStart( m_start );
-  //m_lowerScale->setStart( m_start );
-  //m_chart->setStart( m_start );
+  m_upperScale->setStart( m_start );
+  m_lowerScale->setStart( m_start );
+  m_chart->setStart( m_start );
 }
 
 /******************************************** setEnd *********************************************/
@@ -204,7 +204,7 @@ void GanttView::setEnd( DateTime end )
 {
   // set gantt end date-time
   m_end = end;
-  //m_chart->setEnd( m_end );
+  m_chart->setEnd( m_end );
 }
 
 /****************************************** setMinsPP ********************************************/
@@ -213,9 +213,9 @@ void GanttView::setMinsPP( double mpp )
 {
   // set gantt minutes per pixel
   m_minsPP = mpp;
-  //m_upperScale->setMinsPerPixel( m_minsPP );
-  //m_lowerScale->setMinsPerPixel( m_minsPP );
-  //m_chart->setMinsPerPixel( m_minsPP );
+  m_upperScale->setMinsPerPixel( m_minsPP );
+  m_lowerScale->setMinsPerPixel( m_minsPP );
+  m_chart->setMinsPerPixel( m_minsPP );
 }
 
 /******************************************* setWidth ********************************************/
@@ -223,6 +223,6 @@ void GanttView::setMinsPP( double mpp )
 void GanttView::setWidth()
 {
   // ensure view width is never less than chart width
-  //if ( m_chart->chartWidth() > width() ) m_view->setFixedWidth( m_chart->chartWidth() );
-  //else                                   m_view->setFixedWidth( width() );
+  if ( m_chart->chartWidth() > width() ) m_view->setFixedWidth( m_chart->chartWidth() );
+  else                                   m_view->setFixedWidth( width() );
 }

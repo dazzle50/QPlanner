@@ -259,7 +259,7 @@ void MainWindow::slotSchedulePlan()
 {
   // get plan to reschedule all the tasks
   m_tabs->endEdits();
-  //plan->schedule();
+  plan->schedule();
 }
 
 /*************************************** slotStretchTasks ****************************************/
@@ -268,9 +268,14 @@ void MainWindow::slotStretchTasks( bool checked )
 {
   // if stretch tasks flag is changed, trigger redraw of gantt
   m_tabs->endEdits();
+  if ( plan->stretchTasks != checked )
+  {
+    plan->stretchTasks = checked;
+    m_tabs->updateGantt();
 
-  // TODO
-  Q_UNUSED( checked );
+    foreach( MainTabWidget* tabs, m_windows )
+      if (tabs) tabs->updateGantt();
+  }
 }
 
 /***************************************** slotNewWindow *****************************************/

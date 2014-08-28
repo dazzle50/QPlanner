@@ -96,6 +96,8 @@ public:
   static DateTime    currentDateTime();             // return DateTime for current date-time
   static QString     toString( DateTime );          // return dd/MM/yyyy hh:mm string from DateTime
   static QString     toString( DateTime, QString ); // return string in format from DateTime
+  static DateTime    trunc( DateTime, Interval );   // return DateTime truncated to interval
+  static DateTime    next( DateTime, Interval );    // return DateTime moved forward by interval
 };
 
 #endif // DATETIME_H

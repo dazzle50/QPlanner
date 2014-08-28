@@ -46,7 +46,6 @@ public:
   bool          isWorking( Date ) const;
 
   Day*          day( Date ) const;                             // return day type for given date
-  Day*          day( DateTime ) const;                         // return day type for given date-time
   DateTime      workUp( DateTime ) const;                      // return date-time now or future when working
   DateTime      workDown( DateTime ) const;                    // return date-time now or past when working
 

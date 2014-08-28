@@ -122,8 +122,22 @@ QString XDate::toString( Date d, QString format )
   // return string in specified format from Date
   if ( d == XDate::NULL_DATE ) return QString( "NA" );
 
-  QDate qdate = ANCHOR_QDATE.addDays( d );
-  return qdate.toString( format );
+  QDate   qdate = ANCHOR_QDATE.addDays( d );
+  QString label = qdate.toString( format );
+
+  if ( label.contains( "QN" ) )
+  {
+    int quarter = (qdate.month() - 1) / 3 + 1;
+    label.replace( "QN", QString( "Q%1" ).arg( quarter ) );
+  }
+
+  if ( label.contains( "HN" ) )
+  {
+    int half = (qdate.month() - 1) / 6 + 1;
+    label.replace( "HN", QString( "H%1" ).arg( half ) );
+  }
+
+  return label;
 }
 
 /*************************************************************************************************/
@@ -142,7 +156,7 @@ DateTime XDateTime::datetime( QDateTime qdt )
 {
   // return quint32 DateTime from QDateTime
   if ( !qdt.isValid() ) return XDateTime::NULL_DATETIME;
-  return ANCHOR_QDATETIME.secsTo( qdt ) / 60;
+  return ANCHOR_QDATETIME.secsTo( qdt ) / 60LL;
 }
 
 /****************************************** qdatetime ********************************************/
@@ -176,5 +190,61 @@ QString XDateTime::toString( DateTime dt, QString format )
   if ( dt == XDateTime::NULL_DATETIME ) return QString( "NA" );
 
   QDateTime qdatetime = ANCHOR_QDATETIME.addSecs( dt * 60LL );
-  return qdatetime.toString( format );
+  return qdatetime.toString( format );;
+}
+
+/******************************************** trunc **********************************************/
+
+DateTime XDateTime::trunc( DateTime dt, XDateTime::Interval interval )
+{
+  // return DateTime truncated to interval
+  QDate qd = XDate::qdate( dt/1440u );
+  switch( interval )
+  {
+    case INTERVAL_YEAR:
+      return 1440u * XDate::date( qd.year(), 1, 1 );
+    case INTERVAL_HALFYEAR:
+      if ( qd.month() > 6 ) return 1440u * XDate::date( qd.year(), 7, 1 );
+      return 1440u * XDate::date( qd.year(), 1, 1 );
+    case INTERVAL_QUARTERYEAR:
+      if ( qd.month() > 9 ) return 1440u * XDate::date( qd.year(), 10, 1 );
+      if ( qd.month() > 6 ) return 1440u * XDate::date( qd.year(), 7, 1 );
+      if ( qd.month() > 3 ) return 1440u * XDate::date( qd.year(), 4, 1 );
+      return 1440u * XDate::date( qd.year(), 1, 1 );
+    case INTERVAL_MONTH:
+      return 1440u * XDate::date( qd.year(), qd.month(), 1 );
+    case INTERVAL_WEEK:
+      return 1440u * XDate::date( qd.addDays( 1-qd.dayOfWeek() ) );
+    case INTERVAL_DAY:
+      return dt - dt%1440u;
+    default:
+      qWarning("XDateTime::trunc - UNKNOWN interval %i", interval );
+      return XDateTime::NULL_DATETIME;
+  }
+}
+
+/******************************************** next ***********************************************/
+
+DateTime XDateTime::next( DateTime dt, XDateTime::Interval interval )
+{
+  // return DateTime moved forward by interval
+  QDateTime qdt = XDateTime::qdatetime( dt );
+  switch( interval )
+  {
+    case INTERVAL_YEAR:
+      return XDateTime::datetime( qdt.addYears(1) );
+    case INTERVAL_HALFYEAR:
+      return XDateTime::datetime( qdt.addMonths(6) );
+    case INTERVAL_QUARTERYEAR:
+      return XDateTime::datetime( qdt.addMonths(3) );
+    case INTERVAL_MONTH:
+      return XDateTime::datetime( qdt.addMonths(1) );
+    case INTERVAL_WEEK:
+      return XDateTime::datetime( qdt.addDays(7) );
+    case INTERVAL_DAY:
+      return XDateTime::datetime( qdt.addDays(1) );
+    default:
+      qWarning("XDateTime::next - UNKNOWN interval %i", interval );
+      return XDateTime::NULL_DATETIME;
+  }
 }

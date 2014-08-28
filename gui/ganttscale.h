@@ -39,7 +39,7 @@ public:
   GanttScale( QWidget* );                          // constructor
   void     setStart( DateTime );                   // set start date-time for GanttScale
   void     setMinsPerPixel( double );              // set minutes per pixel scale
-  void     setInterval( int );                     // set interval (XDateTime::INTERVAL_xx)
+  void     setInterval( XDateTime::Interval );     // set interval (XDateTime::INTERVAL_xx)
   void     setLabelFormat( QString );              // set label text format string
   QMenu*   menu();                                 // return pointer to context menu
 
@@ -47,11 +47,11 @@ protected:
   void     paintEvent( QPaintEvent* );             // draw GanttScale contents
 
 private:
-  DateTime     m_start;             // start date-time for GanttScale
-  double       m_minsPP;            // minutes per pixel
-  int          m_interval;          // interval (XDateTime::INTERVAL_xx)
-  QString      m_format;            // label text format
-  int          m_stretch;           // label text stretch factor
+  DateTime              m_start;             // start date-time for GanttScale
+  double                m_minsPP;            // minutes per pixel
+  XDateTime::Interval   m_interval;          // interval (XDateTime::INTERVAL_xx)
+  QString               m_format;            // label text format
+  int                   m_stretch;           // label text stretch factor
 
   QMenu*       m_menu;              // menu for popup context menu
 };

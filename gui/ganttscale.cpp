@@ -62,12 +62,6 @@ void   GanttScale::paintEvent( QPaintEvent* event )
   p.setPen( Qt::black );
   p.drawLine( x, height()-1, x+w, height()-1 );
 
-  // calc first interval edge
-  /*
-  XDateTime clips = m_start.addSecs( int(m_minsPP * x) );
-  XDateTime dt1   = clips.truncInterval( m_interval ), dt2;
-  int       x1    = int(m_start.secsTo( dt1 ) / m_minsPP), x2;
-
   // set font stretch
   if ( m_stretch > 0 )
   {
@@ -76,25 +70,34 @@ void   GanttScale::paintEvent( QPaintEvent* event )
     p.setFont( font );
   }
 
+  // calc first interval edge
+  DateTime clips = m_start + int( m_minsPP * x );
+  DateTime dt1   = XDateTime::trunc( clips, m_interval ), dt2;
+  int      x1, x2;
+  if ( dt1 > m_start ) x1 = ( dt1 - m_start ) / m_minsPP;
+  else                 x1 = ( m_start - dt1 ) / -m_minsPP;
+
   // draw interval lines & labels
   p.drawLine( x1, y, x1, y+h );
   while( x1 <= x+w )
   {
-    dt2 = dt1.nextInterval( m_interval );
-    x2  = int(m_start.secsTo( dt2 ) / m_minsPP);
+    dt2 = XDateTime::next( dt1, m_interval );
+    x2  = ( dt2 - m_start ) / m_minsPP;
     p.drawLine( x2, y, x2, y+h );
 
     if ( m_stretch > 0 )
     {
-      int     width   = x2 - x1 - 2;
+      int     width   = x2 - x1 - 1;
       int     descent = p.fontMetrics().descent() + p.fontMetrics().leading() + 1;
-      QString label   = dt1.toLabel( m_format );
+      QString label   = XDate::toString( dt1/1440u, m_format );
       QRect   rect    = p.boundingRect( x1+1, y, width, h-descent-1, Qt::AlignCenter, label );
 
-      // if bounding rect larger than space available
+      // if bounding rect larger than space available, calc new stretch and redraw
       if ( width < rect.width() )
       {
-        m_stretch = m_stretch * width / rect.width();
+        int newStretch = 1 + m_stretch * width / rect.width();
+        if ( newStretch >= m_stretch ) m_stretch--;
+        else m_stretch = newStretch;
         update();
         return;
       }
@@ -105,7 +108,6 @@ void   GanttScale::paintEvent( QPaintEvent* event )
     dt1 = dt2;
     x1  = x2;
   }
-  */
 }
 
 /******************************************** setStart *******************************************/
@@ -128,7 +130,7 @@ void   GanttScale::setMinsPerPixel( double mpp )
 
 /****************************************** setInterval ******************************************/
 
-void   GanttScale::setInterval( int i )
+void   GanttScale::setInterval( XDateTime::Interval i )
 {
   // set interval (XDateTime::INTERVAL_xx)
   m_interval = i;

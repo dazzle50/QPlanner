@@ -96,7 +96,7 @@ void  Plan::initialise()
   m_calendars->initialise();
 
   m_calendar = calendar( Calendar::DEFAULT_CALENDAR );
-  m_start    = m_calendar->workUp( XDate::currentDate() * 1440 );
+  m_start    = m_calendar->workUp( XDate::currentDate() * 1440u );
 
   m_resources->initialise();
   m_tasks->initialise();
@@ -106,11 +106,14 @@ void  Plan::initialise()
 
 DateTime  Plan::stretch( DateTime dt )
 {
+  // if input date-time is null return null
+  if ( dt == XDateTime::NULL_DATETIME ) return dt;
+
   // return date-time stretched across full 24 hrs if plan stretchTasks flag is true
   if ( stretchTasks )
   {
-    Time time = m_calendar->day( dt/1440 )->stretch( dt%1440 );
-    return dt - dt%1440 + time;
+    Time time = m_calendar->day( dt/1440u )->stretch( dt%1440u );
+    return dt - dt%1440u + time;
   }
 
   // plan stretchTasks flag not true, so return original date-time

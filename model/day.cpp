@@ -282,6 +282,7 @@ Time Day::workDown( Time t )
 float Day::workDone( Time t )
 {
   // return days equivalent work done start to time
+  if ( m_work == 0.0f || m_minutes == 0 ) return 0.0f;
   return ( m_work * minsDone( t ) ) / m_minutes;
 }
 
@@ -290,6 +291,7 @@ float Day::workDone( Time t )
 float Day::workToGo( Time t )
 {
   // return days equivalent work togo time to end
+  if ( m_work == 0.0f || m_minutes == 0 ) return 0.0f;
   return ( m_work * minsToGo( t ) ) / m_minutes;
 }
 

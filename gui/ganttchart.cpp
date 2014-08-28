@@ -257,10 +257,15 @@ void GanttChart::drawTasks( QPainter* p, int y, int h )
   if ( last  < 0 ) last  = plan->tasks()->rowCount() - 1;
 
   Q_UNUSED( p );
-  // for each row draw the gantt task
+  // for each non-null row draw the gantt task
   for( int row=first ; row<=last ; row++ )
+  {
+    if ( plan->task(row)->isNull() ) continue;
+
     plan->task(row)->ganttData()->drawTask( p, m_table->rowViewportPosition(row) + ( m_table->rowHeight(row) / 2 ),
-                                            m_start, m_minsPP, plan->task(row)->dataDisplayRole( Task::SECTION_RES ).toString() );
+                                            m_start, m_minsPP,
+                                            plan->task(row)->dataDisplayRole( Task::SECTION_RES ).toString() );
+  }
 }
 
 /*************************************** shadeNonWorkingDays **************************************/
@@ -271,14 +276,14 @@ void GanttChart::shadeNonWorkingDays( QPainter* p, int x, int y, int w, int h )
   p->fillRect( x, y, w, h, Qt::white );
 
   // not practical to shade non working days if one day less than one pixel
-  if ( m_minsPP > 1440 ) return;
+  if ( m_minsPP > 1440.0 ) return;
 
   // use plan current default calendar
   Calendar*  calendar = plan->calendar();
 
   // setup internal variable
-  Date  dateStart = ( m_start + int( m_minsPP * (x-1) ) ) / 1440;
-  Date  dateEnd   = ( m_start + int( m_minsPP * (x+w) ) ) / 1440;
+  Date  dateStart = ( m_start + int( m_minsPP * (x-1) ) ) / 1440u;
+  Date  dateEnd   = ( m_start + int( m_minsPP * (x+w) ) ) / 1440u;
   int    xs = -1, xe;
   QBrush brush( QColor("#F5F5F5") );
 
@@ -288,14 +293,14 @@ void GanttChart::shadeNonWorkingDays( QPainter* p, int x, int y, int w, int h )
     // find m_start of non-working days
     if ( xs<0 && !calendar->isWorking(date) )
     {
-      xs = int( ( date*1440 - m_start ) / m_minsPP ) + 1;
+      xs = ( date*1440.0 - m_start ) / m_minsPP + 1;
       if ( xs < 0 ) xs = 0;
     }
 
     // find m_end of non-working days and shade the period
     if ( xs>=0 && calendar->isWorking(date) )
     {
-      xe = int( ( date*1440 - m_start ) / m_minsPP );
+      xe = ( date*1440.0 - m_start ) / m_minsPP;
       p->fillRect( xs, y, xe-xs, h, brush );
       xs = -1;
     }
