@@ -27,11 +27,14 @@
 
 #include "datetime.h"
 
+class QUndoStack;
+class QXmlStreamWriter;
+class QXmlStreamReader;
+
 class TasksModel;
 class ResourcesModel;
 class CalendarsModel;
 class DaysModel;
-class QUndoStack;
 
 class Task;
 class Resource;
@@ -53,6 +56,10 @@ public:
   QUndoStack*      undostack() { return m_undostack; }              // return undo stack pointer
   QColor           nullCellColour() { return QColor( "#F0F0F0" ); } // return colour for null table cell
   void             schedule();                                      // schedule the plan tasks
+  bool             isOK();                                          // return if plan appears valid
+  void             setFileInfo( QString, QDateTime, QString );      // set plan file, when, who properties
+  void             saveToStream( QXmlStreamWriter* );               // write plan data to xml stream
+  void             loadFromStream( QXmlStreamReader*, QString );    // load plan data from xml stream
 
   TasksModel*      tasks() { return m_tasks; }                      // return tasks model pointer
   ResourcesModel*  resources() { return m_resources; }              // return resources model pointer

@@ -102,6 +102,104 @@ void  Plan::initialise()
   m_tasks->initialise();
 }
 
+/********************************************* isOK **********************************************/
+
+bool  Plan::isOK()
+{
+  // return if plan appears ok
+  if ( numDays()          > 0  &&
+       numCalendars()     > 0  &&
+       index( calendar()) >= 0 )
+    return true;
+
+  return false;
+}
+
+/***************************************** setFileInfo *******************************************/
+
+void  Plan::setFileInfo( QString filename, QDateTime when, QString who )
+{
+  // set plan file, when, who properties
+  QFileInfo  file = filename;
+  m_filename      = file.fileName();
+  m_file_location = file.path();
+  m_saved_by      = who;
+  m_saved_when    = when;
+}
+
+/***************************************** saveToStream ******************************************/
+
+void  Plan::saveToStream( QXmlStreamWriter* stream )
+{
+  // write plan data to xml stream
+  //TODO m_days->saveToStream( stream );
+  //TODO m_calendars->saveToStream( stream );
+  //TODO m_resources->saveToStream( stream );
+  //TODO m_tasks->saveToStream( stream );
+
+  stream->writeStartElement( "plan-data" );
+  stream->writeAttribute( "title", m_title );
+  stream->writeAttribute( "start", XDateTime::toString( m_start, "yyyy-MM-ddTHH:mm:ss" ) );
+  stream->writeAttribute( "calendar", QString("%1").arg(plan->index(m_calendar)) );
+  stream->writeAttribute( "datetime-format", m_datetime_format );
+  stream->writeAttribute( "notes", m_notes );
+  stream->writeEndElement();
+}
+
+/**************************************** loadFromStream *****************************************/
+
+void  Plan::loadFromStream( QXmlStreamReader* stream, QString file )
+{
+  // read qplanner file attributes
+  foreach( QXmlStreamAttribute attribute, stream->attributes() )
+  {
+    if ( attribute.name() == "user" )
+      m_saved_by = attribute.value().toString();
+
+    if ( attribute.name() == "when" )
+      m_saved_when = QDateTime::fromString( attribute.value().toString(), "yyyy-MM-ddTHH:mm:ss" );
+  }
+  setFileInfo( file, m_saved_when, m_saved_by );
+
+  // load plan data from xml stream
+  while ( !stream->atEnd() )
+  {
+    stream->readNext();
+    if ( stream->isStartElement() )
+    {
+      //TODO if ( stream->name() == "days-data"      ) m_days->loadFromStream( stream );
+      //TODO if ( stream->name() == "calendars-data" ) m_calendars->loadFromStream( stream );
+      //TODO if ( stream->name() == "resources-data" ) m_resources->loadFromStream( stream );
+      //TODO if ( stream->name() == "tasks-data"     ) m_tasks->loadFromStream( stream );
+
+      if ( stream->name() == "plan-data" )
+        foreach( QXmlStreamAttribute attribute, stream->attributes() )
+        {
+          if ( attribute.name() == "title" )
+            m_title = attribute.value().toString();
+
+          if ( attribute.name() == "start" )
+          {
+            QDateTime start = QDateTime::fromString( attribute.value().toString(), "yyyy-MM-ddTHH:mm:ss" );
+            m_start = XDateTime::datetime( start );
+          }
+
+          if ( attribute.name() == "calendar" )
+            m_calendar = calendar( attribute.value().toString().toInt() );
+
+          if ( attribute.name() == "datetime-format" )
+            m_datetime_format = attribute.value().toString();
+
+          if ( attribute.name() == "notes" )
+            m_notes = attribute.value().toString();
+        }
+
+      // if stream name is display-data then have finished loading plan
+      if ( stream->name() == "display-data" ) return;
+    }
+  }
+}
+
 /********************************************* stretch *******************************************/
 
 DateTime  Plan::stretch( DateTime dt )

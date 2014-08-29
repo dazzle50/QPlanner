@@ -27,6 +27,7 @@
 class QUndoView;
 class QItemSelection;
 class MainTabWidget;
+class QXmlStreamReader;
 
 /*************************************************************************************************/
 /********************* Main application window showing tabbed main screens ***********************/
@@ -42,6 +43,10 @@ public:
 
   void setModels();                            // set models for views & undostack
   void message( QString = "" );                // show message on status bar and enure is top & active
+  void setTitle( QString = "" );               // update main window title to include text
+  bool savePlan( QString );                    // save plan to xml file
+  bool loadPlan( QString );                    // load plan from xml file
+  void loadDisplayData( QXmlStreamReader* );   // load display data from xml stream
 
 public slots:
   void slotUndoStackView( bool );              // slot for actionUndoStackView triggered signal

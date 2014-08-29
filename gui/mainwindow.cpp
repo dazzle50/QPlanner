@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QUndoView>
 #include <QUndoStack>
+#include <QXmlStreamWriter>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -114,6 +115,158 @@ void MainWindow::message( QString msg )
   ui->statusBar->showMessage( msg );
 }
 
+/******************************************** savePlan *******************************************/
+
+bool MainWindow::savePlan( QString filename )
+{
+  // save plan to xml file, first open the file and check we can write to it
+  QFile file( filename );
+  if ( !file.open( QIODevice::WriteOnly ) )
+  {
+    message( QString("Failed to write to '%1'").arg(filename) );
+    return false;
+  }
+
+  // make sure plan is up to date from 'Plan' tab widgets before saving
+  m_tabs->updatePlan();
+
+  // open an xml stream writer and write simulation data
+  QXmlStreamWriter  stream( &file );
+  QString           who  = qgetenv("USERNAME");
+  QDateTime         when = QDateTime::currentDateTime();
+  stream.setAutoFormatting( true );
+  stream.writeStartDocument();
+  stream.writeStartElement( "projectplanner" );
+  stream.writeAttribute( "version", "2014-08" );
+  stream.writeAttribute( "user", who );
+  stream.writeAttribute( "when", when.toString(Qt::ISODate) );
+  plan->saveToStream( &stream );
+  m_tabs->saveToStream( &stream );
+  stream.writeEndDocument();
+
+  // close the file and display useful message
+  file.close();
+  message( QString("Plan saved to '%1'").arg(filename) );
+
+  // update plan properties
+  plan->setFileInfo( filename, when, who );
+  setTitle( plan->filename() );
+  m_tabs->slotUpdatePlanTab();
+  return true;
+}
+
+/******************************************** loadPlan *******************************************/
+
+bool MainWindow::loadPlan( QString filename )
+{
+  // open the file and check we can read from it
+  QFile file( filename );
+  if ( !file.open( QIODevice::ReadOnly ) )
+  {
+    message( QString("Failed to open '%1'").arg(filename) );
+    return false;
+  }
+
+  // open an xml stream reader and try to load new plan data
+  QXmlStreamReader  stream( &file );
+  Plan*             newPlan = new Plan();
+  Plan*             oldPlan = plan;
+  plan = newPlan;   // set global plan variable so plan methods work as expected
+
+  while ( !stream.atEnd() && !stream.isStartElement() )
+    stream.readNext();
+
+  if ( stream.isStartElement() )
+  {
+    if ( stream.name() == "projectplanner" )
+      newPlan->loadFromStream( &stream, filename );
+    else
+      stream.raiseError( QString("Unrecognised element '%1'").arg(stream.name().toString()) );
+  }
+
+  // check if error occured while loading
+  if ( stream.hasError() )
+  {
+    file.close();
+    message( QString("Failed to load '%1' (%2)").arg(filename).arg(stream.errorString()) );
+    delete newPlan;
+    plan = oldPlan;
+    return false;
+  }
+
+  // check if plan is ok
+  if ( !newPlan->isOK() )
+  {
+    file.close();
+    message( QString("Invalid plan in '%1'").arg(filename) );
+    delete newPlan;
+    plan = oldPlan;
+    return false;
+  }
+
+  // no errors when loading plan, and plan is ok, so load display data
+  loadDisplayData( &stream );
+  file.close();
+
+  // delete old plan, set models, and schedule
+  delete oldPlan;
+  setModels();
+  plan->schedule();
+  message( QString("Loaded '%1'").arg(filename) );
+  setTitle( plan->filename() );
+  m_tabs->slotUpdatePlanTab();
+  return true;
+}
+
+/**************************************** loadDisplayData ****************************************/
+
+void MainWindow::loadDisplayData( QXmlStreamReader* stream )
+{
+  // load display data from xml stream
+  while ( !stream->atEnd() )
+  {
+    stream->readNext();
+    if ( stream->isStartElement() )
+    {
+      if ( stream->name() == "gantt" )
+      {
+        QDateTime start, end;
+        double    mpp;
+/*
+        m_tabs->getGanttAttributes( start, end, mpp );
+        foreach( QXmlStreamAttribute attribute, stream->attributes() )
+        {
+          if ( attribute.name() == "start" )
+            start = XDateTime::fromText( attribute.value().toString() );
+
+          if ( attribute.name() == "end" )
+            end = XDateTime::fromText( attribute.value().toString() );;
+
+          if ( attribute.name() == "minspp" )
+            mpp = attribute.value().toString().toDouble();
+        }
+        m_tabs->setGanttAttributes( start, end, mpp );
+        foreach( MainTabWidget* tabs, m_windows )
+          if (tabs) tabs->setGanttAttributes( start, end, mpp );
+*/
+      }
+    }
+  }
+}
+
+/******************************************* setTitle ********************************************/
+
+void MainWindow::setTitle( QString text )
+{
+  // update main window title to include given text
+  if ( text.isEmpty() ) setWindowTitle( "QPlanner" );
+  else                  setWindowTitle( text + " - QPlanner");
+
+  // update other windows titles to match
+  foreach( MainTabWidget* tabs, m_windows )
+    if (tabs) tabs->setWindowTitle( windowTitle() );
+}
+
 /************************************** slotTaskDataChanged **************************************/
 
 void MainWindow::slotTaskDataChanged( const QModelIndex& index, const QModelIndex& )
@@ -194,7 +347,7 @@ bool MainWindow::slotFileOpen()
     return false;
   }
 
-  return false; // loadPlan( filename );
+  return loadPlan( filename );
 }
 
 /****************************************** slotFileSave *****************************************/
@@ -203,8 +356,10 @@ bool MainWindow::slotFileSave()
 {
   // slot for file save plan action - if plan has filename, save to same file and location
   m_tabs->endEdits();
+  if ( !plan->filename().isEmpty() ) return savePlan( plan->fileLocation() + "/" + plan->filename() );
 
-  return false;
+  // plan has no filename so use saveAs functionality
+  return slotFileSaveAs();
 }
 
 /***************************************** slotFileSaveAs ****************************************/
@@ -213,7 +368,11 @@ bool MainWindow::slotFileSaveAs()
 {
   // slot for file saveAs plan action - get user to select filename and location
   m_tabs->endEdits();
+  QString filename = QFileDialog::getSaveFileName();
+  if ( !filename.isEmpty() ) return savePlan( filename );
 
+  // user cancelled
+  message();
   return false;
 }
 
@@ -286,7 +445,7 @@ void MainWindow::slotNewWindow()
   MainTabWidget*  tabWidget = new MainTabWidget();
   tabWidget->setAttribute( Qt::WA_QuitOnClose, false );
   tabWidget->setAttribute( Qt::WA_DeleteOnClose, true );
-  //tabWidget->removePlanTab();
+  tabWidget->removePlanTab();
   tabWidget->setWindowTitle( windowTitle() );
   tabWidget->show();
   m_windows.append( tabWidget );

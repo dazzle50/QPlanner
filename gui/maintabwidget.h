@@ -25,6 +25,7 @@
 #include <QModelIndexList>
 
 class QItemSelectionModel;
+class QXmlStreamWriter;
 
 /*************************************************************************************************/
 /***************************** Tabbed widget containing main screens *****************************/
@@ -44,6 +45,9 @@ public:
   void  updatePlan();                // update plan from 'Plan' tab widgets
   void  updateGantt();               // trigger gantt widget redraw
   int   indexOfTasksTab();           // return index of tasks tab
+  void  removePlanTab();             // remove 'Plan' tab
+
+  void  saveToStream( QXmlStreamWriter* );        // write display data to xml stream
 
   QItemSelectionModel*  tasksSelectionModel();    // return selection model for tasks table view
   QModelIndexList       tasksSelectionIndexes();  // return selected indexes on tasks table view

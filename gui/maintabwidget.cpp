@@ -20,6 +20,7 @@
 
 #include <QMessageBox>
 #include <QUndoStack>
+#include <QXmlStreamWriter>
 
 #include "maintabwidget.h"
 #include "ui_maintabwidget.h"
@@ -240,6 +241,34 @@ int MainTabWidget::indexOfTasksTab()
 {
   // return index of tasks tab
   return indexOf( ui->tasksGanttTab );
+}
+
+/**************************************** removePlanTab ******************************************/
+
+void MainTabWidget::removePlanTab()
+{
+  // remove 'Plan' tab (for example of new windows)
+  removeTab( this->indexOf( ui->planTab ) );
+}
+
+/***************************************** saveToStream ******************************************/
+
+void MainTabWidget::saveToStream( QXmlStreamWriter* stream )
+{
+  // write display data to xml stream
+  stream->writeStartElement( "display-data" );
+
+  stream->writeStartElement( "gantt" );
+/*
+  stream->writeAttribute( "start", XDateTime( ui->ganttView->start() ).toText() );
+  stream->writeAttribute( "end", XDateTime( ui->ganttView->end() ).toText() );
+  stream->writeAttribute( "minspp", QString("%1").arg( ui->ganttView->minsPP() ) );
+*/
+  stream->writeAttribute( "upper-scale", "TODO" );
+  stream->writeAttribute( "lower-scale", "TODO" );
+  stream->writeEndElement();  // gantt
+
+  stream->writeEndElement();  // display-data
 }
 
 /***************************************** updatePlan ********************************************/
