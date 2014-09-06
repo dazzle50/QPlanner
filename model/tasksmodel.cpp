@@ -25,6 +25,8 @@
 #include "command/commandtaskindent.h"
 #include "command/commandtaskoutdent.h"
 
+#include <QXmlStreamWriter>
+
 /*************************************************************************************************/
 /**************************** Table model containing all plan tasks ******************************/
 /*************************************************************************************************/
@@ -82,6 +84,73 @@ int TasksModel::number()
     if ( !t->isNull() ) count++;
 
   return count;
+}
+
+/***************************************** saveToStream ******************************************/
+
+void  TasksModel::saveToStream( QXmlStreamWriter* stream )
+{
+  // write tasks data to xml stream
+  stream->writeStartElement( "tasks-data" );
+
+  foreach( Task* t, m_tasks )
+  {
+    // don't write 'plan summary' task 0
+    if ( plan->index(t) == 0 ) continue;
+
+    stream->writeStartElement( "task" );
+    stream->writeAttribute( "id", QString("%1").arg(plan->index(t)) );
+    if ( !t->isNull() ) t->saveToStream( stream );
+    stream->writeEndElement();
+  }
+
+  foreach( Task* t, m_tasks )
+  {
+    if ( !t->predecessorsString().isEmpty() )
+    {
+      stream->writeStartElement( "predecessors" );
+      stream->writeAttribute( "task", QString("%1").arg(plan->index(t)) );
+      stream->writeAttribute( "preds", t->predecessorsString() );
+      stream->writeEndElement();
+    }
+  }
+
+  // close tasks-data element
+  stream->writeEndElement();
+}
+
+/**************************************** loadFromStream *****************************************/
+
+void  TasksModel::loadFromStream( QXmlStreamReader* stream )
+{
+  // load tasks data from xml stream
+  while ( !stream->atEnd() )
+  {
+    stream->readNext();
+
+    // if task element create new task
+    if ( stream->isStartElement() && stream->name() == "task" )
+      m_tasks.append( new Task(stream) );
+
+    // if predecessors element update task
+    if ( stream->isStartElement() && stream->name() == "predecessors" )
+    {
+      int      task = -1;
+      QString  preds;
+      foreach( QXmlStreamAttribute attribute, stream->attributes() )
+      {
+        if ( attribute.name() == "task" ) task  = attribute.value().toString().toInt();
+        if ( attribute.name() == "preds") preds = attribute.value().toString();
+      }
+      plan->task( task )->setPredecessors( preds );
+    }
+
+    // when reached end of tasks data break out of loop
+    if ( stream->isEndElement() && stream->name() == "tasks-data" ) break;
+  }
+
+  // ensure summaries are set correctly
+  setSummaries();
 }
 
 /******************************************* schedule ********************************************/

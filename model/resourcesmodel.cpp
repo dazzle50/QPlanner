@@ -23,6 +23,8 @@
 #include "plan.h"
 #include "command/commandresourcesetdata.h"
 
+#include <QXmlStreamWriter>
+
 /*************************************************************************************************/
 /**************************** Table model containing all resources *******************************/
 /*************************************************************************************************/
@@ -75,6 +77,48 @@ int ResourcesModel::number()
     if ( !res->isNull() ) count++;
 
   return count;
+}
+
+/***************************************** saveToStream ******************************************/
+
+void  ResourcesModel::saveToStream( QXmlStreamWriter* stream )
+{
+  // write resources data to xml stream
+  stream->writeStartElement( "resources-data" );
+
+  foreach( Resource* r, m_resources )
+  {
+    // don't write 'unassigned' resource 0
+    if ( plan->index(r) == 0 ) continue;
+
+    stream->writeStartElement( "resource" );
+    stream->writeAttribute( "id", QString("%1").arg(plan->index(r)) );
+    if ( !r->isNull() ) r->saveToStream( stream );
+    stream->writeEndElement();
+  }
+
+  // close resources-data element
+  stream->writeEndElement();
+}
+
+/**************************************** loadFromStream *****************************************/
+
+void  ResourcesModel::loadFromStream( QXmlStreamReader* stream )
+{
+  // load resources data from xml stream
+  while ( !stream->atEnd() )
+  {
+    stream->readNext();
+
+    // if resource element create new resource
+    if ( stream->isStartElement() && stream->name() == "resource" )
+      m_resources.append( new Resource(stream) );
+
+    // when reached end of resources data return
+    if ( stream->isEndElement() && stream->name() == "resources-data" ) break;
+  }
+
+  updateAssignable();
 }
 
 /******************************************** rowCount *******************************************/

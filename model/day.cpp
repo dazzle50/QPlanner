@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+
 #include "day.h"
 #include "plan.h"
 #include "daysmodel.h"
@@ -98,6 +101,63 @@ Day::Day( int type )
 
   // ensure cached worked minutes in day is set correctly
   calcMinutes();
+}
+
+/****************************************** constructor ******************************************/
+
+Day::Day( QXmlStreamReader* stream ) : Day()
+{
+  // create day from stream
+  foreach( QXmlStreamAttribute attribute, stream->attributes() )
+  {
+    if ( attribute.name() == "name" )
+      m_name = attribute.value().toString();
+
+    if ( attribute.name() == "work" )
+      m_work = attribute.value().toString().toFloat();
+  }
+
+  while ( !stream->atEnd() )
+  {
+    stream->readNext();
+
+    // if period element append new day period
+    if ( stream->isStartElement() && stream->name() == "period" )
+    {
+      foreach( QXmlStreamAttribute attribute, stream->attributes() )
+      {
+        if ( attribute.name() == "start" )
+          m_start.append( XTime::time( attribute.value().toString() ) );
+
+        if ( attribute.name() == "end" )
+          m_end.append( XTime::time( attribute.value().toString() ) );
+      }
+
+      m_periods = m_start.size();
+      if ( m_periods != m_end.size() )
+        qWarning("Day::Day( QXmlStreamReader* ) WARNING size of period starts & ends not equal!");
+    }
+
+    // when reached end of day return
+    if ( stream->isEndElement() && stream->name() == "day" ) return;
+  }
+}
+
+/***************************************** saveToStream ******************************************/
+
+void  Day::saveToStream( QXmlStreamWriter* stream )
+{
+  // write day data to xml stream
+  stream->writeAttribute( "name", m_name );
+  stream->writeAttribute( "work", QString("%1").arg(m_work) );
+
+  for( int p=0 ; p<m_periods ; p++ )
+  {
+    stream->writeEmptyElement( "period" );
+    stream->writeAttribute( "id", QString("%1").arg(p) );
+    stream->writeAttribute( "start", XTime::toString( m_start[p] ) );
+    stream->writeAttribute( "end", XTime::toString( m_end[p] ) );
+  }
 }
 
 /****************************************** calcMinutes ******************************************/

@@ -29,6 +29,8 @@
 #include "timespan.h"
 
 class Day;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 /*************************************************************************************************/
 /********************************* Single calendar for planning **********************************/
@@ -40,7 +42,9 @@ class Calendar
 public:
   Calendar();                                                  // constructor
   Calendar( int );                                             // constructor for initial default calendars
+  Calendar( QXmlStreamReader* );                               // constructor from xml file
 
+  void          saveToStream( QXmlStreamWriter* );             // write calendar data to xml stream
   QString       name() const { return m_name; }                // return calendar name
   int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
   bool          isWorking( Date ) const;

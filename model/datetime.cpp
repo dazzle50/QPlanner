@@ -109,6 +109,14 @@ Date XDate::currentDate()
   return QDate::currentDate().toJulianDay() - ANCHOR_JULIAN;
 }
 
+/****************************************** fromString *******************************************/
+
+Date XDate::fromString( QString str )
+{
+  // return Date from yyyy-MM-dd string
+  return XDate::date( QDate::fromString( str, "yyyy-MM-dd" ) );
+}
+
 /******************************************* toString ********************************************/
 
 QString XDate::toString( Date d )
@@ -174,6 +182,16 @@ DateTime XDateTime::currentDateTime()
 {
   // return quint32 DateTime for current date-time
   return datetime( QDateTime::currentDateTime() );
+}
+
+/****************************************** fromString *******************************************/
+
+DateTime XDateTime::fromString( QString str )
+{
+  // return DateTime from yyyy-MM-ddThh:mm:ss string
+  QDateTime qdt = QDateTime::fromString( str, "yyyy-MM-ddThh:mm:ss" );
+  qdt.setTimeSpec( Qt::UTC );
+  return XDateTime::datetime( qdt );
 }
 
 /******************************************* toString ********************************************/

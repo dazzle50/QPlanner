@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+
 #include "daysmodel.h"
 #include "day.h"
 #include "plan.h"
@@ -48,6 +51,43 @@ void DaysModel::initialise()
   // create initial default day types
   for ( int day=0 ; day<=Day::DEFAULT_MAX ; day++ )
     m_days.append( new Day(day) );
+}
+
+/***************************************** saveToStream ******************************************/
+
+void  DaysModel::saveToStream( QXmlStreamWriter* stream )
+{
+  // write days data to xml stream
+  stream->writeStartElement( "days-data" );
+
+  foreach( Day* d, m_days )
+  {
+    stream->writeStartElement( "day" );
+    stream->writeAttribute( "id", QString("%1").arg(plan->index(d)) );
+    d->saveToStream( stream );
+    stream->writeEndElement();
+  }
+
+  // close days-data element
+  stream->writeEndElement();
+}
+
+/**************************************** loadFromStream *****************************************/
+
+void  DaysModel::loadFromStream( QXmlStreamReader* stream )
+{
+  // load days data from xml stream
+  while ( !stream->atEnd() )
+  {
+    stream->readNext();
+
+    // if day element create new day type
+    if ( stream->isStartElement() && stream->name() == "day" )
+      m_days.append( new Day(stream) );
+
+    // when reached end of days data return
+    if ( stream->isEndElement() && stream->name() == "days-data" ) return;
+  }
 }
 
 /********************************************* day ***********************************************/

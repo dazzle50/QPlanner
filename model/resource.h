@@ -24,6 +24,8 @@
 #include "datetime.h"
 
 class Calendar;
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
 /*************************************************************************************************/
 /************************************* Single plan resource **************************************/
@@ -34,7 +36,9 @@ class Resource
 public:
   Resource();                                                        // constructor (normal)
   Resource( bool );                                                  // constructor (unassigned)
+  Resource( QXmlStreamReader* );                                     // constructor
 
+  void              saveToStream( QXmlStreamWriter* );               // write resource data to xml stream
   static QVariant   headerData( int );                               // return column header data
   QVariant          data( int, int );                                // return data for column & role
   void              setData( int, const QVariant& );                 // set data value for column

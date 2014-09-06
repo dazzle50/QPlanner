@@ -63,6 +63,7 @@ public:
   static Date      date( QDate );              // return Date from QDate
   static QDate     qdate( Date );              // return QDate from Date
   static Date      currentDate();              // return Date for current date
+  static Date      fromString( QString );      // return Date from yyyy-MM-dd string
   static QString   toString( Date );           // return dd/MM/yyyy string from Date
   static QString   toString( Date, QString );  // return string in format from Date
 };
@@ -94,6 +95,7 @@ public:
   static DateTime    datetime( QDateTime );         // return DateTime from QDateTime
   static QDateTime   qdatetime( DateTime );         // return QDateTime from DateTime
   static DateTime    currentDateTime();             // return DateTime for current date-time
+  static DateTime    fromString( QString );         // return DateTime from yyyy-MM-ddThh:mm:ss string
   static QString     toString( DateTime );          // return dd/MM/yyyy hh:mm string from DateTime
   static QString     toString( DateTime, QString ); // return string in format from DateTime
   static DateTime    trunc( DateTime, Interval );   // return DateTime truncated to interval

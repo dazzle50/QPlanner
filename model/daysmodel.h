@@ -24,6 +24,8 @@
 #include <QAbstractTableModel>
 
 class Day;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 /*************************************************************************************************/
 /************************ Table model containing all calendar day types **************************/
@@ -37,6 +39,8 @@ public:
   ~DaysModel();                                                    // destructor
 
   void         initialise();                                       // create initial default contents
+  void         saveToStream( QXmlStreamWriter* );                  // write days data to xml stream
+  void         loadFromStream( QXmlStreamReader* );                // load days data from xml stream
 
   Day*         day( int n );                                       // return pointer to n'th day type
   int          index( Day* d ) { return m_days.indexOf(d); }       // return index of day type, or -1

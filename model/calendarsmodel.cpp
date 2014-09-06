@@ -22,6 +22,8 @@
 #include "calendar.h"
 #include "command/commandcalendarsetdata.h"
 
+#include <QXmlStreamWriter>
+
 /*************************************************************************************************/
 /************************** Table model containing all base calendars ****************************/
 /*************************************************************************************************/
@@ -47,6 +49,43 @@ void CalendarsModel::initialise()
   // create initial default calendars
   for ( int cal=0 ; cal<=Calendar::DEFAULT_MAX ; cal++ )
     m_calendars.append( new Calendar(cal) );
+}
+
+/***************************************** saveToStream ******************************************/
+
+void  CalendarsModel::saveToStream( QXmlStreamWriter* stream )
+{
+  // write calendars data to xml stream
+  stream->writeStartElement( "calendars-data" );
+
+  foreach( Calendar* c, m_calendars )
+  {
+    stream->writeStartElement( "calendar" );
+    stream->writeAttribute( "id", QString("%1").arg(plan->index(c)) );
+    c->saveToStream( stream );
+    stream->writeEndElement();
+  }
+
+  // close calendars-data element
+  stream->writeEndElement();
+}
+
+/**************************************** loadFromStream *****************************************/
+
+void  CalendarsModel::loadFromStream( QXmlStreamReader* stream )
+{
+  // load calendars data from xml stream
+  while ( !stream->atEnd() )
+  {
+    stream->readNext();
+
+    // if calendar element create new calendar
+    if ( stream->isStartElement() && stream->name() == "calendar" )
+      m_calendars.append( new Calendar(stream) );
+
+    // when reached end of calendars data return
+    if ( stream->isEndElement() && stream->name() == "calendars-data" ) return;
+  }
 }
 
 /******************************************* calendar ********************************************/

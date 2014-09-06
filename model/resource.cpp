@@ -26,6 +26,8 @@
 #include "calendar.h"
 #include "calendarsmodel.h"
 
+#include <QXmlStreamWriter>
+
 /*************************************************************************************************/
 /************************************* Single plan resource **************************************/
 /*************************************************************************************************/
@@ -55,6 +57,70 @@ Resource::Resource( bool unassigned )
   m_start        = XDate::NULL_DATE;
   m_end          = XDate::NULL_DATE;
   m_comment      = "Unassigned";
+}
+
+/****************************************** constructor ******************************************/
+
+Resource::Resource( QXmlStreamReader* stream ) : Resource()
+{
+  // create resource from stream
+  foreach( QXmlStreamAttribute attribute, stream->attributes() )
+  {
+    if ( attribute.name() == "initials" )
+      m_initials = attribute.value().toString();
+
+    if ( attribute.name() == "name" )
+      m_name = attribute.value().toString();
+
+    if ( attribute.name() == "org" )
+      m_org = attribute.value().toString();
+
+    if ( attribute.name() == "group" )
+      m_group = attribute.value().toString();
+
+    if ( attribute.name() == "role" )
+      m_role = attribute.value().toString();
+
+    if ( attribute.name() == "alias" )
+      m_alias = attribute.value().toString();
+
+    if ( attribute.name() == "start" )
+      m_start = XDate::fromString( attribute.value().toString() );
+
+    if ( attribute.name() == "end" )
+      m_end = XDate::fromString( attribute.value().toString() );
+
+    if ( attribute.name() == "availability" )
+      m_availability = attribute.value().toString().toFloat();
+
+    if ( attribute.name() == "cost" )
+      m_cost = attribute.value().toString().toFloat();
+
+    if ( attribute.name() == "calendar" )
+      m_calendar = plan->calendar( attribute.value().toString().toInt() );
+
+    if ( attribute.name() == "comment" )
+      m_comment = attribute.value().toString();
+  }
+}
+
+/***************************************** saveToStream ******************************************/
+
+void  Resource::saveToStream( QXmlStreamWriter* stream )
+{
+  // write resource data to xml stream
+  stream->writeAttribute( "initials", m_initials );
+  stream->writeAttribute( "name", m_name );
+  stream->writeAttribute( "org", m_org );
+  stream->writeAttribute( "group", m_group );
+  stream->writeAttribute( "role", m_role );
+  stream->writeAttribute( "alias", m_alias );
+  stream->writeAttribute( "start", XDate::toString( m_start, "yyyy-MM-dd" ) );
+  stream->writeAttribute( "end", XDate::toString( m_end, "yyyy-MM-dd" ) );
+  stream->writeAttribute( "availability", QString("%1").arg(m_availability) );
+  stream->writeAttribute( "cost", "TODO" );
+  stream->writeAttribute( "calendar", QString("%1").arg(plan->index(m_calendar)) );
+  stream->writeAttribute( "comment", m_comment );
 }
 
 /****************************************** headerData *******************************************/

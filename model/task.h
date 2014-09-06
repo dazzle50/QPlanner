@@ -30,7 +30,8 @@
 #include "ganttdata.h"
 #include "taskresources.h"
 
-class TimeSpan;
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
 /*************************************************************************************************/
 /*************************************** Single plan task ****************************************/
@@ -41,6 +42,9 @@ class Task
 public:
   Task();                                                         // constructor (normal)
   Task( bool );                                                   // constructor (plan summary)
+  Task( QXmlStreamReader* );                                      // constructor
+
+  void              saveToStream( QXmlStreamWriter* );            // write task data to xml stream
 
   bool              isNull() const { return m_title.isNull(); }   // is this task null (blank)
   QString           name() const { return m_title; }              // return name of task (i.e. title)

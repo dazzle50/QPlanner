@@ -27,6 +27,9 @@
 
 #include "datetime.h"
 
+class QXmlStreamReader;
+class QXmlStreamWriter;
+
 /*************************************************************************************************/
 /**************************** Single day type used in plan calendars *****************************/
 /*************************************************************************************************/
@@ -37,6 +40,9 @@ class Day
 public:
   Day();                                               // constructor
   Day( int );                                          // constructor
+  Day( QXmlStreamReader* );                            // constructor
+
+  void       saveToStream( QXmlStreamWriter* );        // write day data to xml stream
 
   QString    name() { return m_name; }                 // return day name
   float      work() { return m_work; }                 // return work days equivalent

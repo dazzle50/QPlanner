@@ -27,6 +27,8 @@
 #include "datetime.h"
 
 class Task;
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
 /*************************************************************************************************/
 /**************************** Table model containing all plan tasks ******************************/
@@ -44,6 +46,8 @@ public:
   DateTime       planEnd();                                       // return finish of latest finishing task
   int            number();                                        // return number of non-null tasks in plan
   void           schedule();                                      // re-schedule tasks
+  void           saveToStream( QXmlStreamWriter* );               // write tasks data to xml stream
+  void           loadFromStream( QXmlStreamReader* );             // load tasks data from xml stream
 
   Task*          task( int n );                                   // return pointer to n'th task
   int            index( Task* t ) { return m_tasks.indexOf(t); }  // return index of task, or -1

@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+
 #include "plan.h"
 #include "calendarsmodel.h"
 #include "daysmodel.h"
@@ -107,6 +110,81 @@ Calendar::Calendar( int type )
     m_normal.resize( m_cycleLength );
 
     m_normal[0] = plan->day( Day::DEFAULT_TWENTYFOURHOURS );
+  }
+}
+
+/****************************************** constructor ******************************************/
+
+Calendar::Calendar( QXmlStreamReader* stream ) : Calendar()
+{
+  // create calendar from stream
+  foreach( QXmlStreamAttribute attribute, stream->attributes() )
+  {
+    if ( attribute.name() == "name" )
+      m_name = attribute.value().toString();
+
+    if ( attribute.name() == "anchor" )
+      m_cycleAnchor = XDate::fromString( attribute.value().toString() );
+  }
+
+  while ( !stream->atEnd() )
+  {
+    stream->readNext();
+
+    // if normal element append new day
+    if ( stream->isStartElement() && stream->name() == "normal" )
+      foreach( QXmlStreamAttribute attribute, stream->attributes() )
+      {
+        if ( attribute.name() == "day" )
+        {
+          m_normal.append( plan->day( attribute.value().toString().toInt() ) );
+          m_cycleLength = m_normal.size();
+        }
+      }
+
+    // if exception element append new exception
+    if ( stream->isStartElement() && stream->name() == "exception" )
+    {
+      Date   date;
+      Day*   day = nullptr;
+      foreach( QXmlStreamAttribute attribute, stream->attributes() )
+      {
+        if ( attribute.name() == "date" )
+          date = XDate::fromString( attribute.value().toString() );
+
+        if ( attribute.name() == "day" )
+          day = plan->day( attribute.value().toString().toInt() );
+      }
+      m_exceptions[ date ] = day;
+    }
+
+    // when reached end of calendar return
+    if ( stream->isEndElement() && stream->name() == "calendar" ) return;
+  }
+}
+
+/***************************************** saveToStream ******************************************/
+
+void  Calendar::saveToStream( QXmlStreamWriter* stream )
+{
+  // write calendar data to xml stream
+  stream->writeAttribute( "name", m_name );
+  stream->writeAttribute( "anchor", XDate::toString( m_cycleAnchor, "yyyy-MM-dd" ) );
+
+  for( int n=0 ; n<m_cycleLength ; n++ )
+  {
+    stream->writeEmptyElement( "normal" );
+    stream->writeAttribute( "id", QString("%1").arg(n) );
+    stream->writeAttribute( "day", QString("%1").arg(plan->index(m_normal[n])) );
+  }
+
+  QHashIterator<Date, Day*> e( m_exceptions );
+  while ( e.hasNext() )
+  {
+      e.next();
+      stream->writeEmptyElement( "exception" );
+      stream->writeAttribute( "date", XDate::toString( e.key(), "yyyy-MM-dd" ) );
+      stream->writeAttribute( "day", QString("%1").arg(plan->index(e.value())) );
   }
 }
 

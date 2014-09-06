@@ -26,6 +26,8 @@
 #include "tasksmodel.h"
 #include "datetime.h"
 
+#include <QXmlStreamWriter>
+
 /*************************************************************************************************/
 /*************************************** Single plan task ****************************************/
 /*************************************************************************************************/
@@ -65,6 +67,73 @@ Task::Task( bool planSummary )
   m_start       = XDateTime::NULL_DATETIME;
   m_end         = XDateTime::NULL_DATETIME;
   m_deadline    = XDateTime::NULL_DATETIME;
+}
+
+/****************************************** constructor ******************************************/
+
+Task::Task( QXmlStreamReader* stream ) : Task()
+{
+  // create task from stream
+  foreach( QXmlStreamAttribute attribute, stream->attributes() )
+  {
+    if ( attribute.name() == "indent" )
+      m_indent = attribute.value().toString().toShort();
+
+    if ( attribute.name() == "summary" )
+      m_summaryEnd = attribute.value().toString().toInt();
+
+    if ( attribute.name() == "expanded" )
+      m_expanded = ( attribute.value() == "1" );
+
+    if ( attribute.name() == "title" )
+      m_title = attribute.value().toString();
+
+    if ( attribute.name() == "duration" )
+      m_duration = attribute.value().toString();
+
+    if ( attribute.name() == "start" )
+      m_start = XDateTime::fromString( attribute.value().toString() );
+
+    if ( attribute.name() == "end" )
+      m_end = XDateTime::fromString( attribute.value().toString() );
+
+    if ( attribute.name() == "work" )
+      m_work = attribute.value().toString();
+
+    if ( attribute.name() == "resources" )
+      m_resources = attribute.value().toString();
+
+    if ( attribute.name() == "type" )
+      m_type = attribute.value().toString().toInt();
+
+    if ( attribute.name() == "priority" )
+      m_priority = attribute.value().toString().toInt() * 1e6;
+
+    if ( attribute.name() == "cost" )
+      m_cost = attribute.value().toString().toFloat();
+
+    if ( attribute.name() == "comment" )
+      m_comment = attribute.value().toString();
+  }
+}
+/***************************************** saveToStream ******************************************/
+
+void  Task::saveToStream( QXmlStreamWriter* stream )
+{
+  // write task data to xml stream
+  stream->writeAttribute( "indent", QString("%1").arg(m_indent) );
+  stream->writeAttribute( "summary", QString("%1").arg(m_summaryEnd) );
+  stream->writeAttribute( "expanded", QString("%1").arg(m_expanded) );
+  stream->writeAttribute( "title", m_title );
+  stream->writeAttribute( "duration", m_duration.toString() );
+  stream->writeAttribute( "start", XDateTime::toString( m_start, "yyyy-MM-ddThh:mm:ss" ) );
+  stream->writeAttribute( "end", XDateTime::toString( m_end, "yyyy-MM-ddThh:mm:ss" ) );
+  stream->writeAttribute( "work", m_work.toString() );
+  stream->writeAttribute( "resources", m_resources.toString() );
+  stream->writeAttribute( "type", QString("%1").arg(int(m_type)) );
+  stream->writeAttribute( "priority", QString("%1").arg(m_priority/1e6) );
+  stream->writeAttribute( "cost", "TODO" );
+  stream->writeAttribute( "comment", m_comment );
 }
 
 /****************************************** headerData *******************************************/

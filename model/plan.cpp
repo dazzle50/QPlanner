@@ -132,10 +132,10 @@ void  Plan::setFileInfo( QString filename, QDateTime when, QString who )
 void  Plan::saveToStream( QXmlStreamWriter* stream )
 {
   // write plan data to xml stream
-  //TODO m_days->saveToStream( stream );
-  //TODO m_calendars->saveToStream( stream );
-  //TODO m_resources->saveToStream( stream );
-  //TODO m_tasks->saveToStream( stream );
+  m_days->saveToStream( stream );
+  m_calendars->saveToStream( stream );
+  m_resources->saveToStream( stream );
+  m_tasks->saveToStream( stream );
 
   stream->writeStartElement( "plan-data" );
   stream->writeAttribute( "title", m_title );
@@ -167,10 +167,10 @@ void  Plan::loadFromStream( QXmlStreamReader* stream, QString file )
     stream->readNext();
     if ( stream->isStartElement() )
     {
-      //TODO if ( stream->name() == "days-data"      ) m_days->loadFromStream( stream );
-      //TODO if ( stream->name() == "calendars-data" ) m_calendars->loadFromStream( stream );
-      //TODO if ( stream->name() == "resources-data" ) m_resources->loadFromStream( stream );
-      //TODO if ( stream->name() == "tasks-data"     ) m_tasks->loadFromStream( stream );
+      if ( stream->name() == "days-data"      ) m_days->loadFromStream( stream );
+      if ( stream->name() == "calendars-data" ) m_calendars->loadFromStream( stream );
+      if ( stream->name() == "resources-data" ) m_resources->loadFromStream( stream );
+      if ( stream->name() == "tasks-data"     ) m_tasks->loadFromStream( stream );
 
       if ( stream->name() == "plan-data" )
         foreach( QXmlStreamAttribute attribute, stream->attributes() )
@@ -179,10 +179,7 @@ void  Plan::loadFromStream( QXmlStreamReader* stream, QString file )
             m_title = attribute.value().toString();
 
           if ( attribute.name() == "start" )
-          {
-            QDateTime start = QDateTime::fromString( attribute.value().toString(), "yyyy-MM-ddTHH:mm:ss" );
-            m_start = XDateTime::datetime( start );
-          }
+            m_start = XDateTime::fromString( attribute.value().toString() );
 
           if ( attribute.name() == "calendar" )
             m_calendar = calendar( attribute.value().toString().toInt() );

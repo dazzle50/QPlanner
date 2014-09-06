@@ -25,6 +25,9 @@
 
 class Calendar;
 
+class QXmlStreamWriter;
+class QXmlStreamReader;
+
 /*************************************************************************************************/
 /************************** Table model containing all base calendars ****************************/
 /*************************************************************************************************/
@@ -37,6 +40,9 @@ public:
   ~CalendarsModel();                                                      // destructor
 
   void           initialise();                                            // create initial default contents
+  void           saveToStream( QXmlStreamWriter* );                       // write calendars data to xml stream
+  void           loadFromStream( QXmlStreamReader* );                     // load calendars data from xml stream
+
   Calendar*      calendar( int n );                                       // return pointer to n'th calendar
   int            index( Calendar* c ) { return m_calendars.indexOf(c); }  // return index of calendar, or -1
   int            number() { return m_calendars.size(); }                  // return number of calendars in plan
