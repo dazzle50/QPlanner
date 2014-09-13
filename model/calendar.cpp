@@ -137,7 +137,14 @@ Calendar::Calendar( QXmlStreamReader* stream ) : Calendar()
       {
         if ( attribute.name() == "day" )
         {
-          m_normal.append( plan->day( attribute.value().toString().toInt() ) );
+          int dayId = attribute.value().toString().toInt();
+          if ( dayId >= plan->numDays() )
+          {
+            stream->raiseError( QString("Calendar invalid normal day '%1'").arg(dayId) );
+            return;
+          }
+
+          m_normal.append( plan->day( dayId ) );
           m_cycleLength = m_normal.size();
         }
       }
@@ -153,7 +160,16 @@ Calendar::Calendar( QXmlStreamReader* stream ) : Calendar()
           date = XDate::fromString( attribute.value().toString() );
 
         if ( attribute.name() == "day" )
-          day = plan->day( attribute.value().toString().toInt() );
+        {
+          int dayId = attribute.value().toString().toInt();
+          if ( dayId >= plan->numDays() )
+          {
+            stream->raiseError( QString("Calendar invalid exception day '%1'").arg(dayId) );
+            return;
+          }
+
+          day = plan->day( dayId );
+        }
       }
       m_exceptions[ date ] = day;
     }

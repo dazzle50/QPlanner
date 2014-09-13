@@ -258,17 +258,104 @@ void MainTabWidget::saveToStream( QXmlStreamWriter* stream )
   // write display data to xml stream
   stream->writeStartElement( "display-data" );
 
-  stream->writeStartElement( "gantt" );
-/*
-  stream->writeAttribute( "start", XDateTime( ui->ganttView->start() ).toText() );
-  stream->writeAttribute( "end", XDateTime( ui->ganttView->end() ).toText() );
-  stream->writeAttribute( "minspp", QString("%1").arg( ui->ganttView->minsPP() ) );
-*/
-  stream->writeAttribute( "upper-scale", "TODO" );
-  stream->writeAttribute( "lower-scale", "TODO" );
-  stream->writeEndElement();  // gantt
+  saveTasksGanttToStream( stream );
+  saveResourcesTabToStream( stream );
+  saveCalendarsTabToStream( stream );
+  saveDaysTabToStream( stream );
 
   stream->writeEndElement();  // display-data
+}
+
+/************************************ saveTasksGanttToStream *************************************/
+
+void MainTabWidget::saveTasksGanttToStream( QXmlStreamWriter* stream )
+{
+  // write tasks-gantt data to xml stream
+  stream->writeStartElement( "tasks-gantt" );
+
+  stream->writeAttribute( "start", XDateTime::toString( ui->ganttView->start(), "yyyy-MM-ddThh:mm:ss" ) );
+  stream->writeAttribute( "end", XDateTime::toString( ui->ganttView->end(), "yyyy-MM-ddThh:mm:ss" ) );
+  stream->writeAttribute( "minspp", QString("%1").arg( ui->ganttView->minsPP() ) );
+  stream->writeAttribute( "nonworking", "TODO" );
+  stream->writeAttribute( "current", "TODO" );
+  stream->writeAttribute( "upper", "TODO" );
+  stream->writeAttribute( "lower", "TODO" );
+  stream->writeAttribute( "splitter", "TODO" );
+
+  stream->writeStartElement( "upper-scale" );
+  stream->writeAttribute( "interval", ui->ganttView->upperInterval() );
+  stream->writeAttribute( "format", ui->ganttView->upperFormat() );
+  stream->writeEndElement();  // upper-scale
+
+  stream->writeStartElement( "lower-scale" );
+  stream->writeAttribute( "interval", ui->ganttView->lowerInterval() );
+  stream->writeAttribute( "format", ui->ganttView->lowerFormat() );
+  stream->writeEndElement();  // lower-scale
+
+  // <row id="x" height="y"/>
+  // <column id="x" width="y"/>
+
+  stream->writeEndElement();  // tasks-gantt
+}
+
+/*********************************** saveResourcesTabToStream ************************************/
+
+void MainTabWidget::saveResourcesTabToStream( QXmlStreamWriter* stream )
+{
+  // write resources-tab data to xml stream
+  stream->writeStartElement( "resources-tab" );
+
+  // <row id="x" height="y"/>
+  // <column id="x" width="y"/>
+
+  stream->writeEndElement();  // resources-tab
+}
+
+/*********************************** saveCalendarsTabToStream ************************************/
+
+void MainTabWidget::saveCalendarsTabToStream( QXmlStreamWriter* stream )
+{
+  // write calendars-tab data to xml stream
+  stream->writeStartElement( "calendars-tab" );
+
+  // <row id="x" height="y"/>
+  // <column id="x" width="y"/>
+
+  stream->writeEndElement();  // calendars-tab
+}
+
+/*********************************** saveDaysTabToStream ************************************/
+
+void MainTabWidget::saveDaysTabToStream( QXmlStreamWriter* stream )
+{
+  // write days-tab data to xml stream
+  stream->writeStartElement( "days-tab" );
+
+  // <row id="x" height="y"/>
+  // <column id="x" width="y"/>
+
+  stream->writeEndElement();  // days-tab
+}
+
+/************************************** getGanttAttributes ***************************************/
+
+void MainTabWidget::getGanttAttributes( DateTime& start, DateTime& end, double& minspp )
+{
+  // get gantt attributes start/end/minsPP
+  start  = ui->ganttView->start();
+  end    = ui->ganttView->end();
+  minspp = ui->ganttView->minsPP();
+}
+
+/************************************** setGanttAttributes ***************************************/
+
+void MainTabWidget::setGanttAttributes( DateTime start, DateTime end, double minspp )
+{
+  // set gantt attributes start/end/minsPP
+  ui->ganttView->setStart( start );
+  ui->ganttView->setEnd( end );
+  ui->ganttView->setMinsPP( minspp );
+  ui->ganttView->setWidth();
 }
 
 /***************************************** updatePlan ********************************************/

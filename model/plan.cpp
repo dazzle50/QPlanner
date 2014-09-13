@@ -182,7 +182,13 @@ void  Plan::loadFromStream( QXmlStreamReader* stream, QString file )
             m_start = XDateTime::fromString( attribute.value().toString() );
 
           if ( attribute.name() == "calendar" )
-            m_calendar = calendar( attribute.value().toString().toInt() );
+          {
+            int calId = attribute.value().toString().toInt();
+            if ( calId >= numCalendars() )
+              stream->raiseError( QString("Plan invalid calendar '%1'").arg(calId) );
+            else
+              m_calendar = calendar( calId );
+          }
 
           if ( attribute.name() == "datetime-format" )
             m_datetime_format = attribute.value().toString();

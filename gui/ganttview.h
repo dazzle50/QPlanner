@@ -48,6 +48,14 @@ public:
   void    setMinsPP( double );          // set gantt minutes per pixel
   void    setWidth();                   // ensure view width is never less than chart width
 
+  DateTime   start() { return m_start; }          // return gantt start date-time
+  DateTime   end() { return m_end; }              // return gantt end date-time
+  double     minsPP() { return m_minsPP; }        // return gantt minutes per pixel
+  QString    upperInterval() { return "?"; }      // return upper scale interval
+  QString    upperFormat() { return "?"; }        // return upper scale format
+  QString    lowerInterval() { return "?"; }      // return lower scale interval
+  QString    lowerFormat() { return "?"; }        // return lower scale format
+
 public slots:
   void    contextMenu( QPoint );        // slot to receive context menu signals
   void    slotZoomIn();                 // slot to receive zoom in action signal

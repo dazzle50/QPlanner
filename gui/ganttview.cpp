@@ -159,7 +159,7 @@ void  GanttView::slotZoomFit()
   }
 
   // add margins to start and end
-  qint64 margin = 1 + ( start - end ) / 32;
+  qint64 margin = 1 + ( end - start ) / 16;
   setStart( start - margin );
   setEnd( end + margin );
 

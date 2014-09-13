@@ -228,19 +228,19 @@ void MainWindow::loadDisplayData( QXmlStreamReader* stream )
     stream->readNext();
     if ( stream->isStartElement() )
     {
-      if ( stream->name() == "gantt" )
+      if ( stream->name() == "tasks-gantt" )
       {
-        QDateTime start, end;
+        DateTime start, end;
         double    mpp;
-/*
+
         m_tabs->getGanttAttributes( start, end, mpp );
         foreach( QXmlStreamAttribute attribute, stream->attributes() )
         {
           if ( attribute.name() == "start" )
-            start = XDateTime::fromText( attribute.value().toString() );
+            start = XDateTime::fromString( attribute.value().toString() );
 
           if ( attribute.name() == "end" )
-            end = XDateTime::fromText( attribute.value().toString() );;
+            end = XDateTime::fromString( attribute.value().toString() );;
 
           if ( attribute.name() == "minspp" )
             mpp = attribute.value().toString().toDouble();
@@ -248,7 +248,7 @@ void MainWindow::loadDisplayData( QXmlStreamReader* stream )
         m_tabs->setGanttAttributes( start, end, mpp );
         foreach( MainTabWidget* tabs, m_windows )
           if (tabs) tabs->setGanttAttributes( start, end, mpp );
-*/
+
       }
     }
   }

@@ -27,6 +27,8 @@
 class QItemSelectionModel;
 class QXmlStreamWriter;
 
+#include "model/datetime.h"
+
 /*************************************************************************************************/
 /***************************** Tabbed widget containing main screens *****************************/
 /*************************************************************************************************/
@@ -48,6 +50,17 @@ public:
   void  removePlanTab();             // remove 'Plan' tab
 
   void  saveToStream( QXmlStreamWriter* );        // write display data to xml stream
+  void  saveTasksGanttToStream( QXmlStreamWriter* );
+  void  saveResourcesTabToStream( QXmlStreamWriter* );
+  void  saveCalendarsTabToStream( QXmlStreamWriter* );
+  void  saveDaysTabToStream( QXmlStreamWriter* );
+
+  void  getGanttAttributes( DateTime&,
+                            DateTime&,
+                            double& );            // get gantt attributes start/end/minsPP
+  void  setGanttAttributes( DateTime,
+                            DateTime,
+                            double );             // set gantt attributes start/end/minsPP
 
   QItemSelectionModel*  tasksSelectionModel();    // return selection model for tasks table view
   QModelIndexList       tasksSelectionIndexes();  // return selected indexes on tasks table view

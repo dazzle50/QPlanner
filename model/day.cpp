@@ -139,8 +139,11 @@ Day::Day( QXmlStreamReader* stream ) : Day()
     }
 
     // when reached end of day return
-    if ( stream->isEndElement() && stream->name() == "day" ) return;
+    if ( stream->isEndElement() && stream->name() == "day" ) break;
   }
+
+  // ensure cached worked minutes in day is set correctly
+  calcMinutes();
 }
 
 /***************************************** saveToStream ******************************************/

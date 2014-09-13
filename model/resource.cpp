@@ -97,7 +97,13 @@ Resource::Resource( QXmlStreamReader* stream ) : Resource()
       m_cost = attribute.value().toString().toFloat();
 
     if ( attribute.name() == "calendar" )
-      m_calendar = plan->calendar( attribute.value().toString().toInt() );
+    {
+      int calId = attribute.value().toString().toInt();
+      if ( calId >= plan->numCalendars() )
+        stream->raiseError( QString("Resource invalid calendar '%1'").arg(calId) );
+      else
+        m_calendar = plan->calendar( calId );
+    }
 
     if ( attribute.name() == "comment" )
       m_comment = attribute.value().toString();
