@@ -51,6 +51,7 @@ public:
 public slots:
   void slotUndoStackView( bool );              // slot for actionUndoStackView triggered signal
   void slotUndoStackViewDestroyed();           // slot for undo stack view destroyed signal
+  void slotCleanChanged( bool );               // slot for undostack clean state change
   void slotTabChange( int );                   // slot for mainTabWidget current changed signal
   void slotSchedulePlan();                     // slot for schedule plan action
   void slotIndent();                           // slot for indent task(s) action
@@ -65,12 +66,16 @@ public slots:
   void slotFilePrint();                        // slot for file print action
   void slotFilePrintPreview();                 // slot for file print preview action
   void slotFileExit();                         // slot for file exit application action
-  void slotAboutQPlanner();                    // slot for about qplanner action
+  void slotAboutProjectPlanner();              // slot for about ProjectPlanner action
 
   void slotTaskSelectionChanged( const QItemSelection&,
                                  const QItemSelection& );   // slot for task selection change
   void slotTaskDataChanged( const QModelIndex&,
                             const QModelIndex& );           // slot for task data change
+
+protected:
+  void changeEvent( QEvent* );                 // reimplement to detect window loses active focus
+  void closeEvent( QCloseEvent* );             // reimplement to check if user really wants to exit
 
 private:
   Ui::MainWindow*         ui;                  // user interface created using qt designer

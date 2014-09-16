@@ -22,6 +22,8 @@
 #include <QUndoView>
 #include <QUndoStack>
 #include <QXmlStreamWriter>
+#include <QCloseEvent>
+#include <QMessageBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -47,10 +49,6 @@ MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent ), ui( new Ui::M
   setCentralWidget( m_tabs );
   resize( 900, 450 );
 
-  // ensure plan tab and is kept up-to-date when plan signals changes
-  connect( plan, SIGNAL(signalPlanUpdated()), m_tabs, SLOT(slotUpdatePlanTab()),
-           Qt::UniqueConnection );
-
   // ensure menus and plan tab are kept up-to-date when current tab changes
   slotTabChange( m_tabs->currentIndex() );
   connect( m_tabs, SIGNAL(currentChanged(int)), this, SLOT(slotTabChange(int)),
@@ -64,6 +62,13 @@ MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent ), ui( new Ui::M
 
 void MainWindow::setModels()
 {
+  // ensure plan tab and is kept up-to-date when plan signals changes
+  connect( plan, SIGNAL(signalPlanUpdated()), m_tabs, SLOT(slotUpdatePlanTab()),
+           Qt::UniqueConnection );
+
+  // ensure window title updated to reflect that there are unsaved changes
+  connect( plan->undostack(), SIGNAL(cleanChanged(bool)), this, SLOT(slotCleanChanged(bool)) );
+
   // set undostack for edit menu undo/redo
   QAction* undoAction = plan->undostack()->createUndoAction( this );
   undoAction->setShortcut( QKeySequence::Undo );
@@ -150,6 +155,7 @@ bool MainWindow::savePlan( QString filename )
 
   // update plan properties
   plan->setFileInfo( filename, when, who );
+  plan->undostack()->setClean();
   setTitle( plan->filename() );
   m_tabs->slotUpdatePlanTab();
   return true;
@@ -259,8 +265,14 @@ void MainWindow::loadDisplayData( QXmlStreamReader* stream )
 void MainWindow::setTitle( QString text )
 {
   // update main window title to include given text
-  if ( text.isEmpty() ) setWindowTitle( "QPlanner" );
-  else                  setWindowTitle( text + " - QPlanner");
+  if ( text.isEmpty() )
+    setWindowTitle( "ProjectPlanner" );
+  else
+  {
+    // add asterisk to filename to indicate if unsaved changes
+    if ( !plan->undostack()->isClean() ) text += "*";
+    setWindowTitle( text + " - ProjectPlanner");
+  }
 
   // update other windows titles to match
   foreach( MainTabWidget* tabs, m_windows )
@@ -329,9 +341,40 @@ void MainWindow::slotOutdent()
 
 void MainWindow::slotFileNew()
 {
-  // slot for file new plan action
+  // slot for file new plan action, check whether plan needs update
+  m_tabs->updatePlan();
 
-  qDebug("MainWindow::slotFileNew() - TODO !!!!");
+  // if undostack state is not 'clean' ask user what to do
+  if ( !plan->undostack()->isClean() )
+  {
+    bool check = true;
+    while ( check )
+      switch ( QMessageBox::warning( this, "Project Planner",
+          "Do you want to save before starting new?",
+          QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel ) )
+      {
+        case QMessageBox::Save:
+          // if save not successful ask again
+          if ( !slotFileSaveAs() ) break;
+
+        case QMessageBox::Discard:
+          check = false;
+          break;
+
+        default:    // "Cancel"
+          return;
+      }
+  }
+
+  // delete old plan, and generate new default plan
+  delete plan;
+  plan = new Plan();
+  plan->initialise();
+  setModels();
+  plan->schedule();
+  message( "New plan started" );
+  setTitle( plan->filename() );
+  m_tabs->slotUpdatePlanTab();
 }
 
 /****************************************** slotFileOpen *****************************************/
@@ -340,7 +383,8 @@ bool MainWindow::slotFileOpen()
 {
   // slot for file open plan action - get user to select filename and location
   m_tabs->endEdits();
-  QString filename = QFileDialog::getOpenFileName();
+  QString filename = QFileDialog::getOpenFileName( this, "Open Plan", plan->fileLocation(),
+                                                   "Plans (*.xml)" );
   if ( filename.isEmpty() )
   {
     message();
@@ -368,7 +412,10 @@ bool MainWindow::slotFileSaveAs()
 {
   // slot for file saveAs plan action - get user to select filename and location
   m_tabs->endEdits();
-  QString filename = QFileDialog::getSaveFileName();
+  // QString filename = QFileDialog::getSaveFileName();
+  QString filename = QFileDialog::getSaveFileName( this, "Save Plan As",
+                                                   plan->fileLocation() + "/" + plan->filename(),
+                                                   "Plans (*.xml)" );
   if ( !filename.isEmpty() ) return savePlan( filename );
 
   // user cancelled
@@ -403,13 +450,13 @@ void MainWindow::slotFileExit()
   qDebug("MainWindow::slotFileExit() - TODO !!!!");
 }
 
-/*************************************** slotAboutQPlanner ***************************************/
+/************************************ slotAboutProjectPlanner ************************************/
 
-void MainWindow::slotAboutQPlanner()
+void MainWindow::slotAboutProjectPlanner()
 {
   // slot for file saveAs plan action
   m_tabs->endEdits();
-  qDebug("MainWindow::slotAboutQPlanner() - TODO !!!!");
+  qDebug("MainWindow::slotAboutProjectPlanner() - TODO !!!!");
 }
 
 /**************************************** slotSchedulePlan ***************************************/
@@ -485,6 +532,14 @@ void MainWindow::slotUndoStackViewDestroyed()
   ui->actionUndoStackView->setChecked( false );
 }
 
+/*************************************** slotCleanChanged ****************************************/
+
+void MainWindow::slotCleanChanged( bool )
+{
+  // when undostack clean state change update title to reflect if unsaved changes
+  setTitle( plan->filename() );
+}
+
 /***************************************** slotTabChange *****************************************/
 
 void MainWindow::slotTabChange( int index )
@@ -506,4 +561,49 @@ void MainWindow::slotTabChange( int index )
   // ensure plan reflects 'Plan' tab widgets and vice versa
   m_tabs->updatePlan();
   m_tabs->slotUpdatePlanTab();
+}
+
+/****************************************** changeEvent ******************************************/
+
+void MainWindow::changeEvent( QEvent* event )
+{
+  // if windows activation change, check whether plan needs update
+  if ( event->type() == QEvent::ActivationChange )
+    m_tabs->updatePlan();
+
+  QMainWindow::changeEvent( event );
+}
+
+/****************************************** closeEvent *******************************************/
+
+void  MainWindow::closeEvent( QCloseEvent* event )
+{
+  // check whether plan needs update
+  m_tabs->updatePlan();
+
+  // if undostack state is 'clean' then accept close event
+  if ( plan->undostack()->isClean() )
+  {
+    event->accept();
+    return;
+  }
+
+  // check if user wants to save before quitting
+  while ( true )
+    switch ( QMessageBox::warning( this, "Project Planner",
+        "Do you want to save before you quit?",
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel ) )
+    {
+      case QMessageBox::Save:
+        // if save not successful ask again
+        if ( !slotFileSaveAs() ) break;
+
+      case QMessageBox::Discard:
+        event->accept();
+        return;
+
+      default:    // "Cancel"
+        event->ignore();
+        return;
+    }
 }

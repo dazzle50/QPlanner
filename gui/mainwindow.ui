@@ -183,7 +183,7 @@
     <string>Exit</string>
    </property>
    <property name="statusTip">
-    <string>Exit QPlanner application</string>
+    <string>Exit ProjectPlanner application</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -620,7 +620,7 @@
    <sender>actionAboutProjectPlanner</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>slotAboutQPlanner()</slot>
+   <slot>slotAboutProjectPlanner()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -662,7 +662,7 @@
   <slot>slotFilePrint()</slot>
   <slot>slotFilePrintPreview()</slot>
   <slot>slotFileExit()</slot>
-  <slot>slotAboutQPlanner()</slot>
+  <slot>slotAboutProjectPlanner()</slot>
   <slot>slotNewWindow()</slot>
  </slots>
 </ui>

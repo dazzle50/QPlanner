@@ -88,7 +88,7 @@ DateTime GanttData::end() const
 {
   // return task gantt row end date-time
   if ( m_end.size() == 0 ) return m_start;
-  return m_end.at( m_end.size() - 1 );
+  return m_end.last();
 }
 
 /********************************************* startX ********************************************/
@@ -96,7 +96,7 @@ DateTime GanttData::end() const
 int GanttData::startX( DateTime start, double minsPP ) const
 {
   // return task gantt row start x coordinate
-  return int( ( plan->stretch( m_start ) - start ) / minsPP );
+  return x( m_start, start, minsPP );
 }
 
 /********************************************** endX *********************************************/
@@ -104,7 +104,17 @@ int GanttData::startX( DateTime start, double minsPP ) const
 int GanttData::endX( DateTime start, double minsPP ) const
 {
   // return task gantt row end x coordinate
-  return int( ( plan->stretch( end() ) - start ) / minsPP );
+  return x( end(), start, minsPP );
+}
+
+/*********************************************** x ***********************************************/
+
+int GanttData::x( DateTime dt, DateTime start, double minsPP ) const
+{
+  // return x-coord for stretched date-time given start & minspp
+  DateTime stretch = plan->stretch( dt );
+  if ( stretch > start ) return ( stretch - start ) / minsPP;
+  return ( start - stretch ) / -minsPP;
 }
 
 /********************************************* height ********************************************/
@@ -169,21 +179,19 @@ void GanttData::drawDependencyFS( QPainter* p, int thisY, int otherY, int num,
 
   p->setPen( Qt::darkGray );
 
-  if ( thisX == otherX )
+  if ( thisX == otherX || thisX == otherX+1 )
   {
     p->drawLine( otherX+1, otherY,      otherX+2, otherY );
     p->drawLine( otherX+3, otherY+sign, otherX+3, thisY-sign*(h/2+2) );
     verticalArrow( p, otherX+3, thisY-sign*h/2, (sign*h*2)/5 );
   }
-
-  if ( thisX > otherX )
+  else if ( thisX > otherX )
   {
     p->drawLine( otherX+1, otherY,      thisX-1, otherY );
     p->drawLine( thisX,    otherY+sign, thisX,   thisY-sign*(h/2+2) );
     verticalArrow( p, thisX, thisY-sign*h/2, (sign*h*2)/5 );
   }
-
-  if ( thisX < otherX )
+  else // if ( thisX < otherX )
   {
     p->drawLine( otherX+1, otherY,      otherX+2, otherY );
     p->drawLine( otherX+3, otherY+sign, otherX+3, otherY+sign*(h/2+2) );
@@ -207,21 +215,19 @@ void GanttData::drawDependencySF( QPainter* p, int thisY, int otherY, int num,
 
   p->setPen( Qt::darkGray );
 
-  if ( thisX == otherX )
+  if ( thisX == otherX  || thisX == otherX-1 )
   {
     p->drawLine( otherX-1, otherY,      otherX-2, otherY );
     p->drawLine( otherX-3, otherY+sign, otherX-3, thisY-sign*(h/2+2) );
     verticalArrow( p, otherX-3, thisY-sign*h/2, (sign*h*2)/5 );
   }
-
-  if ( thisX > otherX )
+  else if ( thisX > otherX )
   {
     p->drawLine( otherX-1, otherY,      thisX+1, otherY );
     p->drawLine( thisX,    otherY+sign, thisX,   thisY-sign*(h/2+2) );
     verticalArrow( p, thisX, thisY-sign*h/2, (sign*h*2)/5 );
   }
-
-  if ( thisX < otherX )
+  else // if ( thisX < otherX )
   {
     p->drawLine( otherX-1, otherY,      otherX-2, otherY );
     p->drawLine( otherX-3, otherY+sign, otherX-3, otherY+sign*(h/2+2) );
@@ -283,7 +289,7 @@ void GanttData::drawTask( QPainter* p, int y, DateTime start, double minsPP, QSt
 void GanttData::drawMilestone( QPainter* p, int y, DateTime start, double minsPP )
 {
   // calc x position of milestone & height
-  int x = int( ( plan->stretch(m_start) - start ) / minsPP );
+  int x = startX( start, minsPP );
   int h = 1 + height( p ) / 3;
 
   // populate points array to draw the milestone
@@ -304,8 +310,8 @@ void GanttData::drawMilestone( QPainter* p, int y, DateTime start, double minsPP
 void GanttData::drawSummary( QPainter* p, int y, DateTime start, double minsPP )
 {
   // calc x positions of summary & height
-  int xs = int( ( plan->stretch(m_start) - start ) / minsPP );
-  int xe = int( ( plan->stretch(m_end[0]) - start ) / minsPP );
+  int xs = startX( start, minsPP );
+  int xe = endX( start, minsPP );
   int h  = 1 + height( p ) / 3;
   int w  = h;
   if ( w > xe - xs ) w = xe - xs;
@@ -341,7 +347,7 @@ void GanttData::drawTaskBar( QPainter* p, int ty, DateTime start, double minsPP 
   QBrush fill = QColor( Qt::yellow );
 
   // calc start position of task bar
-  int tx     = int( ( plan->stretch(m_start) - start ) / minsPP );
+  int tx     = startX( start, minsPP );
   int offset = int( m_value[0] * scale );
 
   // draw front edge
@@ -351,7 +357,7 @@ void GanttData::drawTaskBar( QPainter* p, int ty, DateTime start, double minsPP 
   int newX, newOffset;
   for( int period=1 ; period<m_value.size() ; period++ )
   {
-    newX = int( ( plan->stretch(m_end[period-1]) - start ) / minsPP );
+    newX      = x( m_end[period-1], start, minsPP );
     newOffset = int( m_value[period] * scale );
     if ( offset > 0 && newX > tx )
     {
@@ -367,7 +373,7 @@ void GanttData::drawTaskBar( QPainter* p, int ty, DateTime start, double minsPP 
   }
 
   // calc end position and draw edges and fill
-  newX = int( ( plan->stretch(m_end.last()) - start ) / minsPP );
+  newX = endX( start, minsPP );
   if ( offset > 0 && newX > tx )
   {
     p->fillRect( tx+1, ty-offset+1, newX-tx-1, offset+offset-1, fill );
@@ -375,5 +381,4 @@ void GanttData::drawTaskBar( QPainter* p, int ty, DateTime start, double minsPP 
     p->drawLine( newX, ty+offset, newX, ty-offset );
   }
   p->drawLine( tx, ty-offset, newX, ty-offset );
-
 }

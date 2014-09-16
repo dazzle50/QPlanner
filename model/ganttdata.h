@@ -44,6 +44,7 @@ public:
   DateTime    end() const;                               // return task gantt start date-time
   int         startX( DateTime, double ) const;          // return task gantt start x coordinate
   int         endX( DateTime, double ) const;            // return task gantt end x coordinate
+  int         x( DateTime, DateTime, double ) const;     // return x-coord for dt given start & minspp
 
   int         height( QPainter* );                                    // max height of task on gantt
   void        drawTask( QPainter*, int, DateTime, double, QString );  // draw task data on gantt
