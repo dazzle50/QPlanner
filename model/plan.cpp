@@ -184,7 +184,7 @@ void  Plan::loadFromStream( QXmlStreamReader* stream, QString file )
           if ( attribute.name() == "calendar" )
           {
             int calId = attribute.value().toString().toInt();
-            if ( calId >= numCalendars() )
+            if ( calId >= numCalendars() || calId < 0 )
               stream->raiseError( QString("Plan invalid calendar '%1'").arg(calId) );
             else
               m_calendar = calendar( calId );

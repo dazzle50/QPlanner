@@ -169,6 +169,9 @@ void MainTabWidget::endEdits()
   ui->resourcesView->endEdit();
   ui->calendarsView->endEdit();
   ui->daysView->endEdit();
+
+  // check whether plan needs update
+  updatePlan();
 }
 
 /*************************************** slotEditDayCell *****************************************/

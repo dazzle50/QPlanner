@@ -236,7 +236,7 @@ void MainWindow::loadDisplayData( QXmlStreamReader* stream )
     {
       if ( stream->name() == "tasks-gantt" )
       {
-        DateTime start, end;
+        DateTime  start, end;
         double    mpp;
 
         m_tabs->getGanttAttributes( start, end, mpp );
@@ -375,14 +375,46 @@ void MainWindow::slotFileNew()
   message( "New plan started" );
   setTitle( plan->filename() );
   m_tabs->slotUpdatePlanTab();
+
+  // set gantt attributes for all the windows
+  DateTime  start = plan->start() - 7*24*60;
+  DateTime  end   = plan->start() + 70*24*60;
+  double    mpp   = 200.0;
+  m_tabs->setGanttAttributes( start, end, mpp );
+  foreach( MainTabWidget* tabs, m_windows )
+    if (tabs) tabs->setGanttAttributes( start, end, mpp );
 }
 
 /****************************************** slotFileOpen *****************************************/
 
 bool MainWindow::slotFileOpen()
 {
-  // slot for file open plan action - get user to select filename and location
+  // slot for file open plan action
   m_tabs->endEdits();
+
+  // if undostack state is not 'clean' ask user what to do
+  if ( !plan->undostack()->isClean() )
+  {
+    bool check = true;
+    while ( check )
+      switch ( QMessageBox::warning( this, "Project Planner",
+          "Do you want to save before opening new?",
+          QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel ) )
+      {
+        case QMessageBox::Save:
+          // if save not successful ask again
+          if ( !slotFileSaveAs() ) break;
+
+        case QMessageBox::Discard:
+          check = false;
+          break;
+
+        default:    // "Cancel"
+          return false;
+      }
+  }
+
+  // get user to select filename and location
   QString filename = QFileDialog::getOpenFileName( this, "Open Plan", plan->fileLocation(),
                                                    "Plans (*.xml)" );
   if ( filename.isEmpty() )
@@ -427,7 +459,7 @@ bool MainWindow::slotFileSaveAs()
 
 void MainWindow::slotFilePrint()
 {
-  // slot for file saveAs plan action
+  // slot for print action
   m_tabs->endEdits();
   qDebug("MainWindow::slotFilePrint() - TODO !!!!");
 }
@@ -436,25 +468,16 @@ void MainWindow::slotFilePrint()
 
 void MainWindow::slotFilePrintPreview()
 {
-  // slot for file saveAs plan action
+  // slot for print preview plan action
   m_tabs->endEdits();
   qDebug("MainWindow::slotFilePrintPreview() - TODO !!!!");
-}
-
-/****************************************** slotFileExit *****************************************/
-
-void MainWindow::slotFileExit()
-{
-  // slot for file saveAs plan action
-  m_tabs->endEdits();
-  qDebug("MainWindow::slotFileExit() - TODO !!!!");
 }
 
 /************************************ slotAboutProjectPlanner ************************************/
 
 void MainWindow::slotAboutProjectPlanner()
 {
-  // slot for file saveAs plan action
+  // slot for about action
   m_tabs->endEdits();
   qDebug("MainWindow::slotAboutProjectPlanner() - TODO !!!!");
 }
@@ -496,6 +519,12 @@ void MainWindow::slotNewWindow()
   tabWidget->setWindowTitle( windowTitle() );
   tabWidget->show();
   m_windows.append( tabWidget );
+
+  // set gantt attributes the same as from main window gantt
+  DateTime  start, end;
+  double    mpp;
+  m_tabs->getGanttAttributes( start, end, mpp );
+  tabWidget->setGanttAttributes( start, end, mpp );
 }
 
 /*************************************** slotViewUndoStack ***************************************/

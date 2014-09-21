@@ -42,7 +42,9 @@ Time XTime::time( QString str )
   // return time from string "hh:mm" format
   int hours = str.left(2).toInt();
   int mins  = str.right(2).toInt();
-  return hours*60 + mins;
+  Time t = hours*60 + mins;
+  if ( t < 0 || t > 1440 ) return XTime::NULL_TIME;
+  return t;
 }
 
 /******************************************* toString ********************************************/

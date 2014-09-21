@@ -65,7 +65,6 @@ public slots:
   bool slotFileSaveAs();                       // slot for file saveAs plan action
   void slotFilePrint();                        // slot for file print action
   void slotFilePrintPreview();                 // slot for file print preview action
-  void slotFileExit();                         // slot for file exit application action
   void slotAboutProjectPlanner();              // slot for about ProjectPlanner action
 
   void slotTaskSelectionChanged( const QItemSelection&,

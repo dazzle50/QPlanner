@@ -99,7 +99,7 @@ Resource::Resource( QXmlStreamReader* stream ) : Resource()
     if ( attribute.name() == "calendar" )
     {
       int calId = attribute.value().toString().toInt();
-      if ( calId >= plan->numCalendars() )
+      if ( calId >= plan->numCalendars() || calId < 0 )
         stream->raiseError( QString("Resource invalid calendar '%1'").arg(calId) );
       else
         m_calendar = plan->calendar( calId );
