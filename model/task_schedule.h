@@ -77,9 +77,26 @@ void  Task::schedule_ASAP_FDUR()
 {
   qDebug("Task::schedule_ASAP_FDUR() STARTING !!! %i %s",plan->index(this),qPrintable(m_title));
 
-  // schedule ASAP Fixed DURation task
-  m_start = scheduleStart();
-  m_end   = scheduleEnd_ASAP_FDUR();
+  // IF HAS TO FINISH PRED(S) DO SOMETHING DIFFERENT TO IF HAS TO START PRED(S)
+  if ( m_predecessors.hasToStart() )
+  {
+    // schedule ASAP Fixed DURation task
+    m_start = scheduleStart();
+    m_end   = scheduleEnd_ASAP_FDUR();
+  }
+  else if ( m_predecessors.hasToFinish() )
+  {
+    qDebug("How to handle to-finish ?????");
+    m_end   = scheduleEnd();
+    m_start = scheduleStart_ASAP_FDUR();
+  }
+  else
+  {
+    // no predecessors therefore
+    m_start = plan->start();
+    m_end   = scheduleEnd_ASAP_FDUR();
+  }
+
 /*
   // register resource employment for each assigned resources
   QHash<Resource*, float>::iterator i;
@@ -166,6 +183,41 @@ DateTime  Task::scheduleEnd_ASAP_FDUR() const
   if ( end < m_start ) return m_start;
 
   return end;
+}
+
+/****************************************** scheduleEnd ******************************************/
+
+DateTime  Task::scheduleEnd() const
+{
+  // get end based on this task's predecessors
+  DateTime  end = plan->calendar()->workDown( m_predecessors.end() );
+
+  // if indented also check end against summary(s) predecessors
+  int index = plan->index( (Task*)this );
+  for( int indent = m_indent ; indent > 0 ; indent-- )
+  {
+    // find task summary
+    while ( plan->task(index)->isNull() ||
+            plan->task(index)->indent() >= indent ) index--;
+
+    // if end from summary predecessors is later, use it instead
+    DateTime summaryEnd = plan->calendar()->workDown( plan->task(index)->predecessors().end() );
+    if ( summaryEnd < end ) end = summaryEnd;
+  }
+
+  return end;
+}
+
+/************************************ scheduleStart_ASAP_FDUR ************************************/
+
+DateTime  Task::scheduleStart_ASAP_FDUR() const
+{
+  // determine start of fixed duration task using plan calendar
+  DateTime start = plan->calendar()->addTimeSpan( m_end, TimeSpan( -m_duration.number(), m_duration.units() ) );
+  start = plan->calendar()->workUp( start );
+  if ( start > m_end ) return m_end;
+
+  return start;
 }
 
 #endif // TASK_SCHEDULE_H

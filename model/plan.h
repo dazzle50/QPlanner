@@ -102,8 +102,6 @@ public:
                      { m_calendar = calendar(c); }                  // set plan default calendar
   void             setNotes( QString n ) { m_notes = n; }           // set notes text
 
-  void             emitPlanUpdated()
-                     { emit signalPlanUpdated(); }                  // emit signalPlanUpdated
   bool             stretchTasks;                                    // flag if gantt task bars stretched to use full 24h day
   DateTime         stretch( DateTime dt );                          // return date-time stretched if necessary
 

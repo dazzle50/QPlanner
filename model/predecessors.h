@@ -43,7 +43,10 @@ public:
   QString         clean( int );                      // remove forbidden and then return string
   bool            hasPredecessor( Task* ) const;     // return true if task is a predecessor
   bool            areOK( int ) const;                // return true if no forbidden predecessors
+  bool            hasToStart() const;                // return true has FS or SS predecessor
+  bool            hasToFinish() const;               // return true has FF or SF predecessor
   DateTime        start() const;                     // return task start based on predecessors
+  DateTime        end() const;                       // return task end based on predecessors
 
   static QString  validate( const QString&, int );   // return any validation failures
 

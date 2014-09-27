@@ -190,8 +190,8 @@ DateTime XDateTime::currentDateTime()
 
 DateTime XDateTime::fromString( QString str )
 {
-  // return DateTime from yyyy-MM-ddThh:mm:ss string
-  QDateTime qdt = QDateTime::fromString( str, "yyyy-MM-ddThh:mm:ss" );
+  // return DateTime from yyyy-MM-ddThh:mm string
+  QDateTime qdt = QDateTime::fromString( str.left(16) , "yyyy-MM-ddThh:mm" );
   qdt.setTimeSpec( Qt::UTC );
   return XDateTime::datetime( qdt );
 }

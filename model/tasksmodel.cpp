@@ -181,6 +181,7 @@ void TasksModel::schedule()
   // now scheduling has completed update both tasks table view and gantt view
   emit dataChanged( QAbstractTableModel::index( 0, 0 ), QAbstractTableModel::index( rowCount(), columnCount() ) );
   emit ganttChanged();
+  plan->signalPlanUpdated();
 }
 
 /***************************************** planBeginning *****************************************/
@@ -318,6 +319,15 @@ void TasksModel::emitDataChangedRow( int row )
   // emit data changed signal for row
   emit dataChanged( QAbstractTableModel::index( row, 0 ),
                     QAbstractTableModel::index( row, columnCount() ) );
+}
+
+/************************************* emitDataChangedColumn *************************************/
+
+void TasksModel::emitDataChangedColumn( int col )
+{
+  // emit data changed signal for column
+  emit dataChanged( QAbstractTableModel::index( 0, col ),
+                    QAbstractTableModel::index( rowCount(), col ) );
 }
 
 /***************************************** setSummaries ******************************************/

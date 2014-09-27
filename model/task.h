@@ -53,6 +53,7 @@ public:
   TimeSpan          duration() const;                             // return task (or summary) duration
   float             work() const;                                 // return task (or summary) work (in days)
   int               priority() const { return m_priority; }       // return task priority
+  DateTime          deadline() const { return m_deadline; }       // return task deadline (often null)
   GanttData*        ganttData() { return &m_gantt; }              // return pointer to gantt data
 
   static QVariant   headerData( int );                            // return column header data
@@ -66,6 +67,7 @@ public:
 
   bool              isExpanded() const { return m_expanded; }     // if summary is it expanded to show subtasks
   bool              isSummary() const { return m_summaryEnd >= 0; }    // is this task a summary
+  bool              isMilestone() const { return start() == end(); }   // is this a milestone
   int               summaryEnd() const { return m_summaryEnd; }   // return summary last sub-task id, or -1 if not summary
   void              setNotSummary() { m_summaryEnd = -1; }        // set task to non-summary
   void              setSummaryEnd( int s ) { m_summaryEnd = s; }  // set summary last sub-task id
@@ -84,6 +86,8 @@ public:
   void              schedule_ASAP_FDUR();                         // schedule ASAP fixed duration
   DateTime          scheduleStart() const;                        // determine start based on predecessors
   DateTime          scheduleEnd_ASAP_FDUR() const;                // determine end based on duration
+  DateTime          scheduleEnd() const;                          // determine end based on predecessors
+  DateTime          scheduleStart_ASAP_FDUR() const;              // determine start based on duration
 
   static QString    typeToString( int );                          // return type string equivalent
 

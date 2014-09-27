@@ -71,7 +71,7 @@ public:
     if ( m_cal_new   != m_cal_old   ) plan->setCalendar( m_cal_new );
     if ( m_dtf_new   != m_dtf_old   ) plan->setDatetimeFormat( m_dtf_new );
     if ( m_notes_new != m_notes_old ) plan->setNotes( m_notes_new );
-    plan->emitPlanUpdated();
+    plan->signalPlanUpdated();
 
     // if default calendar or start changed, need to re-schedule
     if ( m_cal_new   != m_cal_old   ||
@@ -86,7 +86,7 @@ public:
     if ( m_cal_new   != m_cal_old   ) plan->setCalendar( m_cal_old );
     if ( m_dtf_new   != m_dtf_old   ) plan->setDatetimeFormat( m_dtf_old );
     if ( m_notes_new != m_notes_old ) plan->setNotes( m_notes_old );
-    plan->emitPlanUpdated();
+    plan->signalPlanUpdated();
 
     // if default calendar or start changed, need to re-schedule
     if ( m_cal_new   != m_cal_old   ||

@@ -52,11 +52,15 @@ public:
   void  redo()
   {
     // update resource with new value
+    bool wasNull = plan->resource( m_row )->isNull();
     plan->resource( m_row )->setData( m_column, m_new_value );
 
     // ensure table row is refreshed, and plan re-scheduled if needed
     plan->resources()->emitDataChangedRow( m_row );
     if ( m_column != Resource::SECTION_COMMENT ) plan->schedule();
+
+    // update plan tab to reflect increase in number of resources
+    if ( wasNull ) plan->signalPlanUpdated();
   }
 
   void  undo()
@@ -67,6 +71,9 @@ public:
     // ensure table row is refreshed, and plan re-scheduled if needed
     plan->resources()->emitDataChangedRow( m_row );
     if ( m_column != Resource::SECTION_COMMENT ) plan->schedule();
+
+    // update plan tab to reflect decrease in number of resources
+    if ( plan->resource( m_row )->isNull() ) plan->signalPlanUpdated();
   }
 
 private:

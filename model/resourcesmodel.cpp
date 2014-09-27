@@ -212,6 +212,9 @@ void ResourcesModel::slotCalendarNameChange()
   // slot to receive calendar name changed signal, update Calendar column
   emit dataChanged( QAbstractTableModel::index( 0, Resource::SECTION_CALENDAR ),
                     QAbstractTableModel::index( rowCount(), Resource::SECTION_CALENDAR ) );
+
+  // also signal plan updated to ensure plan tab is also up-to-date
+  plan->signalPlanUpdated();
 }
 
 /************************************** emitDataChangedRow ***************************************/

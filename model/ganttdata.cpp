@@ -177,9 +177,23 @@ void GanttData::drawDependencyFS( QPainter* p, int thisY, int otherY, int num,
   int  sign   = thisY > otherY ? 1 : -1;
   int  h      = height( p );
 
+  // if other is milestone adjust for size, using same size formula as used in drawMilestone
+  if ( plan->task(num)->isMilestone() )
+  {
+    int size = 1 + h / 3;
+    otherX += size - 1 ;
+  }
+
+  // if this is milestone adjust for size, using same size formula as used in drawMilestone
+  if ( m_value.isEmpty() )
+  {
+    int size = 1 + h / 3;
+    thisX -= size - 1 ;
+  }
+
   p->setPen( Qt::darkGray );
 
-  if ( thisX == otherX || thisX == otherX+1 )
+  if ( thisX == otherX || thisX == otherX+1 || thisX == otherX+2 )
   {
     p->drawLine( otherX+1, otherY,      otherX+2, otherY );
     p->drawLine( otherX+3, otherY+sign, otherX+3, thisY-sign*(h/2+2) );
@@ -238,7 +252,7 @@ void GanttData::drawDependencySF( QPainter* p, int thisY, int otherY, int num,
   }
 }
 
-/**************************************** drawDependencyFS ***************************************/
+/**************************************** drawDependencySS ***************************************/
 
 void GanttData::drawDependencySS( QPainter* p, int thisY, int otherY, int num,
                                   DateTime start, double minsPP )
@@ -250,7 +264,7 @@ void GanttData::drawDependencySS( QPainter* p, int thisY, int otherY, int num,
   Q_UNUSED(minsPP)
 }
 
-/**************************************** drawDependencyFS ***************************************/
+/**************************************** drawDependencyFF ***************************************/
 
 void GanttData::drawDependencyFF( QPainter* p, int thisY, int otherY, int num,
                                   DateTime start, double minsPP )

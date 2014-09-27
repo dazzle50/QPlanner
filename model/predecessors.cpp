@@ -171,6 +171,34 @@ bool Predecessors::areOK( int thisTaskNum ) const
   return true;
 }
 
+/******************************************* hasToStart ******************************************/
+
+bool Predecessors::hasToStart() const
+{
+  // return true has Finish-To-Start or Start-to-Start predecessor
+  foreach( Predecessor pred, m_preds )
+  {
+    if ( pred.type == TYPE_FINISH_START ) return true;
+    if ( pred.type == TYPE_START_START )  return true;
+  }
+
+  return false;
+}
+
+/****************************************** hasToFinish ******************************************/
+
+bool Predecessors::hasToFinish() const
+{
+  // return true has Finish-To-Finish or Start-to-Finish predecessor
+  foreach( Predecessor pred, m_preds )
+  {
+    if ( pred.type == TYPE_FINISH_FINISH ) return true;
+    if ( pred.type == TYPE_START_FINISH )  return true;
+  }
+
+  return false;
+}
+
 /******************************************** validate *******************************************/
 
 QString Predecessors::validate( const QString& text, int thisTaskNum )
@@ -281,4 +309,28 @@ DateTime  Predecessors::start() const
   }
 
   return start;
+}
+
+/********************************************** end **********************************************/
+
+DateTime  Predecessors::end() const
+{
+  // return task end based on predecessors
+  DateTime  end = XDateTime::MAX_DATETIME;
+  foreach( Predecessor pred, m_preds )
+  {
+    if ( pred.type == TYPE_FINISH_FINISH )
+    {
+      DateTime check = plan->calendar()->addTimeSpan( pred.task->end(), pred.lag );
+      if ( check < end ) end = check;
+    }
+
+    if ( pred.type == TYPE_START_FINISH )
+    {
+      DateTime check = plan->calendar()->addTimeSpan( pred.task->start(), pred.lag );
+      if ( check < end ) end = check;
+    }
+  }
+
+  return end;
 }

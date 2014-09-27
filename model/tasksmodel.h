@@ -53,6 +53,7 @@ public:
   int            index( Task* t ) { return m_tasks.indexOf(t); }  // return index of task, or -1
 
   void           emitDataChangedRow( int );                       // emit data changed signal for row
+  void           emitDataChangedColumn( int );                    // emit data changed signal for column
   bool           canIndent( int );                                // return true if task can be indented
   bool           canOutdent( int );                               // return true if task can be outdented
   bool           indentRows( QSet<int> );                         // indent selected rows

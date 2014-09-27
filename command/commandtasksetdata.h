@@ -52,6 +52,7 @@ public:
   void  redo()
   {
     // update task with new value
+    bool wasNull = plan->task( m_row )->isNull();
     plan->task( m_row )->setData( m_column, m_value );
 
     // ensure table row is refreshed, and plan re-scheduled if needed
@@ -59,6 +60,9 @@ public:
     if ( m_column != Task::SECTION_TITLE &&
          m_column != Task::SECTION_COMMENT &&
          m_column != Task::SECTION_DEADLINE ) plan->schedule();
+
+    // update plan tab to reflect increase in number of tasks
+    if ( wasNull ) plan->signalPlanUpdated();
   }
 
   void  undo()
@@ -71,6 +75,13 @@ public:
     if ( m_column != Task::SECTION_TITLE &&
          m_column != Task::SECTION_COMMENT &&
          m_column != Task::SECTION_DEADLINE ) plan->schedule();
+
+    // update plan tab to reflect decrease in number of tasks & re-schedule
+    if ( plan->task( m_row )->isNull() )
+    {
+      plan->signalPlanUpdated();
+      plan->schedule();
+    }
   }
 
 private:

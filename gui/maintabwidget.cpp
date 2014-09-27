@@ -276,8 +276,8 @@ void MainTabWidget::saveTasksGanttToStream( QXmlStreamWriter* stream )
   // write tasks-gantt data to xml stream
   stream->writeStartElement( "tasks-gantt" );
 
-  stream->writeAttribute( "start", XDateTime::toString( ui->ganttView->start(), "yyyy-MM-ddThh:mm:ss" ) );
-  stream->writeAttribute( "end", XDateTime::toString( ui->ganttView->end(), "yyyy-MM-ddThh:mm:ss" ) );
+  stream->writeAttribute( "start", XDateTime::toString( ui->ganttView->start(), "yyyy-MM-ddThh:mm" ) );
+  stream->writeAttribute( "end", XDateTime::toString( ui->ganttView->end(), "yyyy-MM-ddThh:mm" ) );
   stream->writeAttribute( "minspp", QString("%1").arg( ui->ganttView->minsPP() ) );
   stream->writeAttribute( "nonworking", "TODO" );
   stream->writeAttribute( "current", "TODO" );
@@ -432,6 +432,11 @@ void MainTabWidget::slotUpdatePlanTab()
   ui->numDays->setText( QString(": %1").arg( plan->numDays() ) );
 
   ui->notesEdit->setPlainText( plan->notes() );
+
+  // also update tasks table start/end/deadline columns in case datetimeFormat changed
+  plan->tasks()->emitDataChangedColumn( Task::SECTION_START );
+  plan->tasks()->emitDataChangedColumn( Task::SECTION_END );
+  plan->tasks()->emitDataChangedColumn( Task::SECTION_DEADLINE );
 }
 
 /************************************** tasksSelectionModel **************************************/

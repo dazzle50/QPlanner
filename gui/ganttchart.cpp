@@ -256,15 +256,25 @@ void GanttChart::drawTasks( QPainter* p, int y, int h )
   if ( first < 0 ) first = 0;
   if ( last  < 0 ) last  = plan->tasks()->rowCount() - 1;
 
-  Q_UNUSED( p );
-  // for each non-null row draw the gantt task
+  // pen for deadline
+  QPen  pen = QPen( Qt::darkGreen );
+  pen.setWidth( 2 );
+
+  // for each non-null row draw the gantt task & deadline
   for( int row=first ; row<=last ; row++ )
   {
-    if ( plan->task(row)->isNull() ) continue;
+    Task*  task = plan->task(row);
+    if ( task->isNull() ) continue;
+    int y = m_table->rowViewportPosition(row) + ( m_table->rowHeight(row) / 2 );
+    task->ganttData()->drawTask( p, y, m_start, m_minsPP,
+                                 plan->task(row)->dataDisplayRole( Task::SECTION_RES ).toString() );
 
-    plan->task(row)->ganttData()->drawTask( p, m_table->rowViewportPosition(row) + ( m_table->rowHeight(row) / 2 ),
-                                            m_start, m_minsPP,
-                                            plan->task(row)->dataDisplayRole( Task::SECTION_RES ).toString() );
+    if ( task->deadline() == XDateTime::NULL_DATETIME ) continue;
+    int x = task->ganttData()->x( task->deadline(), m_start, m_minsPP );
+    p->setPen( pen );
+    p->drawLine( x, y-4, x, y+4 );
+    p->drawLine( x-4, y, x, y+4 );
+    p->drawLine( x+4, y, x, y+4 );
   }
 }
 

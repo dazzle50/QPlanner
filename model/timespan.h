@@ -51,7 +51,7 @@ public:
     // initialise default invalid time-span
     m_units = UNIT_INVALID;
     m_num   = 0.0;
-  };
+  }
 
 /****************************************** constructor ******************************************/
 
@@ -60,7 +60,7 @@ public:
     // construct time-span from number and units
     m_units = units;
     m_num   = num;
-  };
+  }
 
 /****************************************** constructor ******************************************/
 
@@ -102,9 +102,9 @@ public:
     return QString("%1 %2").arg( m_num ).arg( m_units );
   }
 
-  bool       isValid() { return ( m_units != UNIT_INVALID ); }
-  float      number() { return m_num; }
-  char       units()  { return m_units; }
+  bool       isValid() const { return ( m_units != UNIT_INVALID ); }
+  float      number() const  { return m_num; }
+  char       units() const   { return m_units; }
 
 private:
   float      m_num;        // number of units time quantity

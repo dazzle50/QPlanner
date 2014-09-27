@@ -322,7 +322,7 @@ Time Day::workUp( Time t )
   for( int p=0 ; p<m_periods ; p++ )
   {
     if ( t <= m_start.at(p) ) return m_start.at(p);
-    if ( t >= m_start.at(p) && t < m_end.at(p) ) return t;
+    if ( t <  m_end.at(p)   ) return t;
   }
   return XTime::NULL_TIME;
 }
@@ -334,8 +334,8 @@ Time Day::workDown( Time t )
   // return time now or past when working or NULL time
   for( int p=m_periods-1 ; p>=0 ; p-- )
   {
-    if ( t >= m_end.at(p) ) return m_end.at(p);
-    if ( t >= m_start.at(p) && t < m_end.at(p) ) return t;
+    if ( t >= m_end.at(p)   ) return m_end.at(p);
+    if ( t >  m_start.at(p) ) return t;
   }
   return XTime::NULL_TIME;
 }
@@ -367,7 +367,7 @@ int Day::minsDone( Time t )
   for( int p=0 ; p<m_periods ; p++ )
   {
     if ( t <= m_start.at(p) ) return done;
-    if ( t >= m_start.at(p) && t <= m_end.at(p) ) return done + m_end.at(p) - t;
+    if ( t >= m_start.at(p) && t <= m_end.at(p) ) return done + t - m_start.at(p);
     done += m_end.at(p) - m_start.at(p);
   }
   return done;

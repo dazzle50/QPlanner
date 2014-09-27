@@ -109,6 +109,9 @@ Task::Task( QXmlStreamReader* stream ) : Task()
     if ( attribute.name() == "priority" )
       m_priority = attribute.value().toString().toInt() * 1e6;
 
+    if ( attribute.name() == "deadline" )
+      m_deadline = XDateTime::fromString( attribute.value().toString() );
+
     if ( attribute.name() == "cost" )
       m_cost = attribute.value().toString().toFloat();
 
@@ -126,12 +129,13 @@ void  Task::saveToStream( QXmlStreamWriter* stream )
   stream->writeAttribute( "expanded", QString("%1").arg(m_expanded) );
   stream->writeAttribute( "title", m_title );
   stream->writeAttribute( "duration", m_duration.toString() );
-  stream->writeAttribute( "start", XDateTime::toString( m_start, "yyyy-MM-ddThh:mm:ss" ) );
-  stream->writeAttribute( "end", XDateTime::toString( m_end, "yyyy-MM-ddThh:mm:ss" ) );
+  stream->writeAttribute( "start", XDateTime::toString( m_start, "yyyy-MM-ddThh:mm" ) );
+  stream->writeAttribute( "end", XDateTime::toString( m_end, "yyyy-MM-ddThh:mm" ) );
   stream->writeAttribute( "work", m_work.toString() );
   stream->writeAttribute( "resources", m_resources.toString() );
   stream->writeAttribute( "type", QString("%1").arg(int(m_type)) );
   stream->writeAttribute( "priority", QString("%1").arg(m_priority/1e6) );
+  stream->writeAttribute( "deadline", XDateTime::toString( m_deadline, "yyyy-MM-ddThh:mm" ) );
   stream->writeAttribute( "cost", "TODO" );
   stream->writeAttribute( "comment", m_comment );
 }
