@@ -96,6 +96,11 @@ public:
 
 /******************************************** methods ********************************************/
 
+  TimeSpan   operator-() const
+  {
+    return TimeSpan( -m_num, m_units );
+  }
+
   QString    toString() const
   {
     if ( m_units == UNIT_INVALID ) return "-";

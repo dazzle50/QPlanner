@@ -47,7 +47,7 @@ public:
   void          saveToStream( QXmlStreamWriter* );             // write calendar data to xml stream
   QString       name() const { return m_name; }                // return calendar name
   int           cycleLength() const { return m_cycleLength; }  // return calendar cycle length
-  bool          isWorking( Date ) const;
+  bool          isWorking( Date ) const;                       // return true if has work periods
 
   Day*          day( Date ) const;                             // return day type for given date
   DateTime      workUp( DateTime ) const;                      // return date-time now or future when working

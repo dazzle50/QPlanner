@@ -75,27 +75,47 @@ void  Task::schedule()
 
 void  Task::schedule_ASAP_FDUR()
 {
-  qDebug("Task::schedule_ASAP_FDUR() STARTING !!! %i %s",plan->index(this),qPrintable(m_title));
+  // depending on predecessors determine task start & end
+  bool hasToStart  = m_predecessors.hasToStart();
+  bool hasToFinish = m_predecessors.hasToFinish();
 
-  // IF HAS TO FINISH PRED(S) DO SOMETHING DIFFERENT TO IF HAS TO START PRED(S)
-  if ( m_predecessors.hasToStart() )
+  // if this task doesn't have predecessors, does a summary?
+  if ( !hasToStart && !hasToFinish )
   {
-    // schedule ASAP Fixed DURation task
-    m_start = scheduleStart();
-    m_end   = scheduleEnd_ASAP_FDUR();
+    int index = plan->index( (Task*)this );
+    for( int indent = m_indent ; indent > 0 ; indent-- )
+    {
+      // find task summary
+      while ( plan->task(index)->isNull() ||
+              plan->task(index)->indent() >= indent ) index--;
+
+      hasToStart  = plan->task(index)->predecessors().hasToStart();
+      if ( hasToStart ) break;
+      hasToFinish = plan->task(index)->predecessors().hasToFinish();
+      if ( hasToFinish ) break;
+    }
   }
-  else if ( m_predecessors.hasToFinish() )
+
+  Calendar*  planCal = plan->calendar();
+  if ( hasToStart )
   {
-    qDebug("How to handle to-finish ?????");
-    m_end   = scheduleEnd();
-    m_start = scheduleStart_ASAP_FDUR();
+    m_start = planCal->workUp( startDueToPredecessors() );
+    m_end   = planCal->workDown( planCal->addTimeSpan( m_start, m_duration ) );
+  }
+  else if ( hasToFinish )
+  {
+    m_end   = planCal->workDown( endDueToPredecessors() );
+    m_start = planCal->workUp( planCal->addTimeSpan( m_end, -m_duration ) );
   }
   else
   {
-    // no predecessors therefore
-    m_start = plan->start();
-    m_end   = scheduleEnd_ASAP_FDUR();
+    m_start = planCal->workUp( plan->start() );
+    m_end   = planCal->workDown( planCal->addTimeSpan( m_start, m_duration ) );
+    if ( m_end > XDateTime::MAX_DATETIME ) m_end = XDateTime::MIN_DATETIME;
   }
+
+  // ensure end is always greater or equal to start
+  if ( m_end < m_start ) m_end = m_start;
 
 /*
   // register resource employment for each assigned resources
@@ -147,12 +167,12 @@ void  Task::schedule_ASAP_FDUR()
          qPrintable(m_title), qPrintable(XDateTime::toString(m_start)), qPrintable(XDateTime::toString(m_end)) );
 }
 
-/***************************************** scheduleStart *****************************************/
+/************************************ startDueToPredecessors *************************************/
 
-DateTime  Task::scheduleStart() const
+DateTime  Task::startDueToPredecessors() const
 {
   // get start based on this task's predecessors
-  DateTime  start = plan->calendar()->workUp( m_predecessors.start() );
+  DateTime  start = m_predecessors.start();
 
   // if indented also check start against summary(s) predecessors
   int index = plan->index( (Task*)this );
@@ -163,34 +183,19 @@ DateTime  Task::scheduleStart() const
             plan->task(index)->indent() >= indent ) index--;
 
     // if start from summary predecessors is later, use it instead
-    DateTime summaryStart = plan->calendar()->workUp( plan->task(index)->predecessors().start() );
+    DateTime summaryStart = plan->task(index)->predecessors().start();
     if ( summaryStart > start ) start = summaryStart;
   }
-
-  // if not set by predecessors, task start is plan start
-  if ( start <= plan->calendar()->workUp( XDateTime::MIN_DATETIME ) ) return plan->start();
 
   return start;
 }
 
-/************************************* scheduleEnd_ASAP_FDUR *************************************/
+/************************************* endDueToPredecessors **************************************/
 
-DateTime  Task::scheduleEnd_ASAP_FDUR() const
-{
-  // determine end of fixed duration task using plan calendar
-  DateTime end = plan->calendar()->addTimeSpan( m_start, m_duration );
-  end = plan->calendar()->workDown( end );
-  if ( end < m_start ) return m_start;
-
-  return end;
-}
-
-/****************************************** scheduleEnd ******************************************/
-
-DateTime  Task::scheduleEnd() const
+DateTime  Task::endDueToPredecessors() const
 {
   // get end based on this task's predecessors
-  DateTime  end = plan->calendar()->workDown( m_predecessors.end() );
+  DateTime  end = m_predecessors.end();
 
   // if indented also check end against summary(s) predecessors
   int index = plan->index( (Task*)this );
@@ -201,23 +206,11 @@ DateTime  Task::scheduleEnd() const
             plan->task(index)->indent() >= indent ) index--;
 
     // if end from summary predecessors is later, use it instead
-    DateTime summaryEnd = plan->calendar()->workDown( plan->task(index)->predecessors().end() );
+    DateTime summaryEnd = plan->task(index)->predecessors().end();
     if ( summaryEnd < end ) end = summaryEnd;
   }
 
   return end;
-}
-
-/************************************ scheduleStart_ASAP_FDUR ************************************/
-
-DateTime  Task::scheduleStart_ASAP_FDUR() const
-{
-  // determine start of fixed duration task using plan calendar
-  DateTime start = plan->calendar()->addTimeSpan( m_end, TimeSpan( -m_duration.number(), m_duration.units() ) );
-  start = plan->calendar()->workUp( start );
-  if ( start > m_end ) return m_end;
-
-  return start;
 }
 
 #endif // TASK_SCHEDULE_H

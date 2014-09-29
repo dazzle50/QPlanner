@@ -397,7 +397,7 @@ DateTime  Calendar::addTimeSpan( DateTime start, TimeSpan ts )
 
   // return date-time moved by TimeSpan
   if ( ts.units() == TimeSpan::UNIT_MINUTES ) return addMinutes( start, ts.number() );
-  if ( ts.units() == TimeSpan::UNIT_HOURS )   return addMinutes( start, ts.number()*60.0 );
+  if ( ts.units() == TimeSpan::UNIT_HOURS )   return addMinutes( start, ts.number()*60.0f );
   if ( ts.units() == TimeSpan::UNIT_DAYS )    return addDays(    start, ts.number() );
   if ( ts.units() == TimeSpan::UNIT_WEEKS )   return addWeeks(   start, ts.number() );
   if ( ts.units() == TimeSpan::UNIT_MONTHS )  return addMonths(  start, ts.number() );
@@ -451,7 +451,7 @@ DateTime  Calendar::addMinutes( DateTime start, int mins )
     if ( done >  mins ) return date*1440u + today->doMins( today->start(), done - mins );
 
     // done was insufficient so move to previous day
-    date++;
+    date--;
     mins -= done;
 
     // repeat forever until no need to move to previous day

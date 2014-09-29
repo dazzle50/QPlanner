@@ -159,7 +159,7 @@ void  GanttView::slotZoomFit()
   }
 
   // add margins to start and end
-  qint64 margin = 1 + ( end - start ) / 16;
+  DateTime  margin = 1 + ( end - start ) / 16;
   setStart( start - margin );
   setEnd( end + margin );
 
@@ -192,6 +192,7 @@ int GanttView::scaleHeight()
 void GanttView::setStart( DateTime start )
 {
   // set gantt start date-time
+  if ( start > XDateTime::MAX_DATETIME ) start = XDateTime::MIN_DATETIME;
   m_start = start;
   m_upperScale->setStart( m_start );
   m_lowerScale->setStart( m_start );

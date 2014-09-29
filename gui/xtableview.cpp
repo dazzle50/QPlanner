@@ -55,6 +55,10 @@ XTableView::XTableView( QWidget* parent ) : QTableView( parent )
   int height = fontMetrics().lineSpacing() + 4;
   verticalHeader()->setDefaultSectionSize( height );
   verticalHeader()->setMinimumSectionSize( height );
+
+  // enable smooth scrolling
+  setVerticalScrollMode( ScrollMode::ScrollPerPixel );
+  setHorizontalScrollMode( ScrollMode::ScrollPerPixel );
 }
 
 /**************************************** setHeaderHeight ****************************************/

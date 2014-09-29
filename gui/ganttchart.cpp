@@ -293,6 +293,7 @@ void GanttChart::shadeNonWorkingDays( QPainter* p, int x, int y, int w, int h )
 
   // setup internal variable
   Date  dateStart = ( m_start + int( m_minsPP * (x-1) ) ) / 1440u;
+  if ( dateStart > XDate::MAX_DATE ) dateStart = XDate::MIN_DATE;
   Date  dateEnd   = ( m_start + int( m_minsPP * (x+w) ) ) / 1440u;
   int    xs = -1, xe;
   QBrush brush( QColor("#F5F5F5") );

@@ -45,8 +45,9 @@ public:
   int         startX( DateTime, double ) const;          // return task gantt start x coordinate
   int         endX( DateTime, double ) const;            // return task gantt end x coordinate
   int         x( DateTime, DateTime, double ) const;     // return x-coord for dt given start & minspp
+  int         taskBarHeight( QPainter* ) const;          // max height of task on gantt
+  int         milestoneHeight( QPainter* ) const;        // max height of milestones on gantt
 
-  int         height( QPainter* );                                    // max height of task on gantt
   void        drawTask( QPainter*, int, DateTime, double, QString );  // draw task data on gantt
   void        drawTaskBar( QPainter*, int, DateTime, double );        // draw task bar on gantt
   void        drawMilestone( QPainter*, int, DateTime, double );      // draw milestone on gantt

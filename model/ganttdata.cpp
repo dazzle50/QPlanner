@@ -117,15 +117,23 @@ int GanttData::x( DateTime dt, DateTime start, double minsPP ) const
   return ( start - stretch ) / -minsPP;
 }
 
-/********************************************* height ********************************************/
+/***************************************** taskBarHeight *****************************************/
 
-int GanttData::height( QPainter* p )
+int GanttData::taskBarHeight( QPainter* p ) const
 {
   // return max height of task on gantt
   return p->fontMetrics().lineSpacing() * 4 / 5;
 }
 
-/***************************************** verticalArrow ******************************************/
+/**************************************** milestoneHeight ****************************************/
+
+int GanttData::milestoneHeight( QPainter* p ) const
+{
+  // return max height of milestone on gantt
+  return taskBarHeight( p );
+}
+
+/***************************************** verticalArrow *****************************************/
 
 void GanttData::verticalArrow( QPainter* p, int x, int y, int size )
 {
@@ -150,16 +158,8 @@ void GanttData::horizontalArrow( QPainter* p, int x, int y, int size )
   QPoint points[3];
 
   points[0] = QPoint( x, y );
-  if ( size > 0 )
-  {
-    points[1] = QPoint( x-size, y-size+1 );
-    points[2] = QPoint( x-size, y+size );
-  }
-  else
-  {
-    points[1] = QPoint( x-size, y-size );
-    points[2] = QPoint( x-size, y+size+1 );
-  }
+  points[1] = QPoint( x-size, y-size+1 );
+  points[2] = QPoint( x-size, y+size );
 
   p->setPen( Qt::NoPen );
   p->setBrush( Qt::darkGray );
@@ -174,45 +174,35 @@ void GanttData::drawDependencyFS( QPainter* p, int thisY, int otherY, int num,
   // draw dependency FINISH_START line on gantt
   int  otherX = plan->task(num)->ganttData()->endX( start, minsPP );
   int  thisX  = startX( start, minsPP );
-  int  sign   = thisY > otherY ? 1 : -1;
-  int  h      = height( p );
+  int  signY  = thisY > otherY ? 1 : -1;
+  int  mileX  = milestoneHeight( p ) / 2;
+  int  arrow  = 4 * mileX / 5;
+  int  taskY  = signY*( taskBarHeight( p ) / 2 + arrow );
 
-  // if other is milestone adjust for size, using same size formula as used in drawMilestone
-  if ( plan->task(num)->isMilestone() )
-  {
-    int size = 1 + h / 3;
-    otherX += size - 1 ;
-  }
+  // if other task is milestone adjust for milestone size
+  if ( plan->task(num)->isMilestone() ) otherX += mileX;
 
-  // if this is milestone adjust for size, using same size formula as used in drawMilestone
-  if ( m_value.isEmpty() )
-  {
-    int size = 1 + h / 3;
-    thisX -= size - 1 ;
-  }
+  int  lineX  = thisX > otherX+3 ? thisX : otherX+3;
 
   p->setPen( Qt::darkGray );
 
-  if ( thisX == otherX || thisX == otherX+1 || thisX == otherX+2 )
+  if ( thisX >= otherX )
   {
-    p->drawLine( otherX+1, otherY,      otherX+2, otherY );
-    p->drawLine( otherX+3, otherY+sign, otherX+3, thisY-sign*(h/2+2) );
-    verticalArrow( p, otherX+3, thisY-sign*h/2, (sign*h*2)/5 );
-  }
-  else if ( thisX > otherX )
-  {
-    p->drawLine( otherX+1, otherY,      thisX-1, otherY );
-    p->drawLine( thisX,    otherY+sign, thisX,   thisY-sign*(h/2+2) );
-    verticalArrow( p, thisX, thisY-sign*h/2, (sign*h*2)/5 );
+    p->drawLine( otherX+1, otherY      , lineX-1, otherY );
+    p->drawLine( lineX   , otherY+signY, lineX  , thisY-taskY );
+    verticalArrow( p, lineX, thisY-taskY+signY*arrow, signY*arrow );
   }
   else // if ( thisX < otherX )
   {
+    // if this task is milestone adjust for milestone size
+    if ( m_value.isEmpty() ) thisX -= mileX;
+
     p->drawLine( otherX+1, otherY,      otherX+2, otherY );
-    p->drawLine( otherX+3, otherY+sign, otherX+3, otherY+sign*(h/2+2) );
-    p->drawLine( otherX+2, otherY+sign*(h/2+3), thisX-6, otherY+sign*(h/2+3));
-    p->drawLine( thisX-7, otherY+sign*(h/2+4), thisX-7, thisY-sign );
+    p->drawLine( otherX+3, otherY+signY, otherX+3, otherY+taskY-signY );
+    p->drawLine( otherX+2, otherY+taskY, thisX-6, otherY+taskY );
+    p->drawLine( thisX-7, otherY+taskY+signY, thisX-7, thisY-signY );
     p->drawLine( thisX-6, thisY, thisX-2, thisY );
-    horizontalArrow( p, thisX, thisY, (h*2)/5 );
+    horizontalArrow( p, thisX, thisY, arrow );
   }
 }
 
@@ -224,31 +214,35 @@ void GanttData::drawDependencySF( QPainter* p, int thisY, int otherY, int num,
   // draw dependency START_FINISH line on gantt
   int  otherX = plan->task(num)->ganttData()->startX( start, minsPP );
   int  thisX  = endX( start, minsPP );
-  int  sign   = thisY > otherY ? 1 : -1;
-  int  h      = height( p );
+  int  signY  = thisY > otherY ? 1 : -1;
+  int  mileX  = milestoneHeight( p ) / 2;
+  int  arrow  = 4 * mileX / 5;
+  int  taskY  = signY*( taskBarHeight( p ) / 2 + arrow );
+
+  // if other task is milestone adjust for milestone size
+  if ( plan->task(num)->isMilestone() ) otherX += mileX;
+
+  int  lineX  = thisX < otherX-3 ? thisX : otherX-3;
 
   p->setPen( Qt::darkGray );
 
-  if ( thisX == otherX  || thisX == otherX-1 )
+  if ( thisX <= otherX )
   {
-    p->drawLine( otherX-1, otherY,      otherX-2, otherY );
-    p->drawLine( otherX-3, otherY+sign, otherX-3, thisY-sign*(h/2+2) );
-    verticalArrow( p, otherX-3, thisY-sign*h/2, (sign*h*2)/5 );
+    p->drawLine( otherX-1, otherY      , lineX+1, otherY );
+    p->drawLine( lineX   , otherY+signY, lineX  , thisY-taskY );
+    verticalArrow( p, lineX, thisY-taskY+signY*arrow, signY*arrow );
   }
-  else if ( thisX > otherX )
+  else // if ( thisX > otherX )
   {
-    p->drawLine( otherX-1, otherY,      thisX+1, otherY );
-    p->drawLine( thisX,    otherY+sign, thisX,   thisY-sign*(h/2+2) );
-    verticalArrow( p, thisX, thisY-sign*h/2, (sign*h*2)/5 );
-  }
-  else // if ( thisX < otherX )
-  {
+    // if this task is milestone adjust for milestone size
+    if ( m_value.isEmpty() ) thisX -= mileX;
+
     p->drawLine( otherX-1, otherY,      otherX-2, otherY );
-    p->drawLine( otherX-3, otherY+sign, otherX-3, otherY+sign*(h/2+2) );
-    p->drawLine( otherX-2, otherY+sign*(h/2+3), thisX+6, otherY+sign*(h/2+3));
-    p->drawLine( thisX+7, otherY+sign*(h/2+4), thisX+7, thisY-sign );
-    p->drawLine( thisX+6, thisY, thisX+2, thisY );
-    horizontalArrow( p, thisX, thisY, (h*2)/5 );
+    p->drawLine( otherX-3, otherY+signY, otherX-3, otherY+taskY-signY );
+    p->drawLine( otherX-2, otherY+taskY, thisX+arrow+2, otherY+taskY );
+    p->drawLine( thisX+arrow+3, otherY+taskY+signY, thisX+arrow+3, thisY-signY );
+    p->drawLine( thisX+arrow+2, thisY, thisX+arrow, thisY );
+    horizontalArrow( p, thisX+1, thisY, -arrow );
   }
 }
 
@@ -258,10 +252,25 @@ void GanttData::drawDependencySS( QPainter* p, int thisY, int otherY, int num,
                                   DateTime start, double minsPP )
 {
   // draw dependency START_START line on gantt
-  qDebug("GanttData::drawDependencySS  thisY=%i  otherY=%i  num=%i",thisY,otherY,num);
-  Q_UNUSED(p)
-  Q_UNUSED(start)
-  Q_UNUSED(minsPP)
+  int  otherX = plan->task( num )->ganttData()->startX( start, minsPP );
+  int  thisX  = startX( start, minsPP );
+  int  signY  = thisY > otherY ? 1 : -1;
+  int  mileX  = milestoneHeight( p ) / 2;
+  int  arrow  = 4 * mileX / 5;
+
+  // if other task is milestone adjust for milestone size
+  if ( plan->task(num)->isMilestone() ) otherX -= mileX;
+
+  // if this task is milestone adjust for milestone size
+  if ( m_value.isEmpty() ) thisX -= mileX;
+
+  int  lineX  = thisX-3-arrow < otherX-4 ? thisX-3-arrow : otherX-4;
+
+  p->setPen( Qt::darkGray );
+  p->drawLine( otherX-1, otherY,       lineX+1, otherY );
+  p->drawLine( lineX   , otherY+signY, lineX  , thisY-signY );
+  p->drawLine( thisX-3 , thisY,        lineX+1, thisY );
+  horizontalArrow( p, thisX, thisY, arrow );
 }
 
 /**************************************** drawDependencyFF ***************************************/
@@ -270,10 +279,25 @@ void GanttData::drawDependencyFF( QPainter* p, int thisY, int otherY, int num,
                                   DateTime start, double minsPP )
 {
   // draw dependency FINISH_FINISH line on gantt
-  qDebug("GanttData::drawDependencyFF  thisY=%i  otherY=%i  num=%i",thisY,otherY,num);
-  Q_UNUSED(p)
-  Q_UNUSED(start)
-  Q_UNUSED(minsPP)
+  int  otherX = plan->task( num )->ganttData()->endX( start, minsPP );
+  int  thisX  = endX( start, minsPP );
+  int  signY  = thisY > otherY ? 1 : -1;
+  int  mileX  = milestoneHeight( p ) / 2;
+  int  arrow  = 4 * mileX / 5;
+
+  // if other task is milestone adjust for milestone size
+  if ( plan->task(num)->isMilestone() ) otherX += mileX;
+
+  // if this task is milestone adjust for milestone size
+  if ( m_value.isEmpty() ) thisX += mileX;
+
+  int  lineX  = thisX+3+arrow > otherX+4 ? thisX+3+arrow : otherX+4;
+
+  p->setPen( Qt::darkGray );
+  p->drawLine( otherX+1, otherY,       lineX-1, otherY );
+  p->drawLine( lineX   , otherY+signY, lineX  , thisY-signY );
+  p->drawLine( thisX+3 , thisY,        lineX-1, thisY );
+  horizontalArrow( p, thisX+1, thisY, -arrow );
 }
 
 /******************************************** drawTask *******************************************/
@@ -304,14 +328,14 @@ void GanttData::drawMilestone( QPainter* p, int y, DateTime start, double minsPP
 {
   // calc x position of milestone & height
   int x = startX( start, minsPP );
-  int h = 1 + height( p ) / 3;
+  int h = milestoneHeight( p ) / 2;
 
   // populate points array to draw the milestone
   QPoint points[4];
-  points[0] = QPoint( x  , y-h );
-  points[1] = QPoint( x+h, y   );
-  points[2] = QPoint( x  , y+h );
-  points[3] = QPoint( x-h, y   );
+  points[0] = QPoint( x,     y-h );
+  points[1] = QPoint( x+h+1, y   );
+  points[2] = QPoint( x,     y+h+1 );
+  points[3] = QPoint( x-h,   y   );
 
   // draw the milestone
   p->setPen( Qt::NoPen );
@@ -326,7 +350,7 @@ void GanttData::drawSummary( QPainter* p, int y, DateTime start, double minsPP )
   // calc x positions of summary & height
   int xs = startX( start, minsPP );
   int xe = endX( start, minsPP );
-  int h  = 1 + height( p ) / 3;
+  int h  = milestoneHeight( p ) / 2;
   int w  = h;
   if ( w > xe - xs ) w = xe - xs;
 
@@ -354,7 +378,7 @@ void GanttData::drawTaskBar( QPainter* p, int ty, DateTime start, double minsPP 
   float scale = 0.0;
   for( int period=0 ; period<m_value.size() ; period++ )
     if ( m_value[period] > scale ) scale = m_value[period];
-  scale *= height( p ) / 2;
+  scale *= taskBarHeight( p ) / 2;
 
   // set pen and fill colours
   p->setPen( QColor( Qt::blue ) );

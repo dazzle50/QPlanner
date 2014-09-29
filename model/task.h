@@ -84,10 +84,8 @@ public:
   static bool       scheduleOrder( Task*, Task* );                // less than function for qSort
   void              schedule();                                   // schedule task
   void              schedule_ASAP_FDUR();                         // schedule ASAP fixed duration
-  DateTime          scheduleStart() const;                        // determine start based on predecessors
-  DateTime          scheduleEnd_ASAP_FDUR() const;                // determine end based on duration
-  DateTime          scheduleEnd() const;                          // determine end based on predecessors
-  DateTime          scheduleStart_ASAP_FDUR() const;              // determine start based on duration
+  DateTime          startDueToPredecessors() const;               // determine start based on predecessors
+  DateTime          endDueToPredecessors() const;                 // determine end based on predecessors
 
   static QString    typeToString( int );                          // return type string equivalent
 
