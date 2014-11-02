@@ -46,6 +46,11 @@
 /***************************** Tabbed widget containing main screens *****************************/
 /*************************************************************************************************/
 
+QTableView*  MainTabWidget::tasksTable() { return ui->tasksView; }
+QTableView*  MainTabWidget::resourcesTable() { return ui->resourcesView; }
+QTableView*  MainTabWidget::calendarsTable() { return ui->calendarsView; }
+QTableView*  MainTabWidget::daysTable() { return ui->daysView; }
+
 /****************************************** constructor ******************************************/
 
 MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new Ui::MainTabWidget )
@@ -135,6 +140,8 @@ MainTabWidget::MainTabWidget( QWidget* parent ) : QTabWidget( parent ), ui( new 
   sizes[0] = ui->tasksView->horizontalHeader()->sectionSize( 0 ) +
              ui->tasksView->horizontalHeader()->sectionSize( 1 ) +
              ui->tasksView->horizontalHeader()->sectionSize( 2 ) +
+             ui->tasksView->horizontalHeader()->sectionSize( 3 ) +
+             ui->tasksView->horizontalHeader()->sectionSize( 4 ) +
              ui->tasksView->verticalHeader()->width();
   sizes[1] = sizes[0];
   ui->tasksGanttSplitter->setSizes( sizes );
@@ -278,12 +285,12 @@ void MainTabWidget::saveTasksGanttToStream( QXmlStreamWriter* stream )
 
   stream->writeAttribute( "start", XDateTime::toString( ui->ganttView->start(), "yyyy-MM-ddThh:mm" ) );
   stream->writeAttribute( "end", XDateTime::toString( ui->ganttView->end(), "yyyy-MM-ddThh:mm" ) );
-  stream->writeAttribute( "minspp", QString("%1").arg( ui->ganttView->minsPP() ) );
+  stream->writeAttribute( "minspp", QString::number( ui->ganttView->minsPP() ) );
   stream->writeAttribute( "nonworking", "TODO" );
   stream->writeAttribute( "current", "TODO" );
   stream->writeAttribute( "upper", "TODO" );
   stream->writeAttribute( "lower", "TODO" );
-  stream->writeAttribute( "splitter", "TODO" );
+  stream->writeAttribute( "splitter", QString::number( ui->tasksGanttSplitter->sizes().at(0) ) );
 
   stream->writeStartElement( "upper-scale" );
   stream->writeAttribute( "interval", ui->ganttView->upperInterval() );
@@ -295,9 +302,7 @@ void MainTabWidget::saveTasksGanttToStream( QXmlStreamWriter* stream )
   stream->writeAttribute( "format", ui->ganttView->lowerFormat() );
   stream->writeEndElement();  // lower-scale
 
-  // <row id="x" height="y"/>
-  // <column id="x" width="y"/>
-
+  saveColumnsRowsToStream( ui->tasksView, stream );
   stream->writeEndElement();  // tasks-gantt
 }
 
@@ -307,10 +312,7 @@ void MainTabWidget::saveResourcesTabToStream( QXmlStreamWriter* stream )
 {
   // write resources-tab data to xml stream
   stream->writeStartElement( "resources-tab" );
-
-  // <row id="x" height="y"/>
-  // <column id="x" width="y"/>
-
+  saveColumnsRowsToStream( ui->resourcesView, stream );
   stream->writeEndElement();  // resources-tab
 }
 
@@ -320,10 +322,7 @@ void MainTabWidget::saveCalendarsTabToStream( QXmlStreamWriter* stream )
 {
   // write calendars-tab data to xml stream
   stream->writeStartElement( "calendars-tab" );
-
-  // <row id="x" height="y"/>
-  // <column id="x" width="y"/>
-
+  saveColumnsRowsToStream( ui->calendarsView, stream );
   stream->writeEndElement();  // calendars-tab
 }
 
@@ -333,11 +332,36 @@ void MainTabWidget::saveDaysTabToStream( QXmlStreamWriter* stream )
 {
   // write days-tab data to xml stream
   stream->writeStartElement( "days-tab" );
-
-  // <row id="x" height="y"/>
-  // <column id="x" width="y"/>
-
+  saveColumnsRowsToStream( ui->daysView, stream );
   stream->writeEndElement();  // days-tab
+}
+
+/************************************** columnsRowsToStream **************************************/
+
+void MainTabWidget::saveColumnsRowsToStream( QTableView* table, QXmlStreamWriter* stream )
+{
+  // write tableview column position and size to xml stream
+  stream->writeStartElement( "columns" );
+  for( int i = 0 ; i < table->model()->columnCount() ; i++ )
+  {
+    stream->writeStartElement( "column" );
+    stream->writeAttribute( "id", QString::number(i) );
+    stream->writeAttribute( "position", QString::number( table->horizontalHeader()->visualIndex(i) ) );
+    stream->writeAttribute( "size", QString::number( table->horizontalHeader()->sectionSize(i) ) );
+    stream->writeEndElement();  // column
+  }
+  stream->writeEndElement();  // columns
+
+  // write tableview row size to xml stream
+  stream->writeStartElement( "rows" );
+  for( int i = 0 ; i < table->model()->rowCount() ; i++ )
+  {
+    stream->writeStartElement( "row" );
+    stream->writeAttribute( "id", QString::number(i) );
+    stream->writeAttribute( "size", QString::number( table->rowHeight(i) ) );
+    stream->writeEndElement();  // row
+  }
+  stream->writeEndElement();  // rows
 }
 
 /************************************** getGanttAttributes ***************************************/

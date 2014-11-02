@@ -28,6 +28,7 @@ class QUndoView;
 class QItemSelection;
 class MainTabWidget;
 class QXmlStreamReader;
+class QTableView;
 
 /*************************************************************************************************/
 /********************* Main application window showing tabbed main screens ***********************/
@@ -47,6 +48,12 @@ public:
   bool savePlan( QString );                    // save plan to xml file
   bool loadPlan( QString );                    // load plan from xml file
   void loadDisplayData( QXmlStreamReader* );   // load display data from xml stream
+  void loadTableColumnsRows( QList<QTableView*>, QXmlStreamReader*, QString );
+
+  QList<QTableView*> listTasksTables();        // list task tables in all windows
+  QList<QTableView*> listResourcesTables();    // list resource tables in all windows
+  QList<QTableView*> listCalendarsTables();    // list calendar tables in all windows
+  QList<QTableView*> listDaysTables();         // list day tables in all windows
 
 public slots:
   void slotUndoStackView( bool );              // slot for actionUndoStackView triggered signal

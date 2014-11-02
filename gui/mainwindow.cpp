@@ -24,6 +24,7 @@
 #include <QXmlStreamWriter>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QTableView>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -47,7 +48,7 @@ MainWindow::MainWindow( QWidget* parent ) : QMainWindow( parent ), ui( new Ui::M
   // setup ui for main window including central widget of tabs
   ui->setupUi( this );
   setCentralWidget( m_tabs );
-  resize( 900, 450 );
+  resize( 1200, 650 );
 
   // ensure menus and plan tab are kept up-to-date when current tab changes
   slotTabChange( m_tabs->currentIndex() );
@@ -142,7 +143,7 @@ bool MainWindow::savePlan( QString filename )
   stream.setAutoFormatting( true );
   stream.writeStartDocument();
   stream.writeStartElement( "projectplanner" );
-  stream.writeAttribute( "version", "2014-08" );
+  stream.writeAttribute( "version", "2014-10" );
   stream.writeAttribute( "user", who );
   stream.writeAttribute( "when", when.toString(Qt::ISODate) );
   plan->saveToStream( &stream );
@@ -210,13 +211,13 @@ bool MainWindow::loadPlan( QString filename )
     return false;
   }
 
-  // no errors when loading plan, and plan is ok, so load display data
+  // no errors when loading plan, and plan is ok, so delete old plan, set models, load display data
+  delete oldPlan;
+  setModels();
   loadDisplayData( &stream );
   file.close();
 
-  // delete old plan, set models, and schedule
-  delete oldPlan;
-  setModels();
+  // schedule, set title, update plan tab etc
   plan->schedule();
   message( QString("Loaded '%1'").arg(filename) );
   setTitle( plan->filename() );
@@ -232,32 +233,144 @@ void MainWindow::loadDisplayData( QXmlStreamReader* stream )
   while ( !stream->atEnd() )
   {
     stream->readNext();
-    if ( stream->isStartElement() )
+    if ( stream->isStartElement() && stream->name() == "tasks-gantt" )
     {
-      if ( stream->name() == "tasks-gantt" )
+      DateTime  start, end;
+      double    mpp;
+
+      m_tabs->getGanttAttributes( start, end, mpp );
+      foreach( QXmlStreamAttribute attribute, stream->attributes() )
       {
-        DateTime  start, end;
-        double    mpp;
+        if ( attribute.name() == "start" )
+          start = XDateTime::fromString( attribute.value().toString() );
 
-        m_tabs->getGanttAttributes( start, end, mpp );
-        foreach( QXmlStreamAttribute attribute, stream->attributes() )
-        {
-          if ( attribute.name() == "start" )
-            start = XDateTime::fromString( attribute.value().toString() );
+        if ( attribute.name() == "end" )
+          end = XDateTime::fromString( attribute.value().toString() );;
 
-          if ( attribute.name() == "end" )
-            end = XDateTime::fromString( attribute.value().toString() );;
-
-          if ( attribute.name() == "minspp" )
-            mpp = attribute.value().toString().toDouble();
-        }
-        m_tabs->setGanttAttributes( start, end, mpp );
-        foreach( MainTabWidget* tabs, m_windows )
-          if (tabs) tabs->setGanttAttributes( start, end, mpp );
-
+        if ( attribute.name() == "minspp" )
+          mpp = attribute.value().toString().toDouble();
       }
+      m_tabs->setGanttAttributes( start, end, mpp );
+      foreach( MainTabWidget* tabs, m_windows )
+        if (tabs) tabs->setGanttAttributes( start, end, mpp );
+
+      QList<QTableView*> tables = listTasksTables();
+      loadTableColumnsRows( tables, stream, "tasks-gantt" );
+    }
+
+    if ( stream->isStartElement() && stream->name() == "resources-tab" )
+      loadTableColumnsRows( listResourcesTables(), stream, stream->name().toString() );
+
+    if ( stream->isStartElement() && stream->name() == "calendars-tab" )
+      loadTableColumnsRows( listCalendarsTables(), stream, stream->name().toString() );
+
+    if ( stream->isStartElement() && stream->name() == "days-tab" )
+      loadTableColumnsRows( listDaysTables(), stream, stream->name().toString() );
+  }
+}
+
+/************************************* loadTableColumnsRows **************************************/
+
+void MainWindow::loadTableColumnsRows( QList<QTableView*> tables,
+                                       QXmlStreamReader* stream,
+                                       QString endElement )
+{
+  // until end element, read XML and adopt column & row attributes
+  while ( !stream->atEnd() && !(stream->isEndElement() && stream->name() == endElement ) )
+  {
+    stream->readNext();
+
+    // if column element, get attributes and update tables appropriately
+    if ( stream->isStartElement() && stream->name() == "column" )
+    {
+      // get column id, pos & size from XML
+      int id = -1, pos = -1, size = -1;
+      foreach( QXmlStreamAttribute attribute, stream->attributes() )
+      {
+        if ( attribute.name() == "id" )       id   = attribute.value().toInt();
+        if ( attribute.name() == "position" ) pos  = attribute.value().toInt();
+        if ( attribute.name() == "size" )     size = attribute.value().toInt();
+      }
+
+      if ( id >= 0 && size >= 0 )
+        foreach( QTableView* table, tables )
+          table->setColumnWidth( id, size );
+
+      // TODO
+      //if ( id >= 0 && pos > 0 )
+      //  foreach( QTableView* table, tables )
+      //    table->horizontalHeader()->moveSection( ???? );
+    }
+
+    // if row element, get attributes and update tables appropriately
+    if ( stream->isStartElement() && stream->name() == "row" )
+    {
+      // get row id & size from XML
+      int id = -1, size = -1;
+      foreach( QXmlStreamAttribute attribute, stream->attributes() )
+      {
+        if ( attribute.name() == "id" )   id   = attribute.value().toInt();
+        if ( attribute.name() == "size" ) size = attribute.value().toInt();
+      }
+
+      // update row height on each table if both id & size set
+      if ( id >= 0 && size >= 0 )
+        foreach( QTableView* table, tables )
+          table->setRowHeight( id, size );
     }
   }
+}
+
+/**************************************** listTasksTables ****************************************/
+
+QList<QTableView*> MainWindow::listTasksTables()
+{
+  // return list of QTableViews showing Tasks in tab widgets
+  QList<QTableView*> list;
+  list.append( m_tabs->tasksTable() );
+  foreach( MainTabWidget* tabs, m_windows )
+    list.append( tabs->tasksTable() );
+
+  return list;
+}
+
+/************************************** listResourcesTables **************************************/
+
+QList<QTableView*> MainWindow::listResourcesTables()
+{
+  // return list of QTableViews showing Resources in tab widgets
+  QList<QTableView*> list;
+  list.append( m_tabs->resourcesTable() );
+  foreach( MainTabWidget* tabs, m_windows )
+    list.append( tabs->resourcesTable() );
+
+  return list;
+}
+
+/************************************** listCalendarsTables **************************************/
+
+QList<QTableView*> MainWindow::listCalendarsTables()
+{
+  // return list of QTableViews showing Calendars in tab widgets
+  QList<QTableView*> list;
+  list.append( m_tabs->calendarsTable() );
+  foreach( MainTabWidget* tabs, m_windows )
+    list.append( tabs->calendarsTable() );
+
+  return list;
+}
+
+/**************************************** listDaysTables *****************************************/
+
+QList<QTableView*> MainWindow::listDaysTables()
+{
+  // return list of QTableViews showing Day Types in tab widgets
+  QList<QTableView*> list;
+  list.append( m_tabs->daysTable() );
+  foreach( MainTabWidget* tabs, m_windows )
+    list.append( tabs->daysTable() );
+
+  return list;
 }
 
 /******************************************* setTitle ********************************************/

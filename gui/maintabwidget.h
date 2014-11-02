@@ -26,6 +26,7 @@
 
 class QItemSelectionModel;
 class QXmlStreamWriter;
+class QTableView;
 
 #include "model/datetime.h"
 
@@ -54,6 +55,7 @@ public:
   void  saveResourcesTabToStream( QXmlStreamWriter* );
   void  saveCalendarsTabToStream( QXmlStreamWriter* );
   void  saveDaysTabToStream( QXmlStreamWriter* );
+  void  saveColumnsRowsToStream( QTableView*, QXmlStreamWriter* );
 
   void  getGanttAttributes( DateTime&,
                             DateTime&,
@@ -64,6 +66,11 @@ public:
 
   QItemSelectionModel*  tasksSelectionModel();    // return selection model for tasks table view
   QModelIndexList       tasksSelectionIndexes();  // return selected indexes on tasks table view
+
+  QTableView*           tasksTable();             // return pointer to tasks table
+  QTableView*           resourcesTable();         // return pointer to resources table
+  QTableView*           calendarsTable();         // return pointer to calendars table
+  QTableView*           daysTable();              // return pointer to tasks table
 
 public slots:
   void  slotUpdatePlanTab();         // ensure 'Plan' tab widgets are up-to-date
