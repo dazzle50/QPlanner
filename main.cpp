@@ -48,5 +48,6 @@ int main( int argc, char* argv[] )
   // create application main window & enter main event loop
   MainWindow window;
   window.show();
+  window.loadPlan("C:\\Users\\Richard\\Documents\\Qt\\!tests\\!defaultload.xml");
   return app.exec();
 }

@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     delegate/xdatetimeedit.cpp \
     model/predecessors.cpp \
     model/ganttdata.cpp \
-    model/taskresources.cpp
+    model/taskresources.cpp \
+    model/resourcefree.cpp
 
 HEADERS  += \
     gui/mainwindow.h \
@@ -78,7 +79,8 @@ HEADERS  += \
     model/task_schedule.h \
     model/predecessors.h \
     model/ganttdata.h \
-    model/taskresources.h
+    model/taskresources.h \
+    model/resourcefree.h
 
 FORMS += \
     gui/mainwindow.ui \
